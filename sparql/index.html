@@ -595,12 +595,10 @@
                     select: function (ele) {
                         let oldId = ele.id();
                         let newNodeVarId = '?node_' + (cy.nodes().length + 1);
-                        ele.data('label', '?');
-                        ele.data('type', 'variable');
 
                         var oldNodeData = ele.data();
                         var oldNodePosition = ele.position();
-                        let newData = Object.assign({}, oldNodeData, { id: newNodeVarId });
+                        let newData = Object.assign({}, oldNodeData, { id: newNodeVarId, label: '?', type: 'variable' });
 
                         cy.add({
                             group: 'nodes',
