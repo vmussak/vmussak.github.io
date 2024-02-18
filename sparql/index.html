@@ -16,6 +16,8 @@
 </head>
 
 <body>
+    <input type="file" id="upload-json" accept=".json" style="display: none;">
+
     <main>
         <div class="navbar-fixed">
             <nav class="blue">
@@ -23,11 +25,14 @@
                     <a href="#" class="brand-logo"><img class="responsive-img" style="width: 60px;"
                             src="https://cygri.github.io/rdf-logos/svg/sparql.svg" /></a>
                     <ul class="right hide-on-med-and-down">
-                        <li><a href="#" onclick="loadQuery()"><i class="material-icons left">upload</i>Upload Query</a></li>
-                        <li><a href="#" onclick="saveQuery()"><i class="material-icons left">download</i>Export Query</a>
+                        <li><a href="#" onclick="loadQuery()"><i class="material-icons left">upload</i>Upload Query</a>
                         </li>
-                        <li><a href="#" onclick="seeSparqlQuery()"><i class="material-icons left">query_stats</i>See SPARQL Query</a></li>
-                        <li><a href="login.html"><i class="material-icons left">logout</i>Logout</a></li>
+                        <li><a href="#" onclick="saveQuery()"><i class="material-icons left">download</i>Export
+                                Query</a>
+                        </li>
+                        <li><a href="#" onclick="seeSparqlQuery()"><i class="material-icons left">query_stats</i>See
+                                SPARQL Query</a></li>
+                        <!-- <li><a href="login.html"><i class="material-icons left">logout</i>Logout</a></li> -->
                     </ul>
                 </div>
             </nav>
@@ -39,6 +44,10 @@
                         <i class="material-icons prefix white-text">search</i>
                         <input id="input-busca-elementos" type="text" class="autocomplete white-text">
                         <label for="input-busca-elementos" class="white-text">Search</label>
+                    </div>
+                    <div class="input-field col s1">
+                        <input id="input-max-results" type="number" class="white-text" value="20">
+                        <label for="input-max-results" class="white-text">Max Results</label>
                     </div>
                     <div class="input-field col s6 right">
                         <i class="material-icons prefix white-text">link</i>
@@ -53,20 +62,20 @@
 
         <div id="colorModal"
             style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:1000; background-color: #666; padding:20px; border-radius:5px;">
-            <h4>Escolha um filtro:</h4>
-            <button data-type="contém">Contém</button>
-            <button data-type="começa com">Começa com</button>
-            <button data-type="termina com">Termina com</button>
+            <h4>Pick a filter:</h4>
+            <button data-type="contém">Contains</button>
+            <button data-type="começa com">Starts with</button>
+            <button data-type="termina com">End with</button>
         </div>
 
         <div id="grid-resultado-consulta" class="modal bottom-sheet">
             <a href="#!" class="modal-close waves-effect waves-green btn-flat blue white-text right">x</a>
             <div class="modal-content">
-                <h4>Resultados da consulta</h4>
+                <h4>Query results</h4>
                 <table>
                     <thead>
                         <tr>
-                            <th>Propriedade</th>
+                            <th>Property</th>
                             <th>Label</th>
                         </tr>
                     </thead>
@@ -77,18 +86,18 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <a href="#!" class="modal-close waves-effect waves-green btn-flat blue white-text">Fechar</a>
+                <a href="#!" class="modal-close waves-effect waves-green btn-flat blue white-text">Close</a>
             </div>
         </div>
 
         <div id="modal-sparql" class="modal">
             <a href="#!" class="modal-close waves-effect waves-green btn-flat blue white-text right">x</a>
             <div class="modal-content">
-                <h4>Consulta gerada</h4>
+                <h4>SPARQL Query</h4>
                 <pre><code id="modal-sparql-content"></code></pre>
             </div>
             <div class="modal-footer">
-                <a href="#!" class="modal-close waves-effect waves-green btn-flat blue white-text">Fechar</a>
+                <a href="#!" class="modal-close waves-effect waves-green btn-flat blue white-text">Close</a>
             </div>
         </div>
 
@@ -118,15 +127,15 @@
         for (var i = 0; i < conjuntos[conjuntoQuery].length; i++) {
             var item = conjuntos[conjuntoQuery][i];
             if (item.data('source') && item.data('target')) {
-                if(item.data('source').includes('?')){
+                if (item.data('source').includes('?')) {
                     variableName = item.data('source');
                 }
 
-                if(item.data('target').includes('?')){
+                if (item.data('target').includes('?')) {
                     variableName = item.data('target');
                 }
 
-                if(item.data('id').includes('?')){
+                if (item.data('id').includes('?')) {
                     variableName = item.data('id');
                 }
 
@@ -139,7 +148,7 @@
         }
 
         $.ajax({
-            url: 'https://localhost:7070/api/query/sparql',
+            url: 'https://sparql-query-easy.azurewebsites.net/api/query/sparql',
             type: 'post',
             cache: false,
             data: JSON.stringify({
@@ -155,7 +164,7 @@
                 abrirModalSparql();
             },
             error: function (err) {
-                $("#modal-sparql-content").html("Tente novamente mais tarde.");
+                $("#modal-sparql-content").html("Try again later.");
                 console.log(err);
                 abrirModalSparql();
             }
@@ -164,7 +173,7 @@
 
     function getElementInfo(elementId) {
         $.ajax({
-            url: 'https://localhost:7070/api/query/relationships',
+            url: 'https://sparql-query-easy.azurewebsites.net/api/query/relationships',
             type: 'post',
             cache: false,
             data: JSON.stringify({
@@ -192,7 +201,7 @@
                 abrirModal();
             },
             error: function (err) {
-                $("#table-results-body").html("Tente novamente mais tarde.");
+                $("#table-results-body").html("Try again later.");
                 console.log(err);
                 abrirModal();
             }
@@ -201,7 +210,7 @@
 
     function getQuery(variableName, filters) {
         $.ajax({
-            url: 'https://localhost:7070/api/query',
+            url: 'https://sparql-query-easy.azurewebsites.net/api/query',
             type: 'post',
             cache: false,
             data: JSON.stringify({
@@ -228,7 +237,7 @@
                 abrirModal();
             },
             error: function (err) {
-                $("#table-results-body").html("Tente novamente mais tarde.");
+                $("#table-results-body").html("Try again later.");
                 console.log(err);
                 abrirModal();
             }
@@ -239,7 +248,7 @@
         let parameters = trData[nodeLine];
 
         $.ajax({
-            url: 'https://localhost:7070/api/query/relationship-value',
+            url: 'https://sparql-query-easy.azurewebsites.net/api/query/relationship-value',
             type: 'post',
             cache: false,
             data: JSON.stringify({
@@ -281,19 +290,48 @@
     }
 
     function saveQuery() {
-        var queryData = cy.json();
-        console.log(cy.json())
-        localStorage.setItem('query', JSON.stringify(queryData));
+        let queryData = cy.json();
+        let jsonData = JSON.stringify(queryData)
+
+        var blob = new Blob([jsonData], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "query_exported.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 
     function loadQuery() {
-        var cyData = localStorage.getItem('query');
-        let savedCyData = JSON.parse(cyData)
-
-        cy.json({
-            elements: savedCyData.elements
-        });
+        var input = document.getElementById("upload-json");
+        input.click();
     }
+
+    document.getElementById("upload-json").addEventListener("change", function () {
+        if (this.files.length > 0) {
+            var arquivo = this.files[0];
+
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                let savedCyData = JSON.parse(e.target.result);
+
+                if (savedCyData.elements && savedCyData.elements.nodes) {
+                    cy.json({
+                        elements: savedCyData.elements
+                    });
+                } else {
+                    alert('O JSON informado não é válido.')
+                }
+            };
+            reader.readAsText(arquivo);
+        } else {
+            cy.json({
+                elements: {}
+            });
+        }
+    });
 
     $(document).ready(function () {
         $('#grid-resultado-consulta').modal();
@@ -304,7 +342,7 @@
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(function () {
                 $.ajax({
-                    url: 'https://localhost:7070/api/query/search',
+                    url: 'https://sparql-query-easy.azurewebsites.net/api/query/search',
                     type: 'post',
                     cache: false,
                     data: JSON.stringify({ "search": $("#input-busca-elementos").val() }),
