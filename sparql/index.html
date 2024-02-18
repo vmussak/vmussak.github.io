@@ -118,6 +118,17 @@
         $('#modal-sparql').modal('open');
     }
 
+    function getLimit() {
+        let limitInputValue = +$("#input-max-results").val();
+        let limit = 20;
+
+        if (!isNaN(limitInputValue)) {
+            limit = limitInputValue;
+        }
+
+        return limit;
+    }
+
     function seeSparqlQuery() {
         let conjuntos = cy.elements().components();
         let conjuntoQuery = 0;
@@ -153,7 +164,8 @@
             cache: false,
             data: JSON.stringify({
                 "where": filters,
-                "variableName": variableName
+                "variableName": variableName,
+                "limit": getLimit()
             }),
             headers: {
                 'Content-Type': 'application/json'
@@ -215,7 +227,8 @@
             cache: false,
             data: JSON.stringify({
                 "where": filters,
-                "variableName": variableName
+                "variableName": variableName,
+                "limit": getLimit()
             }),
             headers: {
                 'Content-Type': 'application/json'
@@ -345,7 +358,10 @@
                     url: 'https://sparql-query-easy.azurewebsites.net/api/query/search',
                     type: 'post',
                     cache: false,
-                    data: JSON.stringify({ "search": $("#input-busca-elementos").val() }),
+                    data: JSON.stringify({
+                        "search": $("#input-busca-elementos").val(),
+                        "limit": getLimit()
+                    }),
                     headers: {
                         'Content-Type': 'application/json'
                     },
