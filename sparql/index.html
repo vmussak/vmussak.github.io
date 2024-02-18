@@ -1,1 +1,720 @@
-sparql index...
+<html lang="pt-br">
+
+<head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="grafos.css">
+    <script src="https://unpkg.com/cytoscape@latest/dist/cytoscape.min.js"></script>
+    <script src="https://unpkg.com/cytoscape-html-label@1.1.7/dist/cytoscape-html-label.js"></script>
+    <script src="cytoscape-cxtmenu.js"></script>
+    <!-- <script src="https://unpkg.com/cytoscape-edgehandles@4.0.1/cytoscape-edgehandles.js"></script> -->
+    <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+
+<body>
+    <main>
+        <div class="navbar-fixed">
+            <nav class="blue">
+                <div class="nav-wrapper">
+                    <a href="#" class="brand-logo"><img class="responsive-img" style="width: 60px;"
+                            src="https://cygri.github.io/rdf-logos/svg/sparql.svg" /></a>
+                    <ul class="right hide-on-med-and-down">
+                        <li><a href="#" onclick="loadQuery()"><i class="material-icons left">upload</i>Upload Query</a></li>
+                        <li><a href="#" onclick="saveQuery()"><i class="material-icons left">download</i>Export Query</a>
+                        </li>
+                        <li><a href="#" onclick="seeSparqlQuery()"><i class="material-icons left">query_stats</i>See SPARQL Query</a></li>
+                        <li><a href="login.html"><i class="material-icons left">logout</i>Logout</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <div class="row blue darken-4">
+            <form class="col s12">
+                <div class="row">
+                    <div class="input-field col s3">
+                        <i class="material-icons prefix white-text">search</i>
+                        <input id="input-busca-elementos" type="text" class="autocomplete white-text">
+                        <label for="input-busca-elementos" class="white-text">Search</label>
+                    </div>
+                    <div class="input-field col s6 right">
+                        <i class="material-icons prefix white-text">link</i>
+                        <input id="input-endpoint-sparql" type="text" class="white-text">
+                        <label for="input-endpoint-sparql" class="white-text">SPARQL endpoint</label>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="cy" style="width: 100%; height: 90%;"></div>
+
+        <div id="colorModal"
+            style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:1000; background-color: #666; padding:20px; border-radius:5px;">
+            <h4>Escolha um filtro:</h4>
+            <button data-type="contém">Contém</button>
+            <button data-type="começa com">Começa com</button>
+            <button data-type="termina com">Termina com</button>
+        </div>
+
+        <div id="grid-resultado-consulta" class="modal bottom-sheet">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat blue white-text right">x</a>
+            <div class="modal-content">
+                <h4>Resultados da consulta</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Propriedade</th>
+                            <th>Label</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="table-results-body">
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close waves-effect waves-green btn-flat blue white-text">Fechar</a>
+            </div>
+        </div>
+
+        <div id="modal-sparql" class="modal">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat blue white-text right">x</a>
+            <div class="modal-content">
+                <h4>Consulta gerada</h4>
+                <pre><code id="modal-sparql-content"></code></pre>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close waves-effect waves-green btn-flat blue white-text">Fechar</a>
+            </div>
+        </div>
+
+    </main>
+</body>
+
+
+<script>
+    var searches = {};
+    var trData = {};
+    var cy = null;
+
+    function abrirModal() {
+        $('#grid-resultado-consulta').modal('open');
+    }
+
+    function abrirModalSparql() {
+        $('#modal-sparql').modal('open');
+    }
+
+    function seeSparqlQuery() {
+        let conjuntos = cy.elements().components();
+        let conjuntoQuery = 0;
+        let variableName = '';
+        let filters = [];
+
+        for (var i = 0; i < conjuntos[conjuntoQuery].length; i++) {
+            var item = conjuntos[conjuntoQuery][i];
+            if (item.data('source') && item.data('target')) {
+                if(item.data('source').includes('?')){
+                    variableName = item.data('source');
+                }
+
+                if(item.data('target').includes('?')){
+                    variableName = item.data('target');
+                }
+
+                if(item.data('id').includes('?')){
+                    variableName = item.data('id');
+                }
+
+                filters.push({
+                    subject: item.data('source'),
+                    predicate: item.data('id'),
+                    object: item.data('target')
+                })
+            }
+        }
+
+        $.ajax({
+            url: 'https://localhost:7070/api/query/sparql',
+            type: 'post',
+            cache: false,
+            data: JSON.stringify({
+                "where": filters,
+                "variableName": variableName
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            success: function (data) {
+                console.log(data.data)
+                $("#modal-sparql-content").html(escapeHTML(data.data));
+                abrirModalSparql();
+            },
+            error: function (err) {
+                $("#modal-sparql-content").html("Tente novamente mais tarde.");
+                console.log(err);
+                abrirModalSparql();
+            }
+        });
+    }
+
+    function getElementInfo(elementId) {
+        $.ajax({
+            url: 'https://localhost:7070/api/query/relationships',
+            type: 'post',
+            cache: false,
+            data: JSON.stringify({
+                //"endpointUrl": null,
+                "id": elementId
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            success: function (data) {
+                let linhas = "";
+                for (let i = 0; i < data.data.length; i++) {
+                    trData[i] = {
+                        subjectId: elementId,
+                        predicateId: data.data[i].propertyId,
+                        predicateLabel: data.data[i].propertyLabel,
+                        isLiteral: data.data[i].propertyType == "label" || data.data[i].propertyLabel == "image"
+                    };
+                    let linha = `<tr onclick='getRelationshipValue(${i})'><td>${escapeHTML(data.data[i].propertyId)}</td><td>${data.data[i].propertyLabel}</td></tr>`
+                    linhas += linha;
+                }
+
+                $("#table-results-body").html(linhas);
+
+                abrirModal();
+            },
+            error: function (err) {
+                $("#table-results-body").html("Tente novamente mais tarde.");
+                console.log(err);
+                abrirModal();
+            }
+        });
+    }
+
+    function getQuery(variableName, filters) {
+        $.ajax({
+            url: 'https://localhost:7070/api/query',
+            type: 'post',
+            cache: false,
+            data: JSON.stringify({
+                "where": filters,
+                "variableName": variableName
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            success: function (data) {
+                let linhas = "";
+                for (let i = 0; i < data.data.length; i++) {
+                    trData[i] = {
+                        variableName: variableName,
+                        nodeId: data.data[i].propertyId,
+                        nodeLabel: data.data[i].propertyLabel
+                    };
+                    let linha = `<tr onclick='replaceNodeVariable(${i})'><td>${escapeHTML(data.data[i].propertyId)}</td><td>${data.data[i].propertyLabel}</td></tr>`
+                    linhas += linha;
+                }
+
+                $("#table-results-body").html(linhas);
+
+                abrirModal();
+            },
+            error: function (err) {
+                $("#table-results-body").html("Tente novamente mais tarde.");
+                console.log(err);
+                abrirModal();
+            }
+        });
+    }
+
+    function getRelationshipValue(nodeLine) {
+        let parameters = trData[nodeLine];
+
+        $.ajax({
+            url: 'https://localhost:7070/api/query/relationship-value',
+            type: 'post',
+            cache: false,
+            data: JSON.stringify({
+                //"endpointUrl": null,
+                "subjectId": parameters.subjectId,
+                "predicateId": parameters.predicateId,
+                "isLiteral": parameters.isLiteral
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            success: function (data) {
+                data.data.forEach(function (item) {
+                    addNodeWithRelationship(cy,
+                        item.propertyId,
+                        item.propertyLabel,
+                        item.propertyType,
+                        parameters.subjectId,
+                        parameters.predicateId,
+                        parameters.predicateLabel
+                    )
+                });
+                $('#grid-resultado-consulta').modal('close');
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+
+    function replaceNodeVariable(nodeLine) {
+        let parameters = trData[nodeLine];
+
+        replaceWithNewNode(cy,
+            parameters.variableName,
+            parameters.nodeId,
+            parameters.nodeLabel
+        )
+    }
+
+    function saveQuery() {
+        var queryData = cy.json();
+        console.log(cy.json())
+        localStorage.setItem('query', JSON.stringify(queryData));
+    }
+
+    function loadQuery() {
+        var cyData = localStorage.getItem('query');
+        let savedCyData = JSON.parse(cyData)
+
+        cy.json({
+            elements: savedCyData.elements
+        });
+    }
+
+    $(document).ready(function () {
+        $('#grid-resultado-consulta').modal();
+        $('#modal-sparql').modal();
+        $("#input-busca-elementos").autocomplete();
+        var debounceTimer;
+        $("#input-busca-elementos").on("input change", function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function () {
+                $.ajax({
+                    url: 'https://localhost:7070/api/query/search',
+                    type: 'post',
+                    cache: false,
+                    data: JSON.stringify({ "search": $("#input-busca-elementos").val() }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    success: function (data) {
+                        var result = {};
+                        data.data.forEach(function (item) {
+                            result[item.propertyLabel] = null;
+                            searches[item.propertyLabel] = item;
+                        });
+
+                        $("#input-busca-elementos").autocomplete("updateData", result);
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            }, 500);
+        });
+
+        $(".autocomplete-content").on("click", function () {
+            var text = $("#input-busca-elementos").val();
+            addNode(cy, searches[text].propertyId, text)
+            $("#input-busca-elementos").val("");
+        });
+    });
+
+    //-------------------- cyto
+
+    function showColorModal(target) {
+        const modal = document.getElementById('colorModal');
+        modal.style.display = 'block';
+        modal.target = target;
+    }
+
+    function getNodeColor(node) {
+        let nodeColors = {
+            'variable': '#A9D18E',
+            'label-filter': '#7030A0'
+        };
+
+        return nodeColors[node.data('type') ?? ''] ?? '#4472C4';
+    }
+
+
+    function addNode(theCy, id, text) {
+        theCy.add({ group: 'nodes', data: { id: id, label: text, type: 'node' }, position: { x: 200, y: 200 } })
+    }
+
+    function replaceWithNewNode(theCy, varName, nodeId, nodeLabel) {
+        let oldElement = theCy.getElementById(varName);
+        let oldId = varName;
+
+        let newData = { id: nodeId, label: nodeLabel, type: 'node' }
+        var oldNodePosition = oldElement.position();
+
+        cy.add({
+            group: 'nodes',
+            data: newData,
+            position: oldNodePosition
+        });
+
+        cy.edges().forEach(function (edge) {
+            if (edge.data('source') === oldId) {
+                let oldEdgeId = edge.data('id');
+                let oldEdgeTarget = edge.data('target');
+                let oldEdgeLabel = edge.data('label');
+                edge.remove();
+                cy.add(
+                    { group: 'edges', data: { id: oldEdgeId, label: oldEdgeLabel, source: nodeId, target: oldEdgeTarget } }
+                )
+            }
+
+            if (edge.data('target') === oldId) {
+                let oldEdgeId = edge.data('id');
+                let oldEdgeSource = edge.data('source');
+                let oldEdgeLabel = edge.data('label');
+                edge.remove();
+                cy.add(
+                    { group: 'edges', data: { id: oldEdgeId, label: oldEdgeLabel, source: oldEdgeSource, target: nodeId } }
+                )
+            }
+        });
+
+        oldElement.remove();
+    }
+
+    function addNodeWithRelationship(theCy, id, text, type, sourceNodeId, predicateId, predicateLabel) {
+        let nodeType = type == "text" ? "label" : "node";
+        let newText = predicateLabel == "image" ? "Ver imagem" : text;
+        let isLink = predicateLabel == "image";
+        theCy.add([
+            { group: 'nodes', data: { id: id, label: newText, type: nodeType, isLink: isLink, href: text }, position: { x: 200, y: 200 } }, //, position: releasedPosition 
+            { group: 'edges', data: { id: predicateId, label: predicateLabel, source: sourceNodeId, target: id } }
+        ]);
+
+        // theCy.add([
+        //     { group: 'nodes', data: { id: id, label: text, type: nodeType } }, //, position: releasedPosition 
+        //     { group: 'edges', data: { id: predicateId, label: predicateLabel, source: sourceNodeId, target: id } }
+        // ]);
+        //theCy.add({ group: 'nodes', data: { id: id, label: text, type: 'node' }, position: { x: 200, y: 200 } })
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        cy = cytoscape({
+            container: document.getElementById('cy'),
+
+            elements: [
+                // { data: { id: 'aluno', label: 'Aluno' } },
+                // { data: { id: 'mussak', label: 'Vinicius Mussak', type: 'label' } },
+                // { data: { id: 'ab', source: 'aluno', target: 'mussak', label: 'hasName' } },
+
+                // { data: { id: 'aluno2', label: 'Aluno' } },
+                // { data: { id: 'usp', label: 'USP' } },
+                // { data: { id: 'au', source: 'aluno2', target: 'usp', label: 'studiesAt' } },
+
+                // { data: { id: 'aluno3', label: 'Aluno' } },
+                // { data: { id: 'usp2', label: 'USP' } },
+                // { data: { id: 'aua', source: 'aluno3', target: 'usp2', label: '?someProp', type: 'variable' } },
+
+                // { data: { id: 'alunovar', label: '?student', type: 'variable' } },
+                // { data: { id: 'usp3', label: 'USP' } },
+                // { data: { id: 'au3', source: 'alunovar', target: 'usp3', label: 'studiesAt' } },
+
+                // { data: { id: 'alunofilter', label: '?student', type: 'variable' } },
+                // { data: { id: 'name', label: 'Mussak', type: 'label-filter' } },
+                // { data: { id: 'au32', source: 'alunofilter', target: 'name', label: 'hasName', type: 'filter', filterType: 'contém' } },
+            ],
+
+            style: [
+                {
+                    selector: 'node',
+                    style: {
+                        'background-color': getNodeColor,
+                        'width': '120px',
+                        'shape': function (node) {
+                            var type = node.data('type');
+                            var labelTypes = ['label', 'label-filter'];
+                            return labelTypes.includes(type) ? 'square' : 'ellipse';
+                        },
+                        'height': function (node) {
+                            var type = node.data('type');
+                            var labelTypes = ['label', 'label-filter'];
+                            return labelTypes.includes(type) ? '50px' : '120px';
+                        }
+                    }
+                },
+                {
+                    selector: 'edge',
+                    style: {
+                        'line-color': '#4472C4'
+                    }
+                }
+            ],
+
+            layout: {
+                name: 'grid'
+            }
+        });
+
+        cy.htmlLabel([
+            {
+                query: 'edge',
+                halign: 'center',
+                valign: 'center',
+                halignBox: 'center',
+                valignBox: 'center',
+                tpl: function (data) {
+                    if (data.type == 'filter') {
+                        return `
+                            <div class="edge-label-filter">
+                                <span>${data.label}</span>
+                                <br />
+                                <br />
+                                <span style="font-weight: bold; color:white">${data.filterType}</span>
+                                <br />
+                            </div>
+                        `;
+                    }
+
+                    return `<div class="edge-label${data.type ? `-${data.type}` : ''}">${data.label}</div>`;
+                }
+            },
+            {
+                query: 'node',
+                halign: 'center',
+                valign: 'center',
+                halignBox: 'center',
+                valignBox: 'center',
+                tpl: function (data) {
+                    let finalLabel = data.label;
+                    if (data.label.includes(')')) {
+                        finalLabel = finalLabel.split(')')[1].trimStart()
+                    }
+                    return `<div class="node-label${data.type == 'variable' ? '-variable' : ''}">${finalLabel}</div>`;
+                }
+            }
+        ]);
+
+        cy.cxtmenu({
+            selector: 'node',
+            adaptativeNodeSpotlightRadius: true,
+            commands: [
+                // {
+                //     content: '<span class="fa fa-flash fa-2x"></span>',
+                //     select: function (ele) {
+                //         console.log(ele.id());
+                //     }
+                // },
+
+                // {
+                //     content: '<span class="fa fa-star fa-2x"></span>',
+                //     select: function (ele) {
+                //         console.log(ele.data('name'));
+                //     },
+                //     enabled: false
+                // },
+                {
+                    content: 'Remove',
+                    select: function (ele) {
+                        cy.edges().forEach(function (edge) {
+                            if ([edge.data('source'), edge.data('target')].includes(ele.id())) {
+                                edge.remove();
+                            }
+                        });
+
+                        ele.remove();
+                    }
+                },
+                {
+                    content: 'Convert to variable',
+                    select: function (ele) {
+                        let oldId = ele.id();
+                        let newNodeVarId = '?node_' + (cy.nodes().length + 1);
+                        ele.data('label', '?');
+                        ele.data('type', 'variable');
+
+                        var oldNodeData = ele.data();
+                        var oldNodePosition = ele.position();
+                        let newData = Object.assign({}, oldNodeData, { id: newNodeVarId });
+
+                        cy.add({
+                            group: 'nodes',
+                            data: newData,
+                            position: oldNodePosition
+                        });
+
+                        cy.edges().forEach(function (edge) {
+                            if (edge.data('source') === oldId) {
+                                let oldEdgeId = edge.data('id');
+                                let oldEdgeTarget = edge.data('target');
+                                let oldEdgeLabel = edge.data('label');
+                                edge.remove();
+                                cy.add(
+                                    { group: 'edges', data: { id: oldEdgeId, label: oldEdgeLabel, source: newNodeVarId, target: oldEdgeTarget } }
+                                )
+                            }
+
+                            if (edge.data('target') === oldId) {
+                                let oldEdgeId = edge.data('id');
+                                let oldEdgeSource = edge.data('source');
+                                let oldEdgeLabel = edge.data('label');
+                                edge.remove();
+                                cy.add(
+                                    { group: 'edges', data: { id: oldEdgeId, label: oldEdgeLabel, source: oldEdgeSource, target: newNodeVarId } }
+                                )
+                            }
+                        });
+
+                        ele.remove();
+                    }
+                }
+            ]
+        });
+
+
+
+        var isDraggingNewNode = false;
+        let originalPosition = null;
+        var sourceNode = null;
+
+        cy.on('drag', 'node', function (event) {
+            if (isDraggingNewNode) {
+                sourceNode.position.x = originalPosition.x;
+                sourceNode.position.y = originalPosition.y;
+            }
+        });
+
+        cy.on('mousedown', 'node', function (event) {
+            sourceNode = event.target._private;
+
+            if (event.originalEvent.altKey) {
+                isDraggingNewNode = true;
+                originalPosition = {
+                    x: sourceNode.position.x,
+                    y: sourceNode.position.y
+                };
+            }
+        });
+
+        cy.on('mouseup', function (event) {
+            if (isDraggingNewNode && event.originalEvent.altKey) {
+                const releasedPosition = event.position;
+
+                let nearbyNode = cy.nodes().filter(function (node) {
+                    let nodePosition = node._private.position;
+                    let distance = Math.sqrt(Math.pow(nodePosition.x - releasedPosition.x, 2) + Math.pow(nodePosition.y - releasedPosition.y, 2));
+
+                    // Aqui estamos usando 30 como um limite arbitrário para proximidade
+                    return distance < 30;
+                }).first();
+
+
+                if (nearbyNode.length) {
+                    // Conecte ao nó existente
+                    cy.add({
+                        group: 'edges',
+                        data: { source: sourceNode.data.id, target: nearbyNode.id(), label: '?someProp', type: 'variable' }
+                    });
+                } else {
+                    const newNodeId = '?node_' + (cy.nodes().length + 1);
+                    cy.add([
+                        { group: 'nodes', data: { id: newNodeId, label: '?', type: 'variable' }, position: releasedPosition },
+                        { group: 'edges', data: { id: '?edge-' + (cy.edges().length + 1), label: '?', source: sourceNode.data.id, target: newNodeId, type: 'variable' } }
+                    ]);
+                }
+
+                isDraggingNewNode = false;
+                sourceNode = null;
+                originalPosition = null;
+            }
+        });
+
+        cy.on('mouseout', 'node', function (event) {
+            if (isDraggingNewNode) {
+                isDraggingNewNode = false;
+                sourceNode = null;
+                originalPosition = null;
+            }
+        });
+
+        cy.on('tap', function (event) {
+            var privateData = event.target._private;
+            console.log(privateData)
+
+            if (privateData.data.isLink) {
+                window.open(privateData.data.href, '_blank');
+                return;
+            }
+
+            if (privateData.data.type == 'node') {
+                getElementInfo(privateData.data.id)
+            }
+
+            if (privateData.data.type == 'filter') {
+                showColorModal(privateData);
+            }
+
+            if (privateData.data.type == 'variable') {
+                let conjuntos = cy.elements().components();
+                let conjuntoQuery = null;
+                for (var i = 0; i < conjuntos.length; i++) {
+                    for (var j = 0; j < conjuntos[i].length; j++) {
+                        if (privateData.data.id == conjuntos[i][j]._private.data.id) {
+                            conjuntoQuery = i;
+                            break;
+                        }
+                    }
+                }
+
+                let filtros = [];
+                for (var i = 0; i < conjuntos[conjuntoQuery].length; i++) {
+                    var item = conjuntos[conjuntoQuery][i];
+                    if (item.data('source') && item.data('target')) {
+                        filtros.push({
+                            subject: item.data('source'),
+                            predicate: item.data('id'),
+                            object: item.data('target')
+                        })
+                    }
+                }
+
+                getQuery(privateData.data.id, filtros);
+            }
+
+            // if (['node', 'variable'].includes(privateData.data.type)) {
+            //     abrirModal();
+            // }
+        });
+
+        document.querySelectorAll('#colorModal button').forEach(button => {
+            button.addEventListener('click', function (event) {
+                const modal = document.getElementById('colorModal');
+                modal.style.display = 'none';
+                const filterType = event.target.getAttribute('data-type');
+                cy.getElementById(modal.target.data.id).data('filterType', filterType);
+            });
+        });
+    });
+
+    function escapeHTML(unsafeText) {
+        return unsafeText
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+</script>
+
+</html>
