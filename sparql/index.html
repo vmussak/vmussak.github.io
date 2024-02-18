@@ -634,7 +634,18 @@
             ]
         });
 
-
+        cy.cxtmenu({
+            selector: 'edge',
+            adaptativeNodeSpotlightRadius: true,
+            commands: [
+                {
+                    content: 'Convert to variable',
+                    select: function (ele) {
+                        
+                    }
+                }
+            ]
+        });
 
         var isDraggingNewNode = false;
         let originalPosition = null;
@@ -743,10 +754,6 @@
 
                 getQuery(privateData.data.id, filtros);
             }
-
-            // if (['node', 'variable'].includes(privateData.data.type)) {
-            //     abrirModal();
-            // }
         });
 
         document.querySelectorAll('#colorModal button').forEach(button => {
