@@ -51,7 +51,7 @@
                     </div>
                     <div class="input-field col s6 right">
                         <i class="material-icons prefix white-text">link</i>
-                        <input id="input-endpoint-sparql" type="text" class="white-text">
+                        <input id="input-endpoint-sparql" type="text" class="white-text" value="https://query.wikidata.org/sparql">
                         <label for="input-endpoint-sparql" class="white-text">SPARQL endpoint</label>
                     </div>
                 </div>
@@ -347,6 +347,11 @@
     });
 
     $(document).ready(function () {
+        $.get("https://sparql-query-easy.azurewebsites.net/health", function(data, status){
+            console.log("API warmup...: " + data + "\nStatus: " + status);
+        });
+
+
         $('#grid-resultado-consulta').modal();
         $('#modal-sparql').modal();
         $("#input-busca-elementos").autocomplete();
