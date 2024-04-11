@@ -51,7 +51,8 @@
                     </div>
                     <div class="input-field col s6 right">
                         <i class="material-icons prefix white-text">link</i>
-                        <input id="input-endpoint-sparql" type="text" class="white-text" value="https://query.wikidata.org/sparql">
+                        <input id="input-endpoint-sparql" type="text" class="white-text"
+                            value="https://query.wikidata.org/sparql">
                         <label for="input-endpoint-sparql" class="white-text">SPARQL endpoint</label>
                     </div>
                 </div>
@@ -127,6 +128,26 @@
         }
 
         return limit;
+    }
+
+    function getAllNodes() {
+        let nodes = [];
+        let conjuntos = cy.elements().components();
+
+        for (var j = 0; j < conjuntos.length; j++) {
+            for (var i = 0; i < conjuntos[j].length; i++) {
+                var item = conjuntos[j][i];
+                if (item.data('id').includes('?')) {
+                    continue;
+                }
+
+                nodes.push(
+                    item.data('id')
+                )
+            }
+        }
+
+        return nodes;
     }
 
     function seeSparqlQuery() {
@@ -347,7 +368,7 @@
     });
 
     $(document).ready(function () {
-        $.get("https://sparql-query-easy.azurewebsites.net/health", function(data, status){
+        $.get("https://sparql-query-easy.azurewebsites.net/health", function (data, status) {
             console.log("API warmup...: " + data + "\nStatus: " + status);
         });
 
@@ -389,10 +410,67 @@
 
         $(".autocomplete-content").on("click", function () {
             var text = $("#input-busca-elementos").val();
-            addNode(cy, searches[text].propertyId, text)
+
+            var allNodes = getAllNodes();
+
+            const promises = allNodes.flatMap(node => [
+                verifyAlreadyExistsNodeAndAdd(searches[text].propertyId, text, node, false),
+                verifyAlreadyExistsNodeAndAdd(searches[text].propertyId, text, node, true)
+            ]);
+
+            Promise.all(promises).then(results => {
+                if (results.every(result => result === false)) {
+                    addNode(cy, searches[text].propertyId, text)
+                }
+            });
+
             $("#input-busca-elementos").val("");
         });
     });
+
+    function verifyAlreadyExistsNodeAndAdd(newNodeId, newNodeText, existingNode, invert) {
+        return new Promise((resolve) => {
+            $.ajax({
+                url: 'https://sparql-query-easy.azurewebsites.net/api/query',
+                type: 'post',
+                cache: false,
+                data: JSON.stringify({
+                    "where": [
+                        {
+                            "object": invert ? newNodeId : existingNode,
+                            "predicate": "?predicate",
+                            "subject": invert ? existingNode : newNodeId
+                        }
+                    ],
+                    "variableName": "?predicate",
+                    "limit": 1,
+                    "ignoreWikidata": false
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                success: function (data) {
+                    console.log('retornou sucesso')
+                    if (!data.data.length) {
+                        console.log('vazio')
+                        resolve(false);
+                        return;
+                    }
+
+                    console.log('encontrou')
+                    let predicate = data.data[0];
+                    addNodeWithRelationship(cy, newNodeId, newNodeText, 'node', existingNode, predicate.propertyId, predicate.propertyLabel)
+                    resolve(true);
+                },
+                error: function (err) {
+                    console.log('retornou erro')
+                    console.log(err);
+                    resolve(false);
+                }
+            });
+        });
+
+    }
 
     //-------------------- cyto
 
@@ -647,7 +725,7 @@
                 {
                     content: 'Convert to variable',
                     select: function (ele) {
-                        
+
                     }
                 }
             ]
