@@ -40,6 +40,17 @@
         <div class="row blue darken-4">
             <form class="col s12">
                 <div class="row">
+                    <div class="input-field col s2">
+                        <div class="switch">
+                            <label for="auto-layout" class="white-text">Auto layout:</label>
+                            <label class="white-text">
+                                Off
+                                <input type="checkbox" id="auto-layout" checked>
+                                <span class="lever"></span>
+                                On
+                            </label>
+                        </div>
+                    </div>
                     <div class="input-field col s3">
                         <i class="material-icons prefix white-text">search</i>
                         <input id="input-busca-elementos" type="text" class="autocomplete white-text">
@@ -426,6 +437,14 @@
 
             $("#input-busca-elementos").val("");
         });
+
+        $("#auto-layout").on("change", function () {
+            let autoLayout = $("#auto-layout").is(":checked");
+            if (autoLayout)
+                cy.layout({
+                    name: 'cose',
+                }).run();
+        })
     });
 
     function verifyAlreadyExistsNodeAndAdd(newNodeId, newNodeText, existingNode, invert) {
@@ -437,9 +456,9 @@
                 data: JSON.stringify({
                     "where": [
                         {
-                            "object": invert ? newNodeId : existingNode,
+                            "subject": invert ? existingNode : newNodeId,
                             "predicate": "?predicate",
-                            "subject": invert ? existingNode : newNodeId
+                            "object": invert ? newNodeId : existingNode,
                         }
                     ],
                     "variableName": "?predicate",
@@ -450,20 +469,26 @@
                     'Content-Type': 'application/json'
                 },
                 success: function (data) {
-                    console.log('retornou sucesso')
                     if (!data.data.length) {
-                        console.log('vazio')
                         resolve(false);
                         return;
                     }
 
-                    console.log('encontrou')
                     let predicate = data.data[0];
-                    addNodeWithRelationship(cy, newNodeId, newNodeText, 'node', existingNode, predicate.propertyId, predicate.propertyLabel)
+
+                    addNodeWithRelationship(cy,
+                        newNodeId,
+                        newNodeText,
+                        'node',
+                        existingNode,
+                        predicate.propertyId,
+                        predicate.propertyLabel,
+                        invert ? existingNode : newNodeId
+                    );
+
                     resolve(true);
                 },
                 error: function (err) {
-                    console.log('retornou erro')
                     console.log(err);
                     resolve(false);
                 }
@@ -483,7 +508,8 @@
     function getNodeColor(node) {
         let nodeColors = {
             'variable': '#A9D18E',
-            'label-filter': '#7030A0'
+            'label-filter': '#7030A0',
+            'label': 'pink'
         };
 
         return nodeColors[node.data('type') ?? ''] ?? '#4472C4';
@@ -491,7 +517,10 @@
 
 
     function addNode(theCy, id, text) {
-        theCy.add({ group: 'nodes', data: { id: id, label: text, type: 'node' }, position: { x: 200, y: 200 } })
+        let autoLayout = $("#auto-layout").is(":checked");
+        theCy.add({ group: 'nodes', data: { id: id, label: text, type: 'node', position: { x: 200, y: 200 } } })//
+        if (autoLayout)
+            theCy.layout({name: 'cose'}).run();
     }
 
     function replaceWithNewNode(theCy, varName, nodeId, nodeLabel) {
@@ -532,14 +561,23 @@
         oldElement.remove();
     }
 
-    function addNodeWithRelationship(theCy, id, text, type, sourceNodeId, predicateId, predicateLabel) {
+    function addNodeWithRelationship(theCy, id, text, type, sourceNodeId, predicateId, predicateLabel, theSubject) {
+        let autoLayout = $("#auto-layout").is(":checked");
+        let theSource = theSubject || sourceNodeId;
+        let theTarget = theSource == sourceNodeId ? id : sourceNodeId;
+
         let nodeType = type == "text" ? "label" : "node";
         let newText = predicateLabel == "image" ? "Ver imagem" : text;
         let isLink = predicateLabel == "image";
         theCy.add([
-            { group: 'nodes', data: { id: id, label: newText, type: nodeType, isLink: isLink, href: text }, position: { x: 200, y: 200 } }, //, position: releasedPosition 
-            { group: 'edges', data: { id: predicateId, label: predicateLabel, source: sourceNodeId, target: id } }
+            { group: 'nodes', data: { id: id, label: newText, type: nodeType, isLink: isLink, href: text }, position: { x: 200, y: 200 } },
+            { group: 'edges', data: { id: predicateId, label: predicateLabel, source: theSource, target: theTarget } }
         ]);
+
+        if (autoLayout)
+            theCy.layout({
+                name: 'cose',
+            }).run();
 
         // theCy.add([
         //     { group: 'nodes', data: { id: id, label: text, type: nodeType } }, //, position: releasedPosition 
@@ -551,7 +589,9 @@
     document.addEventListener("DOMContentLoaded", function () {
         cy = cytoscape({
             container: document.getElementById('cy'),
-
+            zoomingEnabled: true,
+            userZoomingEnabled: false,
+            maxZoom: 1,
             elements: [
                 // { data: { id: 'aluno', label: 'Aluno' } },
                 // { data: { id: 'mussak', label: 'Vinicius Mussak', type: 'label' } },
@@ -595,13 +635,33 @@
                 {
                     selector: 'edge',
                     style: {
-                        'line-color': '#4472C4'
+                        'line-color': '#4472C4',
+                        'target-arrow-shape': 'triangle',
+                        'target-arrow-color': '#ccc',
+                        'width': 3, // Adiciona uma largura visível para a linha
+                        'target-arrow-size': '6' // Ajusta o tamanho da seta do alvo
                     }
                 }
             ],
 
             layout: {
-                name: 'grid'
+                //name: 'grid'
+                name: 'cose',
+                idealEdgeLength: 200,
+                nodeOverlap: 20,
+                refresh: 20,
+                fit: true,
+                padding: 30,
+                randomize: false,
+                componentSpacing: 100,
+                nodeRepulsion: 400000,
+                edgeElasticity: 100,
+                nestingFactor: 5,
+                gravity: 80,
+                numIter: 1000,
+                initialTemp: 200,
+                coolingFactor: 0.95,
+                minTemp: 1.0
             }
         });
 
