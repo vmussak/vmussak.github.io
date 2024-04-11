@@ -184,7 +184,7 @@
 
                 filters.push({
                     subject: item.data('source'),
-                    predicate: item.data('id'),
+                    predicate: item.data('nodeId'),
                     object: item.data('target')
                 })
             }
@@ -306,14 +306,16 @@
                 'Content-Type': 'application/json'
             },
             success: function (data) {
-                data.data.forEach(function (item) {
+                data.data.forEach(function (item, index) {
                     addNodeWithRelationship(cy,
                         item.propertyId,
                         item.propertyLabel,
                         item.propertyType,
                         parameters.subjectId,
                         parameters.predicateId,
-                        parameters.predicateLabel
+                        parameters.predicateLabel,
+                        null,
+                        index
                     )
                 });
                 $('#grid-resultado-consulta').modal('close');
@@ -541,9 +543,10 @@
                 let oldEdgeId = edge.data('id');
                 let oldEdgeTarget = edge.data('target');
                 let oldEdgeLabel = edge.data('label');
+                let oldEdgeNodeId = edge.data('nodeId');
                 edge.remove();
                 cy.add(
-                    { group: 'edges', data: { id: oldEdgeId, label: oldEdgeLabel, source: nodeId, target: oldEdgeTarget } }
+                    { group: 'edges', data: { nodeId: oldEdgeNodeId, id: oldEdgeId, label: oldEdgeLabel, source: nodeId, target: oldEdgeTarget } }
                 )
             }
 
@@ -551,9 +554,10 @@
                 let oldEdgeId = edge.data('id');
                 let oldEdgeSource = edge.data('source');
                 let oldEdgeLabel = edge.data('label');
+                let oldEdgeNodeId = edge.data('nodeId');
                 edge.remove();
                 cy.add(
-                    { group: 'edges', data: { id: oldEdgeId, label: oldEdgeLabel, source: oldEdgeSource, target: nodeId } }
+                    { group: 'edges', data: { nodeId: oldEdgeNodeId, id: oldEdgeId, label: oldEdgeLabel, source: oldEdgeSource, target: nodeId } }
                 )
             }
         });
@@ -561,7 +565,7 @@
         oldElement.remove();
     }
 
-    function addNodeWithRelationship(theCy, id, text, type, sourceNodeId, predicateId, predicateLabel, theSubject) {
+    function addNodeWithRelationship(theCy, id, text, type, sourceNodeId, predicateId, predicateLabel, theSubject, predicateIndex) {
         let autoLayout = $("#auto-layout").is(":checked");
         let theSource = theSubject || sourceNodeId;
         let theTarget = theSource == sourceNodeId ? id : sourceNodeId;
@@ -571,7 +575,7 @@
         let isLink = predicateLabel == "image";
         theCy.add([
             { group: 'nodes', data: { id: id, label: newText, type: nodeType, isLink: isLink, href: text }, position: { x: 200, y: 200 } },
-            { group: 'edges', data: { id: predicateId, label: predicateLabel, source: theSource, target: theTarget } }
+            { group: 'edges', data: { nodeId: predicateId, id: predicateId + predicateIndex, label: predicateLabel, source: theSource, target: theTarget } }
         ]);
 
         if (autoLayout)
@@ -755,9 +759,10 @@
                                 let oldEdgeId = edge.data('id');
                                 let oldEdgeTarget = edge.data('target');
                                 let oldEdgeLabel = edge.data('label');
+                                let oldEdgeNodeId = edge.data('nodeId');
                                 edge.remove();
                                 cy.add(
-                                    { group: 'edges', data: { id: oldEdgeId, label: oldEdgeLabel, source: newNodeVarId, target: oldEdgeTarget } }
+                                    { group: 'edges', data: { nodeId: oldEdgeNodeId, id: oldEdgeId, label: oldEdgeLabel, source: newNodeVarId, target: oldEdgeTarget } }
                                 )
                             }
 
@@ -765,9 +770,10 @@
                                 let oldEdgeId = edge.data('id');
                                 let oldEdgeSource = edge.data('source');
                                 let oldEdgeLabel = edge.data('label');
+                                let oldEdgeNodeId = edge.data('nodeId');
                                 edge.remove();
                                 cy.add(
-                                    { group: 'edges', data: { id: oldEdgeId, label: oldEdgeLabel, source: oldEdgeSource, target: newNodeVarId } }
+                                    { group: 'edges', data: { nodeId: oldEdgeNodeId,  id: oldEdgeId, label: oldEdgeLabel, source: oldEdgeSource, target: newNodeVarId } }
                                 )
                             }
                         });
@@ -888,9 +894,10 @@
                 for (var i = 0; i < conjuntos[conjuntoQuery].length; i++) {
                     var item = conjuntos[conjuntoQuery][i];
                     if (item.data('source') && item.data('target')) {
+                        console.log(item._private.data)
                         filtros.push({
                             subject: item.data('source'),
-                            predicate: item.data('id'),
+                            predicate: item.data('nodeId'),
                             object: item.data('target')
                         })
                     }
