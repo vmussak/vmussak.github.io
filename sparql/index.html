@@ -5,6 +5,8 @@
     <link rel="stylesheet" type="text/css"
         href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="stylesheet" href="grafos.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.css">
+
     <script src="https://unpkg.com/cytoscape@latest/dist/cytoscape.min.js"></script>
     <script src="https://unpkg.com/cytoscape-html-label@1.1.7/dist/cytoscape-html-label.js"></script>
     <script src="cytoscape-cxtmenu.js"></script>
@@ -13,6 +15,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+
 </head>
 
 <body>
@@ -53,7 +57,7 @@
                     </div>
                     <div class="input-field col s3">
                         <i class="material-icons prefix white-text">search</i>
-                        <input id="input-busca-elementos" type="text" class="autocomplete white-text">
+                        <input data-intro="Start typing your search here. Then click at the result" id="input-busca-elementos" type="text" class="autocomplete white-text">
                         <label for="input-busca-elementos" class="white-text">Search</label>
                     </div>
                     <div class="input-field col s1">
@@ -118,6 +122,10 @@
 
 
 <script>
+    window.onload = function() {
+        introJs().start();
+    };
+
     var searches = {};
     var trData = {};
     var cy = null;
@@ -522,7 +530,7 @@
         let autoLayout = $("#auto-layout").is(":checked");
         theCy.add({ group: 'nodes', data: { id: id, label: text, type: 'node', position: { x: 200, y: 200 } } })//
         if (autoLayout)
-            theCy.layout({name: 'cose'}).run();
+            theCy.layout({ name: 'cose' }).run();
     }
 
     function replaceWithNewNode(theCy, varName, nodeId, nodeLabel) {
@@ -773,7 +781,7 @@
                                 let oldEdgeNodeId = edge.data('nodeId');
                                 edge.remove();
                                 cy.add(
-                                    { group: 'edges', data: { nodeId: oldEdgeNodeId,  id: oldEdgeId, label: oldEdgeLabel, source: oldEdgeSource, target: newNodeVarId } }
+                                    { group: 'edges', data: { nodeId: oldEdgeNodeId, id: oldEdgeId, label: oldEdgeLabel, source: oldEdgeSource, target: newNodeVarId } }
                                 )
                             }
                         });
