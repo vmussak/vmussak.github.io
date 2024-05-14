@@ -84,7 +84,7 @@
             <button data-type="termina com">End with</button>
         </div>
 
-        <div id="grid-resultado-consulta" class="modal bottom-sheet">
+        <div id="grid-resultado-consulta" class="modal bottom-sheet" style="cursor: pointer;">
             <a href="#!" class="modal-close waves-effect waves-green btn-flat blue white-text right">x</a>
             <div class="modal-content">
                 <h4>Query results</h4>
@@ -279,7 +279,8 @@
                     trData[i] = {
                         variableName: variableName,
                         nodeId: data.data[i].propertyId,
-                        nodeLabel: data.data[i].propertyLabel
+                        nodeLabel: data.data[i].propertyLabel,
+                        propertyType: data.data[i].propertyType
                     };
                     let linha = `<tr onclick='replaceNodeVariable(${i})'><td>${escapeHTML(data.data[i].propertyId)}</td><td>${data.data[i].propertyLabel}</td></tr>`
                     linhas += linha;
@@ -340,8 +341,11 @@
         replaceWithNewNode(cy,
             parameters.variableName,
             parameters.nodeId,
-            parameters.nodeLabel
+            parameters.nodeLabel,
+            parameters.propertyType
         )
+
+        $('#grid-resultado-consulta').modal('close');
     }
 
     function saveQuery() {
@@ -533,11 +537,11 @@
             theCy.layout({ name: 'cose' }).run();
     }
 
-    function replaceWithNewNode(theCy, varName, nodeId, nodeLabel) {
+    function replaceWithNewNode(theCy, varName, nodeId, nodeLabel, propertyType) {
         let oldElement = theCy.getElementById(varName);
         let oldId = varName;
-
-        let newData = { id: nodeId, label: nodeLabel, type: 'node' }
+        let nodeType = propertyType == 'text' || nodeId == nodeLabel ? 'label' : 'node';
+        let newData = { id: nodeId, label: nodeLabel, type: nodeType }
         var oldNodePosition = oldElement.position();
 
         cy.add({
@@ -579,6 +583,7 @@
         let theTarget = theSource == sourceNodeId ? id : sourceNodeId;
 
         let nodeType = type == "text" ? "label" : "node";
+        console.log(nodeType)
         let newText = predicateLabel == "image" ? "Ver imagem" : text;
         let isLink = predicateLabel == "image";
         theCy.add([
