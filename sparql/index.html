@@ -47,7 +47,7 @@
                     <div class="input-field col s2">
                         <div class="switch">
                             <label for="auto-layout" class="white-text">Auto layout:</label>
-                            <label class="white-text">
+                            <label class="white-text" data-intro="Here you can choose whether to manually organize the layout or have it automatically arranged." data-step="4">
                                 Off
                                 <input type="checkbox" id="auto-layout" checked>
                                 <span class="lever"></span>
@@ -57,16 +57,16 @@
                     </div>
                     <div class="input-field col s3">
                         <i class="material-icons prefix white-text">search</i>
-                        <input data-intro="Start typing your search here. Then click at the result" id="input-busca-elementos" type="text" class="autocomplete white-text">
+                        <input data-intro="Start typing your search query here. Then, click on the desired result" data-step="1" id="input-busca-elementos" type="text" class="autocomplete white-text">
                         <label for="input-busca-elementos" class="white-text">Search</label>
                     </div>
                     <div class="input-field col s1">
-                        <input id="input-max-results" type="number" class="white-text" value="20">
+                        <input data-intro="Here you can specify the number of results you want to display. Remember, the more results you request, the slower the response time" data-step="2" id="input-max-results" type="number" class="white-text" value="20">
                         <label for="input-max-results" class="white-text">Max Results</label>
                     </div>
                     <div class="input-field col s6 right">
                         <i class="material-icons prefix white-text">link</i>
-                        <input id="input-endpoint-sparql" type="text" class="white-text"
+                        <input data-intro="Here you can specify which SPARQL endpoint to use for querying your data." data-step="3" id="input-endpoint-sparql" type="text" class="white-text"
                             value="https://query.wikidata.org/sparql">
                         <label for="input-endpoint-sparql" class="white-text">SPARQL endpoint</label>
                     </div>
@@ -74,7 +74,7 @@
             </form>
         </div>
 
-        <div id="cy" style="width: 100%; height: 90%;"></div>
+        <div id="cy" style="width: 100%; height: 90%;" data-intro="Finally, this is where you can construct your queries!" data-step="5"></div>
 
         <div id="colorModal"
             style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:1000; background-color: #666; padding:20px; border-radius:5px;">
@@ -122,6 +122,13 @@
 
 
 <script>
+    const env = 'prod'; //dev
+
+    const url = {
+        dev: 'https://localhost:7003',
+        prod: 'https://sparql-query-easy.azurewebsites.net'
+    };
+
     window.onload = function() {
         introJs().start();
     };
@@ -197,9 +204,10 @@
                 })
             }
         }
-
+        
+        //
         $.ajax({
-            url: 'https://sparql-query-easy.azurewebsites.net/api/query/sparql',
+            url: `${url[env]}/api/query/sparql`,
             type: 'post',
             cache: false,
             data: JSON.stringify({
@@ -225,7 +233,7 @@
 
     function getElementInfo(elementId) {
         $.ajax({
-            url: 'https://sparql-query-easy.azurewebsites.net/api/query/relationships',
+            url: `${url[env]}/api/query/relationships`,
             type: 'post',
             cache: false,
             data: JSON.stringify({
@@ -262,7 +270,7 @@
 
     function getQuery(variableName, filters) {
         $.ajax({
-            url: 'https://sparql-query-easy.azurewebsites.net/api/query',
+            url: `${url[env]}/api/query`,
             type: 'post',
             cache: false,
             data: JSON.stringify({
@@ -302,7 +310,7 @@
         let parameters = trData[nodeLine];
 
         $.ajax({
-            url: 'https://sparql-query-easy.azurewebsites.net/api/query/relationship-value',
+            url: `${url[env]}/api/query/relationship-value`,
             type: 'post',
             cache: false,
             data: JSON.stringify({
@@ -393,7 +401,7 @@
     });
 
     $(document).ready(function () {
-        $.get("https://sparql-query-easy.azurewebsites.net/health", function (data, status) {
+        $.get(`${url[env]}/health`, function (data, status) {
             console.log("API warmup...: " + data + "\nStatus: " + status);
         });
 
@@ -406,7 +414,7 @@
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(function () {
                 $.ajax({
-                    url: 'https://sparql-query-easy.azurewebsites.net/api/query/search',
+                    url: `${url[env]}/api/query/search`,
                     type: 'post',
                     cache: false,
                     data: JSON.stringify({
@@ -464,7 +472,7 @@
     function verifyAlreadyExistsNodeAndAdd(newNodeId, newNodeText, existingNode, invert) {
         return new Promise((resolve) => {
             $.ajax({
-                url: 'https://sparql-query-easy.azurewebsites.net/api/query',
+                url: `${url[env]}/api/query`,
                 type: 'post',
                 cache: false,
                 data: JSON.stringify({
