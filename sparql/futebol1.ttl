@@ -1,0 +1,110 @@
+@prefix ex: <http://example.org/futebol#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+# Definição de times
+ex:Team1 a ex:Team ;
+    rdfs:label "Team A"@en ;
+    foaf:name "Team A" .
+
+ex:Team2 a ex:Team ;
+    rdfs:label "Team B"@en ;
+    foaf:name "Team B" .
+
+# Definição de jogadores do Time A
+ex:Player1 a ex:Player ;
+    rdfs:label "Player 1"@en ;
+    foaf:name "Player 1" ;
+    ex:playsFor ex:Team1 .
+
+ex:Player2 a ex:Player ;
+    rdfs:label "Player 2"@en ;
+    foaf:name "Player 2" ;
+    ex:playsFor ex:Team1 .
+
+# Definição de jogadores do Time B
+ex:Player3 a ex:Player ;
+    rdfs:label "Player 3"@en ;
+    foaf:name "Player 3" ;
+    ex:playsFor ex:Team2 .
+
+ex:Player4 a ex:Player ;
+    rdfs:label "Player 4"@en ;
+    foaf:name "Player 4" ;
+    ex:playsFor ex:Team2 .
+
+# Definição de um jogo entre Team A e Team B
+ex:Game1 a ex:Game ;
+    rdfs:label "Game between Team A and Team B"@en ;
+    ex:homeTeam ex:Team1 ;
+    ex:awayTeam ex:Team2 ;
+    ex:date "2024-09-01"^^xsd:date ;
+    ex:finalScore ex:Score1 .
+
+# Definição de placar final
+ex:Score1 a ex:Score ;
+    rdfs:label "Final Score of Game 1"@en ;
+    ex:homeTeamGoals 2 ;
+    ex:awayTeamGoals 1 .
+
+# Definição de gols marcados
+ex:Goal1 a ex:Goal ;
+    rdfs:label "Goal by Player 1 at 23 minutes"@en ;
+    ex:scorer ex:Player1 ;
+    ex:team ex:Team1 ;
+    ex:minute 23 ;
+    ex:inGame ex:Game1 .
+
+ex:Goal2 a ex:Goal ;
+    rdfs:label "Goal by Player 2 at 45 minutes"@en ;
+    ex:scorer ex:Player2 ;
+    ex:team ex:Team1 ;
+    ex:minute 45 ;
+    ex:inGame ex:Game1 .
+
+ex:Goal3 a ex:Goal ;
+    rdfs:label "Goal by Player 3 at 67 minutes"@en ;
+    ex:scorer ex:Player3 ;
+    ex:team ex:Team2 ;
+    ex:minute 67 ;
+    ex:inGame ex:Game1 .
+
+# Definição de tipos de propriedades
+# owl:ObjectProperty: Relaciona um recurso com outro recurso
+ex:playsFor rdf:type owl:ObjectProperty .
+
+# owl:DatatypeProperty: Relaciona um recurso com um valor literal (como string, inteiro, etc.)
+foaf:name rdf:type owl:DatatypeProperty .
+rdfs:label rdf:type owl:DatatypeProperty .
+ex:homeTeamGoals rdf:type owl:DatatypeProperty .
+ex:awayTeamGoals rdf:type owl:DatatypeProperty .
+ex:minute rdf:type owl:DatatypeProperty .
+
+# Propriedades relacionais
+ex:homeTeam rdf:type owl:ObjectProperty .
+ex:awayTeam rdf:type owl:ObjectProperty .
+ex:scorer rdf:type owl:ObjectProperty .
+ex:team rdf:type owl:ObjectProperty .
+ex:inGame rdf:type owl:ObjectProperty .
+
+# Propriedades com rdfs:label
+ex:playsFor rdf:type owl:ObjectProperty ;
+    rdfs:label "Plays for"@en .
+
+foaf:name rdf:type owl:DatatypeProperty ;
+    rdfs:label "Name"@en .
+
+rdfs:label rdf:type owl:DatatypeProperty ;
+    rdfs:label "Label"@en .
+
+ex:homeTeam rdf:type owl:ObjectProperty ;
+    rdfs:label "Home Team"@en .
+
+ex:awayTeam rdf:type owl:ObjectProperty ;
+    rdfs:label "Away Team"@en .
+
+ex:minute rdf:type owl:DatatypeProperty ;
+    rdfs:label "Minute"@en .

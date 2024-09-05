@@ -21,6 +21,7 @@
 
 <body>
     <input type="file" id="upload-json" accept=".json" style="display: none;">
+    <input type="file" id="upload-triple" accept=".ttl" style="display: none;">
 
     <main>
         <div class="navbar-fixed">
@@ -29,6 +30,7 @@
                     <a href="#" class="brand-logo"><img class="responsive-img" style="width: 60px;"
                             src="https://cygri.github.io/rdf-logos/svg/sparql.svg" /></a>
                     <ul class="right hide-on-med-and-down">
+                        <li><a href="#" onclick="uploadTriples()"><i class="material-icons left">upload</i>Upload Triples</a>
                         <li><a href="#" onclick="loadQuery()"><i class="material-icons left">upload</i>Upload Query</a>
                         </li>
                         <li><a href="#" onclick="saveQuery()"><i class="material-icons left">download</i>Export
@@ -128,10 +130,10 @@
 
 
 <script>
-    const env = 'prod'; //dev
+    const env = 'dev'; //dev
 
     const url = {
-        dev: 'https://localhost:7003',
+        dev: 'http://localhost:5242',
         prod: 'https://sparql-query-easy.azurewebsites.net'
     };
 
@@ -231,6 +233,7 @@
             type: 'post',
             cache: false,
             data: JSON.stringify({
+                "endpointUrl": $("#input-endpoint-sparql").val(),
                 "where": filters,
                 "variableName": variableName,
                 "limit": getLimit()
@@ -257,7 +260,7 @@
             type: 'post',
             cache: false,
             data: JSON.stringify({
-                //"endpointUrl": null,
+                "endpointUrl": $("#input-endpoint-sparql").val(),
                 "id": elementId
             }),
             headers: {
@@ -294,6 +297,7 @@
             type: 'post',
             cache: false,
             data: JSON.stringify({
+                "endpointUrl": $("#input-endpoint-sparql").val(),
                 "where": filters,
                 "variableName": variableName,
                 "limit": getLimit()
@@ -334,7 +338,7 @@
             type: 'post',
             cache: false,
             data: JSON.stringify({
-                //"endpointUrl": null,
+                "endpointUrl": $("#input-endpoint-sparql").val(),
                 "subjectId": parameters.subjectId,
                 "predicateId": parameters.predicateId,
                 "isLiteral": parameters.isLiteral
@@ -432,6 +436,42 @@
         }
     });
 
+    function uploadTriples() {
+        var input = document.getElementById("upload-triple");
+        input.click();
+    }
+
+    document.getElementById("upload-triple").addEventListener("change", function () {
+    if (this.files.length > 0) {
+        var arquivo = this.files[0];
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+
+            var formData = new FormData();
+            formData.append("ttlFile", arquivo); 
+
+            $.ajax({
+                url: `${url[env]}/api/local-database`, 
+                type: 'POST',
+                data: formData,
+                processData: false, 
+                contentType: false, 
+                success: function (response) {
+                    $("#input-endpoint-sparql").val(response.data)
+                },
+                error: function (error) {
+                    alert('Erro no upload: ' + error.responseText);
+                }
+            });
+        };
+
+        reader.readAsText(arquivo);
+    } else {
+        console.log('Nenhum arquivo foi selecionado.');
+    }
+});
+
     $(document).ready(function () {
         $.get(`${url[env]}/health`, function (data, status) {
             console.log("API warmup...: " + data + "\nStatus: " + status);
@@ -450,6 +490,7 @@
                     type: 'post',
                     cache: false,
                     data: JSON.stringify({
+                        "endpointUrl": $("#input-endpoint-sparql").val(),
                         "search": $("#input-busca-elementos").val(),
                         "limit": getLimit()
                     }),
@@ -508,6 +549,7 @@
                 type: 'post',
                 cache: false,
                 data: JSON.stringify({
+                    "endpointUrl": $("#input-endpoint-sparql").val(),
                     "where": [
                         {
                             "subject": invert ? existingNode : newNodeId,
