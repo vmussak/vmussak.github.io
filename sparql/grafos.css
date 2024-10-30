@@ -3,6 +3,12 @@
     white-space: nowrap;
     color: white;
     font-family: 'Roboto', sans-serif;
+
+}
+
+.node-label-big {
+    margin-top: 150px;
+    color: #4472C4 !important;
 }
 
 .node-label-variable {
