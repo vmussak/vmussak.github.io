@@ -144,12 +144,25 @@
             </div>
         </div>
 
+        <div id="modal-change-value" class="modal">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat blue white-text right">x</a>
+            <div class="modal-content">
+                <h4>Change value</h4>
+                <div id="modal-change-value-content">
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close waves-effect waves-green btn-flat blue white-text">Close</a>
+            </div>
+        </div>
+
     </main>
 </body>
 
 
 <script>
-    const env = 'prod'; //dev
+    const env = 'dev'; //dev
 
     const url = {
         dev: 'http://localhost:5242',
@@ -184,6 +197,10 @@
 
     function abrirModalSparql() {
         $('#modal-sparql').modal('open');
+    }
+
+    function abrirModalChangeValue() {
+        $('#modal-change-value').modal('open');
     }
 
     function getLimit() {
@@ -243,12 +260,14 @@
                 let targetNode = cy.getElementById(item.data('target'));
                 let sourceValue = sourceNode.data('value') || item.data('source'); // Pega `value` ou `id`
                 let targetValue = targetNode.data('value') || item.data('target'); // Pega `value` ou `id`
+                let targetFilter = targetNode.data('filterType') || null
 
                 // Adiciona o filtro com os valores dos nós `source` e `target`
                 filters.push({
                     subject: sourceValue,
                     predicate: item.data('nodeId'),
-                    object: targetValue
+                    object: targetValue,
+                    filterType:  targetFilter ? +targetFilter : null
                 });
             }
         }
@@ -506,6 +525,7 @@
 
         $('#grid-resultado-consulta').modal();
         $('#modal-sparql').modal();
+        $("#modal-change-value").modal();
         $("#input-busca-elementos").autocomplete();
         var debounceTimer;
         $("#input-busca-elementos").on("input change", function () {
@@ -682,12 +702,14 @@
                 let targetNode = cy.getElementById(item.data('target'));
                 let sourceValue = sourceNode.data('value') || item.data('source'); // Pega `value` ou `id`
                 let targetValue = targetNode.data('value') || item.data('target'); // Pega `value` ou `id`
+                let targetFilter = targetNode.data('filterType') || null
 
                 // Adiciona o filtro com os valores dos nós `source` e `target`
                 filters.push({
                     subject: sourceValue,
                     predicate: item.data('nodeId'),
-                    object: targetValue
+                    object: targetValue,
+                    filterType: targetFilter ? +targetFilter : null
                 });
             }
         }
@@ -792,19 +814,19 @@
                 // { data: { id : 'aluno', label: 'Aluno' } },
                 // { data: { id : 'mussak', label: 'Vinicius Mussak', type: 'label' } },
                 // { data: { id : 'ab', source: 'aluno', target: 'mussak', label: 'hasName' } },
- 
+
                 // { data: { id : 'aluno2', label: 'Aluno' } },
                 // { data: { id : 'usp', label: 'USP' } },
                 // { data: { id : 'au', source: 'aluno2', target: 'usp', label: 'studiesAt' } },
- 
+
                 // { data: { id : 'aluno3', label: 'Aluno' } },
                 // { data: { id : 'usp2', label: 'USP' } },
                 // { data: { id : 'aua', source: 'aluno3', target: 'usp2', label: '?someProp', type: 'variable' } },
- 
+
                 // { data: { id : 'alunovar', label: '?student', type: 'variable' } },
                 // { data: { id : 'usp3', label: 'USP' } },
                 // { data: { id : 'au3', source: 'alunovar', target: 'usp3', label: 'studiesAt' } },
- 
+
                 // { data: { id : 'alunofilter', label: '?student', type: 'variable' } },
                 // { data: { id : 'name', label: 'Mussak', type: 'label-filter' } },
                 // { data: { id : 'au32', source: 'alunofilter', target: 'name', label: 'hasName', type: 'filter', filterType: 'contém' } },
@@ -1064,7 +1086,8 @@
             var privateData = event.target._private;
             console.log(privateData)
 
-            changeElementValuefunction(event.target)
+            changeElementBooleanValue(event.target)
+            changeElementStringValueModal(event.target)
 
             if (privateData.data.isLink) {
                 window.open(privateData.data.href, '_blank');
@@ -1095,18 +1118,20 @@
                 for (var i = 0; i < conjuntos[conjuntoQuery].length; i++) {
                     var item = conjuntos[conjuntoQuery][i];
                     if (item.data('source') && item.data('target')) {
-                        
+
                         // Busca o valor dos elementos com o id do `source` e `target`
                         let sourceNode = cy.getElementById(item.data('source'));
                         let targetNode = cy.getElementById(item.data('target'));
                         let sourceValue = sourceNode.data('value') || item.data('source'); // Pega `value` ou `id`
                         let targetValue = targetNode.data('value') || item.data('target'); // Pega `value` ou `id`
+                        let targetFilter = targetNode.data('filterType') || null
 
                         // Adiciona o filtro com os valores dos nós `source` e `target`
                         filtros.push({
                             subject: sourceValue,
                             predicate: item.data('nodeId'),
-                            object: targetValue
+                            object: targetValue,
+                            filterType:  targetFilter ? +targetFilter : null
                         });
                     }
                 }
@@ -1114,15 +1139,15 @@
                 getQuery(privateData.data.value, filtros);
             }
         });
-    
-        function changeElementValuefunction(ele) {
-            if(ele.data('label') != 'true' && ele.data('label') != 'false'){
+
+        function changeElementBooleanValue(ele) {
+            if (ele.data('label') != 'true' && ele.data('label') != 'false') {
                 return;
             }
 
             // Verifica se o nó `source` do elemento tem `data('type') == 'variable'`
             let sourceEdges = cy.edges().filter(edge => edge.data('target') === ele.id() && cy.getElementById(edge.data('source')).data('type') === 'variable');
-    
+
             // Se não houver uma origem com `type: variable`, sai da função
             if (sourceEdges.length === 0) {
                 return;
@@ -1168,7 +1193,104 @@
 
             ele.remove();
         }
+
+
+
+        function changeElementStringValueModal(ele) {
+            if (ele.data('type') != 'label') {
+                return;
+            }
+
+            // Verifica se o nó `source` do elemento tem `data('type') == 'variable'`
+            let sourceEdges = cy.edges().filter(edge => edge.data('target') === ele.id() && cy.getElementById(edge.data('source')).data('type') === 'variable');
+
+            // Se não houver uma origem com `type: variable`, sai da função
+            if (sourceEdges.length === 0) {
+                return;
+            }
+
+            var theValue = ele.data('label');
+            var theId = ele.id();
+            $('#modal-change-value-content').html(`
+                <p>Current value: ${theValue}</p>
+                <div>
+                    <label for="new-value">New Value</label>
+                    <input type="text" id="new-value" placeholder="Enter new value" value="${theValue}">
+                </div>
+                <div>
+                    <label>Filter Type:</label>
+                    <div>
+                        <label>
+                            <input type="radio" name="filter-type" value="" checked>
+                            <span>Exact match</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <input type="radio" name="filter-type" value="1">
+                            <span>Starts with</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <input type="radio" name="filter-type" value="2">
+                            <span>Contains</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#!" id="confirm-btn" onclick="changeElementStringValue('${theId}', $('#new-value').val(), $('input[name=filter-type]:checked').val())" class="waves-effect waves-green btn-flat blue white-text">OK</a>
+                </div>
+            `);
+
+            abrirModalChangeValue();
+
+        }
     });
+
+    function changeElementStringValue(elementId, newValue, filterType) {
+        let ele = cy.getElementById(elementId);
+        let newNodeId = 'node_' + (new Date().getTime());
+        let oldId = ele.id();
+        var oldNodeData = ele.data();
+        var oldNodePosition = ele.position();
+
+        let newData = Object.assign({}, oldNodeData, { id: newNodeId, label: newValue, value: newValue, filterType: filterType });
+
+        cy.add({
+            group: 'nodes',
+            data: newData,
+            position: oldNodePosition
+        });
+
+        cy.edges().forEach(function (edge) {
+            if (edge.data('source') === oldId) {
+                let oldEdgeId = edge.data('id');
+                let oldEdgeTarget = edge.data('target');
+                let oldEdgeLabel = edge.data('label');
+                let oldEdgeNodeId = edge.data('nodeId');
+                edge.remove();
+                cy.add(
+                    { group: 'edges', data: { nodeId: oldEdgeNodeId, id: oldEdgeId, label: oldEdgeLabel, source: newNodeId, target: oldEdgeTarget } }
+                )
+            }
+
+            if (edge.data('target') === oldId) {
+                let oldEdgeId = edge.data('id');
+                let oldEdgeSource = edge.data('source');
+                let oldEdgeLabel = edge.data('label');
+                let oldEdgeNodeId = edge.data('nodeId');
+                edge.remove();
+                cy.add(
+                    { group: 'edges', data: { nodeId: oldEdgeNodeId, id: oldEdgeId, label: oldEdgeLabel, source: oldEdgeSource, target: newNodeId } }
+                )
+            }
+        });
+
+        ele.remove();
+
+        $('#modal-change-value').modal('close');
+    }
 
     function escapeHTML(unsafeText) {
         return unsafeText
