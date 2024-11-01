@@ -70,7 +70,7 @@
                     <div class="input-field col s1">
                         <input
                             data-intro="Here you can specify the number of results you want to display. Remember, the more results you request, the slower the response time"
-                            data-step="2" id="input-max-results" type="number" class="white-text" value="20">
+                            data-step="2" id="input-max-results" type="number" class="white-text" value="150">
                         <label for="input-max-results" class="white-text">Max Results</label>
                     </div>
                     <div class="input-field col s6 right">
@@ -238,11 +238,18 @@
                     variableName = item.data('id');
                 }
 
+                // Busca o valor dos elementos com o id do `source` e `target`
+                let sourceNode = cy.getElementById(item.data('source'));
+                let targetNode = cy.getElementById(item.data('target'));
+                let sourceValue = sourceNode.data('value') || item.data('source'); // Pega `value` ou `id`
+                let targetValue = targetNode.data('value') || item.data('target'); // Pega `value` ou `id`
+
+                // Adiciona o filtro com os valores dos nós `source` e `target`
                 filters.push({
-                    subject: item.data('source'),
+                    subject: sourceValue,
                     predicate: item.data('nodeId'),
-                    object: item.data('target')
-                })
+                    object: targetValue
+                });
             }
         }
 
@@ -618,7 +625,7 @@
 
         cy.add({
             group: 'nodes',
-            data: { id: newNodeVarId, label: '?', type: 'variable' }
+            data: { id: newNodeVarId, value: newNodeVarId, label: '?', type: 'variable' }
         });
 
         if (autoLayout)
@@ -670,11 +677,18 @@
 
                 if (!item.data('source') && !item.data('nodeId') && !item.data('target')) continue;
 
+                // Busca o valor dos elementos com o id do `source` e `target`
+                let sourceNode = cy.getElementById(item.data('source'));
+                let targetNode = cy.getElementById(item.data('target'));
+                let sourceValue = sourceNode.data('value') || item.data('source'); // Pega `value` ou `id`
+                let targetValue = targetNode.data('value') || item.data('target'); // Pega `value` ou `id`
+
+                // Adiciona o filtro com os valores dos nós `source` e `target`
                 filters.push({
-                    subject: item.data('source'),
+                    subject: sourceValue,
                     predicate: item.data('nodeId'),
-                    object: item.data('target')
-                })
+                    object: targetValue
+                });
             }
         }
 
@@ -695,7 +709,7 @@
 
     function addNode(theCy, id, text) {
         let autoLayout = $("#auto-layout").is(":checked");
-        theCy.add({ group: 'nodes', data: { id: id, label: text, type: 'node', position: { x: 200, y: 200 } } })//
+        theCy.add({ group: 'nodes', data: { id: id, value: id, label: text, type: 'node', position: { x: 200, y: 200 } } })//
         if (autoLayout)
             theCy.layout({ name: 'cose' }).run();
 
@@ -706,7 +720,7 @@
         let oldElement = theCy.getElementById(varName);
         let oldId = varName;
         let nodeType = propertyType == 'text' || nodeId == nodeLabel ? 'label' : 'node';
-        let newData = { id: nodeId, label: nodeLabel, type: nodeType }
+        let newData = { id: nodeId, value: nodeId, label: nodeLabel, type: nodeType }
         var oldNodePosition = oldElement.position();
 
         cy.add({
@@ -757,7 +771,7 @@
         let newText = predicateLabel == "image" ? "Ver imagem" : text;
         let isLink = predicateLabel == "image";
         theCy.add([
-            { group: 'nodes', data: { id: id, label: newText, type: nodeType, isLink: isLink, href: text }, position: { x: 200, y: 200 } },
+            { group: 'nodes', data: { id: id, value: id, label: newText, type: nodeType, isLink: isLink, href: text }, position: { x: 200, y: 200 } },
             { group: 'edges', data: { nodeId: predicateId, id: predicateId + predicateIndex, label: predicateLabel, source: theSource, target: theTarget } }
         ]);
 
@@ -775,25 +789,25 @@
             userZoomingEnabled: false,
             maxZoom: 1,
             elements: [
-                // { data: { id: 'aluno', label: 'Aluno' } },
-                // { data: { id: 'mussak', label: 'Vinicius Mussak', type: 'label' } },
-                // { data: { id: 'ab', source: 'aluno', target: 'mussak', label: 'hasName' } },
-
-                // { data: { id: 'aluno2', label: 'Aluno' } },
-                // { data: { id: 'usp', label: 'USP' } },
-                // { data: { id: 'au', source: 'aluno2', target: 'usp', label: 'studiesAt' } },
-
-                // { data: { id: 'aluno3', label: 'Aluno' } },
-                // { data: { id: 'usp2', label: 'USP' } },
-                // { data: { id: 'aua', source: 'aluno3', target: 'usp2', label: '?someProp', type: 'variable' } },
-
-                // { data: { id: 'alunovar', label: '?student', type: 'variable' } },
-                // { data: { id: 'usp3', label: 'USP' } },
-                // { data: { id: 'au3', source: 'alunovar', target: 'usp3', label: 'studiesAt' } },
-
-                // { data: { id: 'alunofilter', label: '?student', type: 'variable' } },
-                // { data: { id: 'name', label: 'Mussak', type: 'label-filter' } },
-                // { data: { id: 'au32', source: 'alunofilter', target: 'name', label: 'hasName', type: 'filter', filterType: 'contém' } },
+                // { data: { id : 'aluno', label: 'Aluno' } },
+                // { data: { id : 'mussak', label: 'Vinicius Mussak', type: 'label' } },
+                // { data: { id : 'ab', source: 'aluno', target: 'mussak', label: 'hasName' } },
+ 
+                // { data: { id : 'aluno2', label: 'Aluno' } },
+                // { data: { id : 'usp', label: 'USP' } },
+                // { data: { id : 'au', source: 'aluno2', target: 'usp', label: 'studiesAt' } },
+ 
+                // { data: { id : 'aluno3', label: 'Aluno' } },
+                // { data: { id : 'usp2', label: 'USP' } },
+                // { data: { id : 'aua', source: 'aluno3', target: 'usp2', label: '?someProp', type: 'variable' } },
+ 
+                // { data: { id : 'alunovar', label: '?student', type: 'variable' } },
+                // { data: { id : 'usp3', label: 'USP' } },
+                // { data: { id : 'au3', source: 'alunovar', target: 'usp3', label: 'studiesAt' } },
+ 
+                // { data: { id : 'alunofilter', label: '?student', type: 'variable' } },
+                // { data: { id : 'name', label: 'Mussak', type: 'label-filter' } },
+                // { data: { id : 'au32', source: 'alunofilter', target: 'name', label: 'hasName', type: 'filter', filterType: 'contém' } },
             ],
 
             style: [
@@ -931,7 +945,7 @@
 
                         var oldNodeData = ele.data();
                         var oldNodePosition = ele.position();
-                        let newData = Object.assign({}, oldNodeData, { id: newNodeVarId, label: '?', type: 'variable' });
+                        let newData = Object.assign({}, oldNodeData, { id: newNodeVarId, value: newNodeVarId, label: '?', type: 'variable' });
 
                         cy.add({
                             group: 'nodes',
@@ -1027,7 +1041,7 @@
                 } else {
                     const newNodeId = '?node_' + (cy.nodes().length + 1);
                     cy.add([
-                        { group: 'nodes', data: { id: newNodeId, label: '?', type: 'variable' }, position: releasedPosition },
+                        { group: 'nodes', data: { id: newNodeId, value: newNodeId, label: '?', type: 'variable' }, position: releasedPosition },
                         { group: 'edges', data: { id: '?edge-' + (cy.edges().length + 1), label: '?', source: sourceNode.data.id, target: newNodeId, type: 'variable' } }
                     ]);
                 }
@@ -1050,13 +1064,15 @@
             var privateData = event.target._private;
             console.log(privateData)
 
+            changeElementValuefunction(event.target)
+
             if (privateData.data.isLink) {
                 window.open(privateData.data.href, '_blank');
                 return;
             }
 
             if (privateData.data.type == 'node') {
-                getElementInfo(privateData.data.id)
+                getElementInfo(privateData.data.value)
             }
 
             if (privateData.data.type == 'filter') {
@@ -1079,18 +1095,79 @@
                 for (var i = 0; i < conjuntos[conjuntoQuery].length; i++) {
                     var item = conjuntos[conjuntoQuery][i];
                     if (item.data('source') && item.data('target')) {
-                        console.log(item._private.data)
+                        
+                        // Busca o valor dos elementos com o id do `source` e `target`
+                        let sourceNode = cy.getElementById(item.data('source'));
+                        let targetNode = cy.getElementById(item.data('target'));
+                        let sourceValue = sourceNode.data('value') || item.data('source'); // Pega `value` ou `id`
+                        let targetValue = targetNode.data('value') || item.data('target'); // Pega `value` ou `id`
+
+                        // Adiciona o filtro com os valores dos nós `source` e `target`
                         filtros.push({
-                            subject: item.data('source'),
+                            subject: sourceValue,
                             predicate: item.data('nodeId'),
-                            object: item.data('target')
-                        })
+                            object: targetValue
+                        });
                     }
                 }
 
-                getQuery(privateData.data.id, filtros);
+                getQuery(privateData.data.value, filtros);
             }
         });
+    
+        function changeElementValuefunction(ele) {
+            if(ele.data('label') != 'true' && ele.data('label') != 'false'){
+                return;
+            }
+
+            // Verifica se o nó `source` do elemento tem `data('type') == 'variable'`
+            let sourceEdges = cy.edges().filter(edge => edge.data('target') === ele.id() && cy.getElementById(edge.data('source')).data('type') === 'variable');
+    
+            // Se não houver uma origem com `type: variable`, sai da função
+            if (sourceEdges.length === 0) {
+                return;
+            }
+
+            let newNodeId = 'node_' + (new Date().getTime());
+            let oldId = ele.id();
+            var oldNodeData = ele.data();
+            var oldNodePosition = ele.position();
+            var newValue = ele.data('label') == 'true' ? 'false' : 'true';
+
+            let newData = Object.assign({}, oldNodeData, { id: newNodeId, label: newValue, value: newValue });
+
+            cy.add({
+                group: 'nodes',
+                data: newData,
+                position: oldNodePosition
+            });
+
+            cy.edges().forEach(function (edge) {
+                if (edge.data('source') === oldId) {
+                    let oldEdgeId = edge.data('id');
+                    let oldEdgeTarget = edge.data('target');
+                    let oldEdgeLabel = edge.data('label');
+                    let oldEdgeNodeId = edge.data('nodeId');
+                    edge.remove();
+                    cy.add(
+                        { group: 'edges', data: { nodeId: oldEdgeNodeId, id: oldEdgeId, label: oldEdgeLabel, source: newNodeId, target: oldEdgeTarget } }
+                    )
+                }
+
+                if (edge.data('target') === oldId) {
+                    let oldEdgeId = edge.data('id');
+                    let oldEdgeSource = edge.data('source');
+                    let oldEdgeLabel = edge.data('label');
+                    let oldEdgeNodeId = edge.data('nodeId');
+                    edge.remove();
+                    cy.add(
+                        { group: 'edges', data: { nodeId: oldEdgeNodeId, id: oldEdgeId, label: oldEdgeLabel, source: oldEdgeSource, target: newNodeId } }
+                    )
+                }
+            });
+
+            ele.remove();
+        }
     });
 
     function escapeHTML(unsafeText) {
