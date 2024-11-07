@@ -162,7 +162,7 @@
 
 
 <script>
-    const env = 'prod'; //dev
+    const env = 'dev'; //dev
 
     const url = {
         dev: 'http://localhost:5242',
@@ -267,7 +267,7 @@
                     subject: sourceValue,
                     predicate: item.data('nodeId'),
                     object: targetValue,
-                    filterType:  targetFilter ? +targetFilter : null
+                    filterType: targetFilter ? +targetFilter : null
                 });
             }
         }
@@ -336,7 +336,14 @@
         });
     }
 
-    function getQuery(variableName, filters) {
+    //TODO: Conectar o node "any" com a nova prop que veio a partir dela (default)
+
+    function getQuery(variableName, filters, showDefault, anotherAction) {
+
+        console.log(variableName, filters, showDefault, anotherAction)
+
+        let method = anotherAction || 'replaceNodeVariable';
+
         $.ajax({
             url: `${url[env]}/api/query`,
             type: 'post',
@@ -357,13 +364,35 @@
                         variableName: variableName,
                         nodeId: data.data[i].propertyId,
                         nodeLabel: data.data[i].propertyLabel,
-                        propertyType: data.data[i].propertyType
+                        propertyType: data.data[i].propertyType,
+                        propertyClass: data.data[i].propertyClass
                     };
-                    let linha = `<tr onclick='replaceNodeVariable(${i})'><td>${escapeHTML(data.data[i].propertyId)}</td><td>${data.data[i].propertyLabel}</td></tr>`
+
+                    if (anotherAction) {
+                        //trData[i].variableName = '?node_' + (new Date().getTime());
+                        trData[i].subjectId = variableName;
+                        trData[i].predicateId = data.data[i].propertyId;
+                        trData[i].predicateLabel = data.data[i].propertyLabel;
+                        trData[i].isLiteral = data.data[i].propertyType == "label" || data.data[i].propertyLabel == "image"
+                    }
+
+                    let linha = `<tr onclick='${method}(${i})'><td>${escapeHTML(data.data[i].propertyId)}</td><td>${data.data[i].propertyLabel}</td></tr>`
                     linhas += linha;
                 }
 
-                $("#table-results-body").html(linhas);
+                let primeiraLinha = '';
+                if (false) { //showDefault
+                    trData["default"] = {
+                        variableName: variableName,
+                        nodeId: '?default_' + (new Date().getTime()),
+                        nodeLabel: '** Any **',
+                        propertyType: 'default',
+                        propertyClass: data.data[0].propertyClass //sempre vai ser igual a class de todas as respostas
+                    }
+                    primeiraLinha = `<tr class='green lighten-3' onclick='replaceNodeVariable("default")'><td>Default</td><td>Default</td></tr>`
+                }
+
+                $("#table-results-body").html(primeiraLinha + linhas);
 
                 abrirModal();
             },
@@ -407,7 +436,7 @@
                     });
                 } else {
                     addNodeWithRelationship(cy,
-                        '?node_' + (cy.nodes().length + 1),
+                        '?node_' + (new Date().getTime()),
                         `${data.data.length} resultados`,
                         'many-results',
                         parameters.subjectId,
@@ -431,7 +460,8 @@
             parameters.variableName,
             parameters.nodeId,
             parameters.nodeLabel,
-            parameters.propertyType
+            parameters.propertyType,
+            parameters.propertyClass
         )
 
         $('#grid-resultado-consulta').modal('close');
@@ -641,7 +671,7 @@
 
     function addNewVariable() {
         let autoLayout = $("#auto-layout").is(":checked");
-        let newNodeVarId = '?node_' + (cy.nodes().length + 1);
+        let newNodeVarId = '?node_' + (new Date().getTime());
 
         cy.add({
             group: 'nodes',
@@ -714,7 +744,7 @@
             }
         }
 
-        getQuery(variableName, filters);
+        getQuery(variableName, filters, true);
     }
 
     //-------------------- cyto
@@ -723,7 +753,8 @@
         let nodeColors = {
             'variable': '#A9D18E',
             'label-filter': '#7030A0',
-            'label': 'pink'
+            'label': 'pink',
+            'default': '#FDD835'
         };
 
         return nodeColors[node.data('type') ?? ''] ?? '#4472C4';
@@ -738,11 +769,16 @@
         showIntroAlert('newNode', 'You can view more details about this new node by clicking on it.');
     }
 
-    function replaceWithNewNode(theCy, varName, nodeId, nodeLabel, propertyType) {
+    function replaceWithNewNode(theCy, varName, nodeId, nodeLabel, propertyType, propertyClass) {
         let oldElement = theCy.getElementById(varName);
         let oldId = varName;
         let nodeType = propertyType == 'text' || nodeId == nodeLabel ? 'label' : 'node';
-        let newData = { id: nodeId, value: nodeId, label: nodeLabel, type: nodeType }
+        var nodeValue = nodeId;
+        if (propertyType == 'default') {
+            nodeType = 'default'
+            nodeValue = propertyClass;
+        }
+        let newData = { id: nodeId, value: nodeValue, label: nodeLabel, type: nodeType }
         var oldNodePosition = oldElement.position();
 
         cy.add({
@@ -779,6 +815,8 @@
     }
 
     function addNodeWithRelationship(theCy, id, text, type, sourceNodeId, predicateId, predicateLabel, theSubject, predicateIndex) {
+        console.log('vou add')
+        console.log(id, text, type, sourceNodeId, predicateId, predicateLabel, theSubject, predicateIndex)
         let autoLayout = $("#auto-layout").is(":checked");
         let theSource = theSubject || sourceNodeId;
         let theTarget = theSource == sourceNodeId ? id : sourceNodeId;
@@ -963,7 +1001,7 @@
                     content: 'Convert to variable',
                     select: function (ele) {
                         let oldId = ele.id();
-                        let newNodeVarId = '?node_' + (cy.nodes().length + 1);
+                        let newNodeVarId = '?node_' + (new Date().getTime());
 
                         var oldNodeData = ele.data();
                         var oldNodePosition = ele.position();
@@ -1061,7 +1099,7 @@
                         data: { source: sourceNode.data.id, target: nearbyNode.id(), label: '?someProp', type: 'variable' }
                     });
                 } else {
-                    const newNodeId = '?node_' + (cy.nodes().length + 1);
+                    const newNodeId = '?node_' + (new Date().getTime());
                     cy.add([
                         { group: 'nodes', data: { id: newNodeId, value: newNodeId, label: '?', type: 'variable' }, position: releasedPosition },
                         { group: 'edges', data: { id: '?edge-' + (cy.edges().length + 1), label: '?', source: sourceNode.data.id, target: newNodeId, type: 'variable' } }
@@ -1102,6 +1140,17 @@
                 showColorModal(privateData);
             }
 
+            if (privateData.data.type == 'default') {
+                var varName = '?default_' + (new Date().getTime());
+                getQuery(varName, [
+                    {
+                        subject: varName,
+                        predicate: "rdfs:domain",
+                        object: privateData.data.value,
+                    }
+                ], false, 'getRelationshipValue');
+            }
+
             if (privateData.data.type == 'variable') {
                 let conjuntos = cy.elements().components();
                 let conjuntoQuery = null;
@@ -1131,12 +1180,12 @@
                             subject: sourceValue,
                             predicate: item.data('nodeId'),
                             object: targetValue,
-                            filterType:  targetFilter ? +targetFilter : null
+                            filterType: targetFilter ? +targetFilter : null
                         });
                     }
                 }
 
-                getQuery(privateData.data.value, filtros);
+                getQuery(privateData.data.value, filtros, true);
             }
         });
 
@@ -1194,8 +1243,6 @@
             ele.remove();
         }
 
-
-
         function changeElementStringValueModal(ele) {
             if (ele.data('type') != 'label') {
                 return;
@@ -1211,42 +1258,94 @@
 
             var theValue = ele.data('label');
             var theId = ele.id();
-            $('#modal-change-value-content').html(`
-                <p>Current value: ${theValue}</p>
-                <div>
-                    <label for="new-value">New Value</label>
-                    <input type="text" id="new-value" placeholder="Enter new value" value="${theValue}">
-                </div>
-                <div>
-                    <label>Filter Type:</label>
-                    <div>
-                        <label>
-                            <input type="radio" name="filter-type" value="" checked>
-                            <span>Exact match</span>
-                        </label>
-                    </div>
-                    <div>
-                        <label>
-                            <input type="radio" name="filter-type" value="1">
-                            <span>Starts with</span>
-                        </label>
-                    </div>
-                    <div>
-                        <label>
-                            <input type="radio" name="filter-type" value="2">
-                            <span>Contains</span>
-                        </label>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <a href="#!" id="confirm-btn" onclick="changeElementStringValue('${theId}', $('#new-value').val(), $('input[name=filter-type]:checked').val())" class="waves-effect waves-green btn-flat blue white-text">OK</a>
-                </div>
-            `);
+            $('#modal-change-value-content').html(getModalReplaceContent(theId, theValue));
 
             abrirModalChangeValue();
-
         }
     });
+
+    function getModalReplaceContent(theId, theValue) {
+        let content = '';
+
+        if (isNaN(theValue) && theValue != "MAX" && theValue != "MIN")
+            content = `
+            <p>Current value: ${theValue}</p>
+            <div>
+                <label for="new-value">New Value</label>
+                <input type="text" id="new-value" placeholder="Enter new value" value="${theValue}">
+            </div>
+            <div>
+                <label>Filter Type:</label>
+                <div>
+                    <label>
+                        <input type="radio" name="filter-type" value="" checked>
+                        <span>Exact match</span>
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="filter-type" value="0">
+                        <span>Starts with</span>
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="filter-type" value="1">
+                        <span>Contains</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" id="confirm-btn" onclick="changeElementStringValue('${theId}', $('#new-value').val(), $('input[name=filter-type]:checked').val())" class="waves-effect waves-green btn-flat blue white-text">OK</a>
+            </div>
+            `;
+        else
+            content = `
+            <p>Current value: ${theValue}</p>
+            <div>
+                <label for="new-value">New Value</label>
+                <input type="text" id="new-value" placeholder="Enter new value" value="${theValue}">
+            </div>
+            <div>
+                <label>Filter Type:</label>
+                <div>
+                    <label>
+                        <input type="radio" name="filter-type" value="" checked>
+                        <span>Exactly Equal</span>
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="filter-type" value="2">
+                        <span>Greater Than</span>
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="filter-type" value="3">
+                        <span>Lesser Than</span>
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="filter-type" value="4">
+                        <span>MAX</span>
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="filter-type" value="5">
+                        <span>MIN</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" id="confirm-btn" onclick="changeElementStringValue('${theId}', $('#new-value').val(), $('input[name=filter-type]:checked').val())" class="waves-effect waves-green btn-flat blue white-text">OK</a>
+            </div>
+        `;
+
+        return content;
+    }
 
     function changeElementStringValue(elementId, newValue, filterType) {
         let ele = cy.getElementById(elementId);
@@ -1254,8 +1353,12 @@
         let oldId = ele.id();
         var oldNodeData = ele.data();
         var oldNodePosition = ele.position();
+        var label = newValue;
+        if (filterType == 4 || filterType == 5) {
+            label = filterType == 4 ? "MAX" : "MIN";
+        }
 
-        let newData = Object.assign({}, oldNodeData, { id: newNodeId, label: newValue, value: newValue, filterType: filterType });
+        let newData = Object.assign({}, oldNodeData, { id: newNodeId, label: label, value: newValue, filterType: filterType });
 
         cy.add({
             group: 'nodes',
