@@ -324,7 +324,19 @@
                     linhas += linha;
                 }
 
-                $("#table-results-body").html(linhas);
+                let primeiraLinha = '';
+                if (false) {
+                    trData["var"] = {
+                        subjectId: elementId,
+                        predicateId: '?node_' + (new Date().getTime()),
+                        predicateLabel: '?',
+                        isLiteral: false,
+                    }
+
+                    primeiraLinha = `<tr class='green lighten-3' onclick='getRelationshipValue("var")'><td>Add variable</td><td></td></tr>`
+                }
+
+                $("#table-results-body").html(primeiraLinha + linhas);
 
                 abrirModal();
             },
@@ -339,9 +351,6 @@
     //TODO: Conectar o node "any" com a nova prop que veio a partir dela (default)
 
     function getQuery(variableName, filters, showDefault, anotherAction) {
-
-        console.log(variableName, filters, showDefault, anotherAction)
-
         let method = anotherAction || 'replaceNodeVariable';
 
         $.ajax({
@@ -406,6 +415,10 @@
 
     function getRelationshipValue(nodeLine) {
         let parameters = trData[nodeLine];
+
+        if(nodeLine == "var") {
+           //validar como fazer
+        }
 
         $.ajax({
             url: `${url[env]}/api/query/relationship-value`,
@@ -737,7 +750,7 @@
                 // Adiciona o filtro com os valores dos nós `source` e `target`
                 filters.push({
                     subject: sourceValue,
-                    predicate: item.data('nodeId'),
+                    predicate: item.data('nodeId') || '?empty_' + (new Date().getTime()),
                     object: targetValue,
                     filterType: targetFilter ? +targetFilter : null
                 });
@@ -849,26 +862,108 @@
             userZoomingEnabled: false,
             maxZoom: 1,
             elements: [
-                // { data: { id : 'aluno', label: 'Aluno' } },
-                // { data: { id : 'mussak', label: 'Vinicius Mussak', type: 'label' } },
-                // { data: { id : 'ab', source: 'aluno', target: 'mussak', label: 'hasName' } },
+                // { "data": { "id": "Atleta", "label": "Atleta" } },
+                // { "data": { "id": "Campeonato", "label": "Campeonato" } },
+                // { "data": { "id": "Classificacao", "label": "Classificacao" } },
+                // { "data": { "id": "Equipe", "label": "Equipe" } },
+                // { "data": { "id": "Estadio", "label": "Estadio" } },
+                // { "data": { "id": "Gol", "label": "Gol" } },
+                // { "data": { "id": "Partida", "label": "Partida" } },
+                // { "data": { "id": "Rodada", "label": "Rodada" } },
 
-                // { data: { id : 'aluno2', label: 'Aluno' } },
-                // { data: { id : 'usp', label: 'USP' } },
-                // { data: { id : 'au', source: 'aluno2', target: 'usp', label: 'studiesAt' } },
+                // { "data": { "id": "competePor", "source": "Atleta", "target": "Equipe", "label": "competePor" } },
+                // { "data": { "id": "contemPartida", "source": "Rodada", "target": "Partida", "label": "contemPartida" } },
+                // { "data": { "id": "formadaPor", "source": "Equipe", "target": "Atleta", "label": "formadaPor" } },
+                // { "data": { "id": "indicaPosicao", "source": "Classificacao", "target": "Equipe", "label": "indicaPosicao" } },
+                // { "data": { "id": "marcaGol", "source": "Atleta", "target": "Gol", "label": "marcaGol" } },
+                // { "data": { "id": "marcadoEm", "source": "Gol", "target": "Partida", "label": "marcadoEm" } },
+                // { "data": { "id": "marcadoPor", "source": "Gol", "target": "Atleta", "label": "marcadoPor" } },
+                // { "data": { "id": "ocorreDurante", "source": "Rodada", "target": "Campeonato", "label": "ocorreDurante" } },
+                // { "data": { "id": "ocorreEm", "source": "Partida", "target": "Rodada", "label": "ocorreEm" } },
+                // { "data": { "id": "participaDe", "source": "Equipe", "target": "Campeonato", "label": "participaDe" } },
+                // { "data": { "id": "possuiClassificacao", "source": "Equipe", "target": "Classificacao", "label": "possuiClassificacao" } },
+                // { "data": { "id": "realizadaEm", "source": "Partida", "target": "Estadio", "label": "realizadaEm" } },
+                // { "data": { "id": "recebe", "source": "Estadio", "target": "Partida", "label": "recebe" } },
+                // { "data": { "id": "refereSeA", "source": "Classificacao", "target": "Campeonato", "label": "refere-se" } },
+                // { "data": { "id": "tem", "source": "Partida", "target": "Gol", "label": "tem" } },
+                // { "data": { "id": "temMandante", "source": "Partida", "target": "Equipe", "label": "temMandante" } },
+                // { "data": { "id": "temVisitante", "source": "Partida", "target": "Equipe", "label": "temVisitante" } },
+                // { "data": { "id": "classifica", "source": "Campeonato", "target": "Classificacao", "label": "classifica" } },
+                // { "data": { "id": "compostoPelaEquipe", "source": "Equipe", "target": "Campeonato", "label": "compostoPelaEquipe" } },
+                // { "data": { "id": "compostoPor", "source": "Campeonato", "target": "Rodada", "label": "compostoPor" } },
+                // { "data": { "id": "manda", "source": "Equipe", "target": "Partida", "label": "manda" } },
+                // { "data": { "id": "visita", "source": "Equipe", "target": "Partida", "label": "visita" } },
 
-                // { data: { id : 'aluno3', label: 'Aluno' } },
-                // { data: { id : 'usp2', label: 'USP' } },
-                // { data: { id : 'aua', source: 'aluno3', target: 'usp2', label: '?someProp', type: 'variable' } },
+                // { "data": { "id": "classificadoLibertadores", "source": "Classificacao", "target": "classificadoLibertadores_val", "label": "classificadoLibertadores" } },
+                // { "data": { "id": "classificadoLibertadores_val", "label": "boolean", "type": "label" } },
 
-                // { data: { id : 'alunovar', label: '?student', type: 'variable' } },
-                // { data: { id : 'usp3', label: 'USP' } },
-                // { data: { id : 'au3', source: 'alunovar', target: 'usp3', label: 'studiesAt' } },
+                // { "data": { "id": "classificadoSulamericana", "source": "Classificacao", "target": "classificadoSulamericana_val", "label": "classificadoSulamericana" } },
+                // { "data": { "id": "classificadoSulamericana_val", "label": "boolean", "type": "label" } },
 
-                // { data: { id : 'alunofilter', label: '?student', type: 'variable' } },
-                // { data: { id : 'name', label: 'Mussak', type: 'label-filter' } },
-                // { data: { id : 'au32', source: 'alunofilter', target: 'name', label: 'hasName', type: 'filter', filterType: 'contém' } },
-            ],
+                // { "data": { "id": "disputadoAoLongoDoAno", "source": "Campeonato", "target": "disputadoAoLongoDoAno_val", "label": "disputadoAoLongoDoAno" } },
+                // { "data": { "id": "disputadoAoLongoDoAno_val", "label": "positiveInteger", "type": "label" } },
+
+                // { "data": { "id": "foiContra", "source": "Gol", "target": "foiContra_val", "label": "foiContra" } },
+                // { "data": { "id": "foiContra_val", "label": "boolean", "type": "label" } },
+
+                // { "data": { "id": "incluiDerrotas", "source": "Classificacao", "target": "incluiDerrotas_val", "label": "incluiDerrotas" } },
+                // { "data": { "id": "incluiDerrotas_val", "label": "int", "type": "label" } },
+
+                // { "data": { "id": "incluiEmpates", "source": "Classificacao", "target": "incluiEmpates_val", "label": "incluiEmpates" } },
+                // { "data": { "id": "incluiEmpates_val", "label": "int", "type": "label" } },
+
+                // { "data": { "id": "incluiGolsContra", "source": "Classificacao", "target": "incluiGolsContra_val", "label": "incluiGolsContra" } },
+                // { "data": { "id": "incluiGolsContra_val", "label": "int", "type": "label" } },
+
+                // { "data": { "id": "incluiGolsPro", "source": "Classificacao", "target": "incluiGolsPro_val", "label": "incluiGolsPro" } },
+                // { "data": { "id": "incluiGolsPro_val", "label": "int", "type": "label" } },
+
+                // { "data": { "id": "incluiPontuacao", "source": "Classificacao", "target": "incluiPontuacao_val", "label": "incluiPontuacao" } },
+                // { "data": { "id": "incluiPontuacao_val", "label": "int", "type": "label" } },
+
+                // { "data": { "id": "incluiVitorias", "source": "Classificacao", "target": "incluiVitorias_val", "label": "incluiVitorias" } },
+                // { "data": { "id": "incluiVitorias_val", "label": "positiveInteger", "type": "label" } },
+
+                // { "data": { "id": "indicaColocacao", "source": "Classificacao", "target": "indicaColocacao_val", "label": "indicaColocacao" } },
+                // { "data": { "id": "indicaColocacao_val", "label": "positiveInteger", "type": "label" } },
+
+                // { "data": { "id": "marcadoNoMinuto", "source": "Gol", "target": "marcadoNoMinuto_val", "label": "marcadoNoMinuto" } },
+                // { "data": { "id": "marcadoNoMinuto_val", "label": "string", "type": "label" } },
+
+                // { "data": { "id": "marcadoNoPrimeiroTempo", "source": "Gol", "target": "marcadoNoPrimeiroTempo_val", "label": "marcadoNoPrimeiroTempo" } },
+                // { "data": { "id": "marcadoNoPrimeiroTempo_val", "label": "boolean", "type": "label" } },
+
+                // { "data": { "id": "placarMandante", "source": "Partida", "target": "placarMandante_val", "label": "placarMandante" } },
+                // { "data": { "id": "placarMandante_val", "label": "int", "type": "label" } },
+
+                // { "data": { "id": "placarVisitante", "source": "Partida", "target": "placarVisitante_val", "label": "placarVisitante" } },
+                // { "data": { "id": "placarVisitante_val", "label": "int", "type": "label" } },
+
+                // { "data": { "id": "possuiIdentificacao", "source": "Rodada", "target": "possuiIdentificacao_val", "label": "possuiIdentificacao" } },
+                // { "data": { "id": "possuiIdentificacao_val", "label": "string", "type": "label" } },
+
+                // { "data": { "id": "possuiNome", "source": "Atleta", "target": "possuiNome_val", "label": "possuiNome" } },
+                // { "data": { "id": "possuiNome_val", "label": "string", "type": "label" } },
+
+                // { "data": { "id": "possuiNumero", "source": "Rodada", "target": "possuiNumero_val", "label": "possuiNumero" } },
+                // { "data": { "id": "possuiNumero_val", "label": "positiveInteger", "type": "label" } },
+
+                // { "data": { "id": "possuiPlacar", "source": "Partida", "target": "possuiPlacar_val", "label": "possuiPlacar" } },
+                // { "data": { "id": "possuiPlacar_val", "label": "string", "type": "label" } },
+
+                // { "data": { "id": "realizadaNaData", "source": "Partida", "target": "realizadaNaData_val", "label": "realizadaNaData" } },
+                // { "data": { "id": "realizadaNaData_val", "label": "dateTime", "type": "label" } },
+
+                // { "data": { "id": "vitoriaMandante", "source": "Partida", "target": "vitoriaMandante_val", "label": "vitoriaMandante" } },
+                // { "data": { "id": "vitoriaMandante_val", "label": "boolean", "type": "label" } },
+
+                // { "data": { "id": "empate", "source": "Partida", "target": "empate_val", "label": "empate" } },
+                // { "data": { "id": "empate_val", "label": "boolean", "type": "label" } },
+
+                // { "data": { "id": "rebaixado", "source": "Classificacao", "target": "rebaixado_val", "label": "rebaixado" } },
+                // { "data": { "id": "rebaixado_val", "label": "boolean", "type": "label" } }
+            ]
+            ,
 
             style: [
                 {
@@ -952,7 +1047,7 @@
                 valignBox: 'center',
                 tpl: function (data) {
                     let finalLabel = data.label;
-                    let lengthClass = finalLabel.length > 15 ? " node-label-big" : "";
+                    let lengthClass = finalLabel.length > 25 ? " node-label-big" : "";
                     if (data.label.includes(')')) {
                         finalLabel = finalLabel.split(')')[1].trimStart()
                     }
@@ -1067,17 +1162,17 @@
             }
         });
 
-        // cy.on('mousedown', 'node', function (event) {
-        //     sourceNode = event.target._private;
+        cy.on('mousedown', 'node', function (event) {
+            sourceNode = event.target._private;
 
-        //     if (event.originalEvent.altKey) {
-        //         isDraggingNewNode = true;
-        //         originalPosition = {
-        //             x: sourceNode.position.x,
-        //             y: sourceNode.position.y
-        //         };
-        //     }
-        // });
+            if (event.originalEvent.altKey) {
+                isDraggingNewNode = true;
+                originalPosition = {
+                    x: sourceNode.position.x,
+                    y: sourceNode.position.y
+                };
+            }
+        });
 
         cy.on('mouseup', function (event) {
             if (isDraggingNewNode && event.originalEvent.altKey) {
@@ -1178,7 +1273,7 @@
                         // Adiciona o filtro com os valores dos nós `source` e `target`
                         filtros.push({
                             subject: sourceValue,
-                            predicate: item.data('nodeId'),
+                            predicate: item.data('nodeId') || '?empty_' + (new Date().getTime()),
                             object: targetValue,
                             filterType: targetFilter ? +targetFilter : null
                         });
