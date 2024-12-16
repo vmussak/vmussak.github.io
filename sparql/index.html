@@ -84,6 +84,10 @@
                 </div>
                 <div class="row">
                     <div class="col s6">
+                        <button id="new-query-button" class="btn waves-effect waves-light" type="button"
+                            onclick="newQuery()">
+                            <i class="material-icons left">refresh</i> New Query
+                        </button>
                         <button id="add-variable-btn" class="btn waves-effect waves-light" type="button"
                             onclick="addNewVariable()" data-intro="Another way to start is adding a new variable here."
                             data-step="6">
@@ -467,6 +471,53 @@
         });
     }
 
+    function getRelationshipValueChange(subject, predicate, predicateLabel) {
+        $.ajax({
+            url: `${url[env]}/api/query/relationship-value`,
+            type: 'post',
+            cache: false,
+            data: JSON.stringify({
+                "endpointUrl": $("#input-endpoint-sparql").val(),
+                "subjectId": subject,
+                "predicateId": predicate,
+                "isLiteral": true
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            success: function (data) {
+                if (data.data.length == 1) {
+                    data.data.forEach(function (item, index) {
+                        addNodeWithRelationship(cy,
+                            item.propertyId,
+                            item.propertyLabel,
+                            item.propertyType,
+                            subject,
+                            predicate,
+                            predicateLabel,
+                            null,
+                            index
+                        )
+                    });
+                } else {
+                    addNodeWithRelationship(cy,
+                        '?node_' + (new Date().getTime()),
+                        `${data.data.length} resultados`,
+                        'many-results',
+                        subject,
+                        predicate,
+                        predicateLabel
+                    )
+                }
+
+                $('#grid-resultado-consulta').modal('close');
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+
     function replaceNodeVariable(nodeLine) {
         let parameters = trData[nodeLine];
 
@@ -683,6 +734,10 @@
 
     }
 
+    function newQuery() {
+        cy.elements().remove();
+    }
+
     function addNewVariable() {
         let autoLayout = $("#auto-layout").is(":checked");
         let newNodeVarId = '?node_' + (new Date().getTime());
@@ -694,8 +749,6 @@
 
         if (autoLayout)
             cy.layout({ name: 'cose' }).run();
-
-        showIntroAlert('newVar', '');
     }
 
     function showIntroAlert(name, text) {
@@ -721,6 +774,11 @@
         let conjuntoQuery = 0;
         let variableName = '';
         let filters = [];
+
+        if(!conjuntos[conjuntoQuery] || !conjuntos[conjuntoQuery].length) {
+            showIntroAlert(new Date().getTime(), 'You can add at least one node');
+            return;
+        }
 
         for (var i = 0; i < conjuntos[conjuntoQuery].length; i++) {
             var item = conjuntos[conjuntoQuery][i];
@@ -756,6 +814,11 @@
                     filterType: targetFilter ? +targetFilter : null
                 });
             }
+        }
+
+        if(!variableName){
+            showIntroAlert(new Date().getTime(), 'You can add at least one variable node');
+            return;
         }
 
         getQuery(variableName, filters, true);
@@ -811,6 +874,9 @@
                 cy.add(
                     { group: 'edges', data: { nodeId: oldEdgeNodeId, id: oldEdgeId, label: oldEdgeLabel, source: nodeId, target: oldEdgeTarget } }
                 )
+
+                cy.$('#' + oldEdgeTarget).remove();
+                getRelationshipValueChange(nodeId, oldEdgeNodeId, oldEdgeLabel)
             }
 
             if (edge.data('target') === oldId) {
@@ -829,8 +895,6 @@
     }
 
     function addNodeWithRelationship(theCy, id, text, type, sourceNodeId, predicateId, predicateLabel, theSubject, predicateIndex) {
-        console.log('vou add')
-        console.log(id, text, type, sourceNodeId, predicateId, predicateLabel, theSubject, predicateIndex)
         let autoLayout = $("#auto-layout").is(":checked");
         let theSource = theSubject || sourceNodeId;
         let theTarget = theSource == sourceNodeId ? id : sourceNodeId;
@@ -1048,7 +1112,7 @@
                 valignBox: 'center',
                 tpl: function (data) {
                     let finalLabel = data.label;
-                    let lengthClass = finalLabel.length > 25 ? " node-label-big" : "";
+                    let lengthClass = finalLabel.length > 15 ? " node-label-big" : "";
                     if (data.label.includes(')')) {
                         finalLabel = finalLabel.split(')')[1].trimStart()
                     }
@@ -1139,18 +1203,18 @@
             ]
         });
 
-        cy.cxtmenu({
-            selector: 'edge',
-            adaptativeNodeSpotlightRadius: true,
-            commands: [
-                {
-                    content: 'Convert to variable',
-                    select: function (ele) {
+        // cy.cxtmenu({
+        //     selector: 'edge',
+        //     adaptativeNodeSpotlightRadius: true,
+        //     commands: [
+        //         {
+        //             content: 'Convert to variable',
+        //             select: function (ele) {
 
-                    }
-                }
-            ]
-        });
+        //             }
+        //         }
+        //     ]
+        // });
 
         var isDraggingNewNode = false;
         let originalPosition = null;
