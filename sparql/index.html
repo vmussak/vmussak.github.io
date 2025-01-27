@@ -834,6 +834,8 @@
             'default': '#FDD835'
         };
 
+        if(node.data('color')) return '#999999ff';
+
         return nodeColors[node.data('type') ?? ''] ?? '#4472C4';
     }
 
@@ -905,11 +907,11 @@
         }
 
         let nodeType = types[type] || "node";
-        console.log(nodeType)
+        let manyColor = type == 'many-results';
         let newText = predicateLabel == "image" ? "Ver imagem" : text;
         let isLink = predicateLabel == "image";
         theCy.add([
-            { group: 'nodes', data: { id: id, value: id, label: newText, type: nodeType, isLink: isLink, href: text }, position: { x: 200, y: 200 } },
+            { group: 'nodes', data: { id: id, value: id, label: newText, type: nodeType, isLink: isLink, href: text, color: manyColor ? 'gray': ''  }, position: { x: 200, y: 200 } },
             { group: 'edges', data: { nodeId: predicateId, id: predicateId + predicateIndex, label: predicateLabel, source: theSource, target: theTarget } }
         ]);
 
@@ -937,95 +939,79 @@
                 // { "data": { "id": "Rodada", "label": "Rodada" } },
 
                 // { "data": { "id": "competePor", "source": "Atleta", "target": "Equipe", "label": "competePor" } },
-                // { "data": { "id": "contemPartida", "source": "Rodada", "target": "Partida", "label": "contemPartida" } },
                 // { "data": { "id": "formadaPor", "source": "Equipe", "target": "Atleta", "label": "formadaPor" } },
-                // { "data": { "id": "indicaPosicao", "source": "Classificacao", "target": "Equipe", "label": "indicaPosicao" } },
                 // { "data": { "id": "marcaGol", "source": "Atleta", "target": "Gol", "label": "marcaGol" } },
-                // { "data": { "id": "marcadoEm", "source": "Gol", "target": "Partida", "label": "marcadoEm" } },
                 // { "data": { "id": "marcadoPor", "source": "Gol", "target": "Atleta", "label": "marcadoPor" } },
-                // { "data": { "id": "ocorreDurante", "source": "Rodada", "target": "Campeonato", "label": "ocorreDurante" } },
-                // { "data": { "id": "ocorreEm", "source": "Partida", "target": "Rodada", "label": "ocorreEm" } },
-                // { "data": { "id": "participaDe", "source": "Equipe", "target": "Campeonato", "label": "participaDe" } },
+                // { "data": { "id": "indicaPosicao", "source": "Classificacao", "target": "Equipe", "label": "indicaPosicao" } },
                 // { "data": { "id": "possuiClassificacao", "source": "Equipe", "target": "Classificacao", "label": "possuiClassificacao" } },
-                // { "data": { "id": "realizadaEm", "source": "Partida", "target": "Estadio", "label": "realizadaEm" } },
-                // { "data": { "id": "recebe", "source": "Estadio", "target": "Partida", "label": "recebe" } },
                 // { "data": { "id": "refereSeA", "source": "Classificacao", "target": "Campeonato", "label": "refere-se" } },
-                // { "data": { "id": "tem", "source": "Partida", "target": "Gol", "label": "tem" } },
-                // { "data": { "id": "temMandante", "source": "Partida", "target": "Equipe", "label": "temMandante" } },
-                // { "data": { "id": "temVisitante", "source": "Partida", "target": "Equipe", "label": "temVisitante" } },
                 // { "data": { "id": "classifica", "source": "Campeonato", "target": "Classificacao", "label": "classifica" } },
+                // // { "data": { "id": "classificadoLibertadores", "source": "Classificacao", "target": "classificadoLibertadores_val", "label": "classificadoLibertadores" } },
+                // // { "data": { "id": "possuiNome", "source": "Atleta", "target": "possuiNome_val", "label": "possuiNome" } },
+                // // { "data": { "id": "classificadoSulamericana", "source": "Classificacao", "target": "classificadoSulamericana_val", "label": "classificadoSulamericana" } },
+                // // { "data": { "id": "incluiDerrotas", "source": "Classificacao", "target": "incluiDerrotas_val", "label": "incluiDerrotas" } },
+                // // { "data": { "id": "incluiEmpates", "source": "Classificacao", "target": "incluiEmpates_val", "label": "incluiEmpates" } },
+                // // { "data": { "id": "incluiGolsContra", "source": "Classificacao", "target": "incluiGolsContra_val", "label": "incluiGolsContra" } },
+                // // { "data": { "id": "incluiGolsPro", "source": "Classificacao", "target": "incluiGolsPro_val", "label": "incluiGolsPro" } },
+                // // { "data": { "id": "incluiPontuacao", "source": "Classificacao", "target": "incluiPontuacao_val", "label": "incluiPontuacao" } },
+                // // { "data": { "id": "incluiVitorias", "source": "Classificacao", "target": "incluiVitorias_val", "label": "incluiVitorias" } },
+                // // { "data": { "id": "incluiSaldoGols", "source": "Classificacao", "target": "incluiSaldoGols_val", "label": "incluiSaldoGols" } },
+                // // { "data": { "id": "indicaColocacao", "source": "Classificacao", "target": "indicaColocacao_val", "label": "indicaColocacao" } },
+                // // { "data": { "id": "rebaixado", "source": "Classificacao", "target": "rebaixado_val", "label": "rebaixado" } },
+               
+                // // { "data": { "id": "marcadoNoMinuto", "source": "Gol", "target": "marcadoNoMinuto_val", "label": "marcadoNoMinuto" } },
+                // // { "data": { "id": "marcadoNoPrimeiroTempo", "source": "Gol", "target": "marcadoNoPrimeiroTempo_val", "label": "marcadoNoPrimeiroTempo" } },
+                // { "data": { "id": "marcadoEm", "source": "Gol", "target": "Partida", "label": "marcadoEm" } },
+                // // { "data": { "id": "foiContra", "source": "Gol", "target": "foiContra_val", "label": "foiContra" } },
+                // { "data": { "id": "tem", "source": "Partida", "target": "Gol", "label": "tem" } },
+
+                // { "data": { "id": "ocorreDurante", "source": "Rodada", "target": "Campeonato", "label": "ocorreDurante" } },
+                // { "data": { "id": "participaDe", "source": "Equipe", "target": "Campeonato", "label": "participaDe" } },
                 // { "data": { "id": "compostoPelaEquipe", "source": "Equipe", "target": "Campeonato", "label": "compostoPelaEquipe" } },
                 // { "data": { "id": "compostoPor", "source": "Campeonato", "target": "Rodada", "label": "compostoPor" } },
+                // // // { "data": { "id": "disputadoAoLongoDoAno", "source": "Campeonato", "target": "disputadoAoLongoDoAno_val", "label": "disputadoAoLongoDoAno" } },
+                
+
+                // { "data": { "id": "contemPartida", "source": "Rodada", "target": "Partida", "label": "contemPartida" } },
+                // { "data": { "id": "ocorreEm", "source": "Partida", "target": "Rodada", "label": "ocorreEm" } },
+                // // // { "data": { "id": "possuiIdentificacao", "source": "Rodada", "target": "possuiIdentificacao_val", "label": "possuiIdentificacao" } },
+                // // // { "data": { "id": "possuiNumero", "source": "Rodada", "target": "possuiNumero_val", "label": "possuiNumero" } },
+                
+                // { "data": { "id": "realizadaEm", "source": "Partida", "target": "Estadio", "label": "realizadaEm" } },
+                // { "data": { "id": "recebe", "source": "Estadio", "target": "Partida", "label": "recebe" } },
+                // { "data": { "id": "temMandante", "source": "Partida", "target": "Equipe", "label": "temMandante" } },
+                // { "data": { "id": "temVisitante", "source": "Partida", "target": "Equipe", "label": "temVisitante" } },
                 // { "data": { "id": "manda", "source": "Equipe", "target": "Partida", "label": "manda" } },
                 // { "data": { "id": "visita", "source": "Equipe", "target": "Partida", "label": "visita" } },
-
-                // { "data": { "id": "classificadoLibertadores", "source": "Classificacao", "target": "classificadoLibertadores_val", "label": "classificadoLibertadores" } },
                 // { "data": { "id": "classificadoLibertadores_val", "label": "boolean", "type": "label" } },
-
-                // { "data": { "id": "classificadoSulamericana", "source": "Classificacao", "target": "classificadoSulamericana_val", "label": "classificadoSulamericana" } },
                 // { "data": { "id": "classificadoSulamericana_val", "label": "boolean", "type": "label" } },
-
-                // { "data": { "id": "disputadoAoLongoDoAno", "source": "Campeonato", "target": "disputadoAoLongoDoAno_val", "label": "disputadoAoLongoDoAno" } },
                 // { "data": { "id": "disputadoAoLongoDoAno_val", "label": "positiveInteger", "type": "label" } },
-
-                // { "data": { "id": "foiContra", "source": "Gol", "target": "foiContra_val", "label": "foiContra" } },
                 // { "data": { "id": "foiContra_val", "label": "boolean", "type": "label" } },
-
-                // { "data": { "id": "incluiDerrotas", "source": "Classificacao", "target": "incluiDerrotas_val", "label": "incluiDerrotas" } },
                 // { "data": { "id": "incluiDerrotas_val", "label": "int", "type": "label" } },
-
-                // { "data": { "id": "incluiEmpates", "source": "Classificacao", "target": "incluiEmpates_val", "label": "incluiEmpates" } },
                 // { "data": { "id": "incluiEmpates_val", "label": "int", "type": "label" } },
-
-                // { "data": { "id": "incluiGolsContra", "source": "Classificacao", "target": "incluiGolsContra_val", "label": "incluiGolsContra" } },
                 // { "data": { "id": "incluiGolsContra_val", "label": "int", "type": "label" } },
-
-                // { "data": { "id": "incluiGolsPro", "source": "Classificacao", "target": "incluiGolsPro_val", "label": "incluiGolsPro" } },
                 // { "data": { "id": "incluiGolsPro_val", "label": "int", "type": "label" } },
-
-                // { "data": { "id": "incluiPontuacao", "source": "Classificacao", "target": "incluiPontuacao_val", "label": "incluiPontuacao" } },
                 // { "data": { "id": "incluiPontuacao_val", "label": "int", "type": "label" } },
-
-                // { "data": { "id": "incluiVitorias", "source": "Classificacao", "target": "incluiVitorias_val", "label": "incluiVitorias" } },
                 // { "data": { "id": "incluiVitorias_val", "label": "positiveInteger", "type": "label" } },
-
-                // { "data": { "id": "indicaColocacao", "source": "Classificacao", "target": "indicaColocacao_val", "label": "indicaColocacao" } },
+                // { "data": { "id": "incluiSaldoGols_val", "label": "positiveInteger", "type": "label" } },
                 // { "data": { "id": "indicaColocacao_val", "label": "positiveInteger", "type": "label" } },
-
-                // { "data": { "id": "marcadoNoMinuto", "source": "Gol", "target": "marcadoNoMinuto_val", "label": "marcadoNoMinuto" } },
                 // { "data": { "id": "marcadoNoMinuto_val", "label": "string", "type": "label" } },
-
-                // { "data": { "id": "marcadoNoPrimeiroTempo", "source": "Gol", "target": "marcadoNoPrimeiroTempo_val", "label": "marcadoNoPrimeiroTempo" } },
                 // { "data": { "id": "marcadoNoPrimeiroTempo_val", "label": "boolean", "type": "label" } },
-
                 // { "data": { "id": "placarMandante", "source": "Partida", "target": "placarMandante_val", "label": "placarMandante" } },
                 // { "data": { "id": "placarMandante_val", "label": "int", "type": "label" } },
-
                 // { "data": { "id": "placarVisitante", "source": "Partida", "target": "placarVisitante_val", "label": "placarVisitante" } },
                 // { "data": { "id": "placarVisitante_val", "label": "int", "type": "label" } },
-
-                // { "data": { "id": "possuiIdentificacao", "source": "Rodada", "target": "possuiIdentificacao_val", "label": "possuiIdentificacao" } },
                 // { "data": { "id": "possuiIdentificacao_val", "label": "string", "type": "label" } },
-
-                // { "data": { "id": "possuiNome", "source": "Atleta", "target": "possuiNome_val", "label": "possuiNome" } },
-                // { "data": { "id": "possuiNome_val", "label": "string", "type": "label" } },
-
-                // { "data": { "id": "possuiNumero", "source": "Rodada", "target": "possuiNumero_val", "label": "possuiNumero" } },
+                //  { "data": { "id": "possuiNome_val", "label": "string", "type": "label" } },
                 // { "data": { "id": "possuiNumero_val", "label": "positiveInteger", "type": "label" } },
-
                 // { "data": { "id": "possuiPlacar", "source": "Partida", "target": "possuiPlacar_val", "label": "possuiPlacar" } },
                 // { "data": { "id": "possuiPlacar_val", "label": "string", "type": "label" } },
-
                 // { "data": { "id": "realizadaNaData", "source": "Partida", "target": "realizadaNaData_val", "label": "realizadaNaData" } },
                 // { "data": { "id": "realizadaNaData_val", "label": "dateTime", "type": "label" } },
-
                 // { "data": { "id": "vitoriaMandante", "source": "Partida", "target": "vitoriaMandante_val", "label": "vitoriaMandante" } },
                 // { "data": { "id": "vitoriaMandante_val", "label": "boolean", "type": "label" } },
-
                 // { "data": { "id": "empate", "source": "Partida", "target": "empate_val", "label": "empate" } },
                 // { "data": { "id": "empate_val", "label": "boolean", "type": "label" } },
-
-                // { "data": { "id": "rebaixado", "source": "Classificacao", "target": "rebaixado_val", "label": "rebaixado" } },
                 // { "data": { "id": "rebaixado_val", "label": "boolean", "type": "label" } }
             ]
             ,
