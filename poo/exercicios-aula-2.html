@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exercícios POO - Aula 2</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+
+<body class="bg-light">
+
+    <div class="container py-5">
+        <h2 class="mb-4">Exercícios de Lógica de Programação com C# (Nível Fácil)</h2>
+
+        <h3 class="mt-4">1) Tipos Primitivos e Variáveis</h3>
+        <ol>
+            <li>Declare uma variável do tipo <code>int</code> com o valor 10 e imprima na tela.</li>
+            <li>Declare uma variável do tipo <code>double</code> com valor 5.5 e imprima o dobro do valor.</li>
+            <li>Declare uma variável do tipo <code>string</code> com seu nome e exiba a mensagem: "Olá, [nome]".</li>
+            <li>Declare uma variável do tipo <code>bool</code> com valor <code>true</code> e imprima o valor invertido.</li>
+        </ol>
+
+        <h3 class="mt-4">2) Operadores e Expressões</h3>
+        <ol start="5">
+            <li>Crie duas variáveis inteiras e imprima: soma, subtração, multiplicação e divisão.</li>
+            <li>Crie uma variável inteira e verifique se ela é maior que 100. Imprima o resultado (true ou false).</li>
+        </ol>
+
+        <h3 class="mt-4">3) Estrutura Condicional if / else</h3>
+        <ol start="7">
+            <li>Leia um número e verifique se ele é positivo ou negativo.</li>
+            <li>Leia a idade de uma pessoa e informe se ela é maior de idade (18 anos ou mais).</li>
+            <li>Leia um número e verifique se ele é par ou ímpar.</li>
+            <li>Leia duas notas, calcule a média e informe se o aluno foi aprovado (média >= 6).</li>
+        </ol>
+
+        <h3 class="mt-4">4) Estrutura switch</h3>
+        <ol start="11">
+            <li>Leia um número de 1 a 7 e imprima o dia da semana correspondente usando <code>switch</code>.</li>
+            <li>Leia uma letra (A, B ou C) e imprima uma mensagem diferente para cada caso.</li>
+        </ol>
+
+        <h3 class="mt-4">5) Laço for</h3>
+        <ol start="13">
+            <li>Use um <code>for</code> para imprimir os números de 1 a 10.</li>
+            <li>Use um <code>for</code> para imprimir apenas os números pares de 1 a 20.</li>
+            <li>Use um <code>for</code> para calcular a soma dos números de 1 a 100.</li>
+        </ol>
+
+        <h3 class="mt-4">6) Laço while</h3>
+        <ol start="16">
+            <li>Use um <code>while</code> para imprimir os números de 1 a 5.</li>
+            <li>Crie um programa que peça uma senha e continue pedindo enquanto a senha estiver incorreta.</li>
+        </ol>
+
+        <h3 class="mt-4">7) Laço foreach</h3>
+        <ol start="18">
+            <li>Crie um array com 5 números e use <code>foreach</code> para imprimir cada número.</li>
+            <li>Crie uma lista de nomes e use <code>foreach</code> para imprimir uma saudação para cada nome.</li>
+        </ol>
+
+        <h3 class="mt-4">8) Exercício Integrador</h3>
+        <ol start="20">
+            <li>Crie um programa que:
+                <ul>
+                    <li>Peça um número ao usuário</li>
+                    <li>Use <code>if</code> para verificar se é positivo</li>
+                    <li>Use <code>for</code> para imprimir os números de 1 até esse número</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3 class="mt-4">9) Contador com validação (while + if)</h3>
+        <ol start="21">
+            <li>
+                Leia um número inteiro <code>N</code> (<code>N &gt; 0</code>).
+                <ul>
+                    <li>Se o usuário digitar <code>N &lt;= 0</code>, continue pedindo até informar um valor válido.</li>
+                    <li>Depois imprima todos os números de <code>N</code> até <code>1</code> (decrescente) usando <code>while</code>.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3 class="mt-4">10) Menu de operações (switch + loop)</h3>
+        <ol start="22">
+            <li>
+                Crie um menu repetitivo com as opções:
+                <ul>
+                    <li><code>1</code>: Somar</li>
+                    <li><code>2</code>: Subtrair</li>
+                    <li><code>3</code>: Multiplicar</li>
+                    <li><code>4</code>: Dividir</li>
+                    <li><code>0</code>: Sair</li>
+                </ul>
+                Para as opções 1–4, peça dois números e mostre o resultado. Trate divisão por zero (se o segundo número for 0, exiba uma mensagem e não divida). O menu deve continuar até o usuário escolher <code>0</code>.
+            </li>
+        </ol>
+
+        <h3 class="mt-4">11) Contar vogais em uma string (foreach + if)</h3>
+        <ol start="23">
+            <li>
+                Leia uma frase do usuário. Use <code>foreach</code> para percorrer os caracteres e conte quantas vogais existem (<code>a, e, i, o, u</code>), ignorando maiúsculas/minúsculas. Ao final, imprima a contagem total e a contagem individual por vogal.
+            </li>
+        </ol>
+
+        <h3 class="mt-4">12) Maior, menor e média de uma sequência (for + if)</h3>
+        <ol start="24">
+            <li>
+                Leia um número <code>N</code> (quantidade de valores). Depois leia <code>N</code> números inteiros e calcule e imprima: maior, menor e média (como <code>double</code>).
+                <ul>
+                    <li>Requisito: não use LINQ (<code>Max</code>, <code>Min</code>, <code>Average</code>) — faça "na mão".</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3 class="mt-4">13) Sequência de Fibonacci até um limite (while)</h3>
+        <ol start="25">
+            <li>
+                Leia um inteiro <code>L</code> (<code>L &gt;= 1</code>). Gere e imprima a sequência de Fibonacci enquanto o próximo valor for <code>&lt;= L</code>.
+                <ul>
+                    <li>Exemplo: se <code>L = 20</code>, imprime: <code>0 1 1 2 3 5 8 13</code></li>
+                </ul>
+            </li>
+        </ol>
+
+        <div class="mt-4 mb-4">
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSf_XQMx69QXQ1-aNJJTs4Uxxm_6Zzx_hux10-DsYw4jAu7yww/viewform?usp=dialog"
+            target="_blank" class="btn btn-primary">Enviar Exercícios</a>
+        <a href="/" class="btn btn-outline-secondary ms-2">Voltar</a>
+    </div>
+    </div>
+
+</body>
+
+</html>
