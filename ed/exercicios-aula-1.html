@@ -121,6 +121,252 @@
             target="_blank" class="btn btn-primary">Enviar Exercícios</a>
         <a href="/" class="btn btn-outline-secondary ms-2">Voltar</a>
     </div>
+
+    <div class="container py-5">
+        <hr class="my-5">
+        <h2 class="mb-4">Resoluções — Python</h2>
+
+        <!-- 1 -->
+        <h3 class="mt-4">1) Variáveis e Tipos</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code># inteiro, float e string
+a = 10
+b = 3.14
+c = "Python"
+
+print(type(a))
+print(type(b))
+print(type(c))
+
+# bool de 0
+x = 0
+print(bool(x))
+
+# bool de -10
+x = -10
+print(bool(x))</code></pre>
+        <p class="mt-2"><strong>Resultado esperado:</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>&lt;class 'int'&gt;
+&lt;class 'float'&gt;
+&lt;class 'str'&gt;
+False
+True</code></pre>
+        <p>Em Python <strong>qualquer número diferente de 0 é True</strong>.</p>
+
+        <!-- 2 -->
+        <h3 class="mt-4">2) Operações Numéricas</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>a = 10
+b = 5
+
+print("Soma:", a + b)
+print("Subtração:", a - b)
+print("Multiplicação:", a * b)
+print("Divisão:", a / b)
+
+# float
+valor = 2.50
+print(valor * 3)
+
+# número complexo
+z = 3 + 4j
+print(z)
+print(type(z))</code></pre>
+        <p class="mt-2"><strong>Resultado esperado:</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>Soma: 15
+Subtração: 5
+Multiplicação: 50
+Divisão: 2.0
+7.5
+(3+4j)
+&lt;class 'complex'&gt;</code></pre>
+
+        <!-- 3 -->
+        <h3 class="mt-4">3) Booleanos e Operadores Lógicos</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>idade = 18
+tem_carteira = True
+
+print(idade >= 18 and tem_carteira)
+
+idade = 16
+acompanhada = True
+
+print(idade >= 18 or acompanhada)
+
+x = 5
+print(x > 2 and x < 10)
+
+ativo = True
+print(not ativo)</code></pre>
+        <p class="mt-2"><strong>Resultado esperado:</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>True
+True
+True
+False</code></pre>
+
+        <!-- 4 -->
+        <h3 class="mt-4">4) Strings</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code># concatenação
+s1 = "Olá"
+s2 = "Mundo"
+
+print(s1 + " " + s2)
+
+# repetição
+texto = "Python "
+print(texto * 5)
+
+# verificação
+frase = "estou aprendendo python"
+print("python" in frase)</code></pre>
+        <p class="mt-2"><strong>Resultado esperado:</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>Olá Mundo
+Python Python Python Python Python
+True</code></pre>
+
+        <!-- 5 -->
+        <h3 class="mt-4">5) Range</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code># 0 até 9
+lista = list(range(10))
+print(lista)
+
+# 1 até 20 pulando de 2
+lista2 = list(range(1, 21, 2))
+print(lista2)
+
+# for
+for i in range(5):
+    print(i)</code></pre>
+        <p class="mt-2"><strong>Resultado esperado:</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+[1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
+0
+1
+2
+3
+4</code></pre>
+
+        <!-- 6 -->
+        <h3 class="mt-4">6) Listas</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code># lista com tipos diferentes
+lista = [10, "python", True]
+print(lista)
+
+# adicionar e remover
+numeros = [1, 2, 3, 4, 5]
+
+numeros.append(6)
+numeros.remove(3)
+
+print(numeros)
+
+# verificar se 10 está na lista
+print(10 in numeros)
+
+# alterar valor
+lista = [1, 2, 3]
+lista[1] = 20
+
+print(lista)</code></pre>
+        <p class="mt-2"><strong>Resultado esperado:</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>[10, 'python', True]
+[1, 2, 4, 5, 6]
+False
+[1, 20, 3]</code></pre>
+
+        <!-- Extra -->
+        <h3 class="mt-4">Extra) Positivo ou não</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>numero = int(input("Digite um número: "))
+
+if numero > 0:
+    print("Positivo")
+else:
+    print("Não positivo")</code></pre>
+
+        <!-- If / Elif / Else -->
+        <h3 class="mt-4">If / Else / Elif — Nota</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>nota = 6
+
+if nota >= 7:
+    print("Aprovado")
+elif nota >= 5:
+    print("Recuperação")
+else:
+    print("Reprovado")</code></pre>
+
+        <h3 class="mt-4">If / Else / Elif — Hora do dia</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>hora = 14
+
+if 6 <= hora <= 11:
+    print("Bom dia")
+elif 12 <= hora <= 17:
+    print("Boa tarde")
+elif 18 <= hora <= 23:
+    print("Boa noite")
+else:
+    print("De madrugada")</code></pre>
+
+        <!-- Match / Case -->
+        <h3 class="mt-4">Match / Case — Dia da semana</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>dia = 3
+
+match dia:
+    case 1:
+        print("Segunda")
+    case 2:
+        print("Terça")
+    case 3:
+        print("Quarta")
+    case 4:
+        print("Quinta")
+    case 5:
+        print("Sexta")
+    case 6:
+        print("Sábado")
+    case 7:
+        print("Domingo")
+    case _:
+        print("Dia inválido")</code></pre>
+
+        <h3 class="mt-4">Match / Case — Operações</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>operacao = "multiplicacao"
+a = 10
+b = 4
+
+match operacao:
+    case "soma":
+        print(a + b)
+    case "subtracao":
+        print(a - b)
+    case "multiplicacao":
+        print(a * b)
+    case "divisao":
+        print(a / b)
+    case _:
+        print("Operação desconhecida")</code></pre>
+
+        <!-- For -->
+        <h3 class="mt-4">Forzinho — Pares e soma dos ímpares</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>numeros = [3, 7, 2, 9, 4, 6, 1, 8, 5, 10]
+
+soma_impares = 0
+
+for n in numeros:
+
+    if n % 2 == 0:
+        print("Par:", n)
+
+    if n % 2 != 0:
+        soma_impares += n
+
+print("Soma dos ímpares:", soma_impares)</code></pre>
+        <p class="mt-2"><strong>Resultado esperado:</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>Par: 2
+Par: 4
+Par: 6
+Par: 8
+Par: 10
+
+Soma dos ímpares: 25</code></pre>
+    </div>
     </div>
 </body>
 
