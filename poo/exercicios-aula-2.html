@@ -129,7 +129,307 @@
             target="_blank" class="btn btn-primary">Enviar Exercícios</a>
         <a href="/" class="btn btn-outline-secondary ms-2">Voltar</a>
     </div>
+
+        <hr class="my-5">
+        <h2 class="mb-4">Resoluções — C#</h2>
+
+        <!-- 1 -->
+        <h3 class="mt-4">1) Tipos Primitivos e Variáveis</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>int a = 10;
+Console.WriteLine(a);
+
+double b = 5.5;
+Console.WriteLine(b * 2);
+
+string nome = "Maria";
+Console.WriteLine("Olá, " + nome);
+
+bool ativo = true;
+Console.WriteLine(!ativo);</code></pre>
+        <p class="mt-2"><strong>Resultado esperado:</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>10
+11
+Olá, Maria
+False</code></pre>
+
+        <!-- 2 -->
+        <h3 class="mt-4">2) Operadores e Expressões</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>int a = 10, b = 3;
+
+Console.WriteLine("Soma: " + (a + b));
+Console.WriteLine("Subtração: " + (a - b));
+Console.WriteLine("Multiplicação: " + (a * b));
+Console.WriteLine("Divisão: " + (a / b));
+
+int x = 150;
+Console.WriteLine(x > 100);</code></pre>
+        <p class="mt-2"><strong>Resultado esperado:</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>Soma: 13
+Subtração: 7
+Multiplicação: 30
+Divisão: 3
+True</code></pre>
+
+        <!-- 3 -->
+        <h3 class="mt-4">3) Estrutura Condicional if / else</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>// positivo ou negativo
+int numero = -5;
+if (numero > 0)
+    Console.WriteLine("Positivo");
+else
+    Console.WriteLine("Negativo");
+
+// maior de idade
+int idade = 20;
+if (idade >= 18)
+    Console.WriteLine("Maior de idade");
+else
+    Console.WriteLine("Menor de idade");
+
+// par ou ímpar
+int n = 7;
+if (n % 2 == 0)
+    Console.WriteLine("Par");
+else
+    Console.WriteLine("Ímpar");
+
+// média
+double nota1 = 7.0, nota2 = 5.0;
+double media = (nota1 + nota2) / 2;
+if (media >= 6)
+    Console.WriteLine("Aprovado");
+else
+    Console.WriteLine("Reprovado");</code></pre>
+        <p class="mt-2"><strong>Resultado esperado:</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>Negativo
+Maior de idade
+Ímpar
+Aprovado</code></pre>
+
+        <!-- 4 -->
+        <h3 class="mt-4">4) Estrutura switch</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>// dia da semana
+int dia = 3;
+switch (dia)
+{
+    case 1: Console.WriteLine("Segunda"); break;
+    case 2: Console.WriteLine("Terça");   break;
+    case 3: Console.WriteLine("Quarta");  break;
+    case 4: Console.WriteLine("Quinta");  break;
+    case 5: Console.WriteLine("Sexta");   break;
+    case 6: Console.WriteLine("Sábado");  break;
+    case 7: Console.WriteLine("Domingo"); break;
+    default: Console.WriteLine("Dia inválido"); break;
+}
+
+// letra
+char letra = 'B';
+switch (letra)
+{
+    case 'A': Console.WriteLine("Escolheu A"); break;
+    case 'B': Console.WriteLine("Escolheu B"); break;
+    case 'C': Console.WriteLine("Escolheu C"); break;
+    default:  Console.WriteLine("Opção inválida"); break;
+}</code></pre>
+        <p class="mt-2"><strong>Resultado esperado:</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>Quarta
+Escolheu B</code></pre>
+
+        <!-- 5 -->
+        <h3 class="mt-4">5) Laço for</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>// 1 a 10
+for (int i = 1; i <= 10; i++)
+    Console.WriteLine(i);
+
+// pares de 1 a 20
+for (int i = 1; i <= 20; i++)
+    if (i % 2 == 0)
+        Console.WriteLine(i);
+
+// soma de 1 a 100
+int soma = 0;
+for (int i = 1; i <= 100; i++)
+    soma += i;
+Console.WriteLine("Soma: " + soma);</code></pre>
+        <p class="mt-2"><strong>Resultado esperado (trecho):</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>1
+2
+...
+10
+2
+4
+...
+20
+Soma: 5050</code></pre>
+
+        <!-- 6 -->
+        <h3 class="mt-4">6) Laço while</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>// 1 a 5
+int i = 1;
+while (i <= 5)
+{
+    Console.WriteLine(i);
+    i++;
+}
+
+// senha
+string senha = "";
+while (senha != "1234")
+{
+    Console.Write("Digite a senha: ");
+    senha = Console.ReadLine();
+}
+Console.WriteLine("Acesso permitido!");</code></pre>
+        <p class="mt-2"><strong>Resultado esperado:</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>1
+2
+3
+4
+5
+Acesso permitido!</code></pre>
+
+        <!-- 7 -->
+        <h3 class="mt-4">7) Laço foreach</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>// array de números
+int[] numeros = { 10, 20, 30, 40, 50 };
+foreach (int n in numeros)
+    Console.WriteLine(n);
+
+// lista de nomes
+var nomes = new List&lt;string&gt; { "Ana", "Bruno", "Carlos", "Diana", "Eva" };
+foreach (string nome in nomes)
+    Console.WriteLine("Olá, " + nome + "!");</code></pre>
+        <p class="mt-2"><strong>Resultado esperado:</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>10
+20
+30
+40
+50
+Olá, Ana!
+Olá, Bruno!
+Olá, Carlos!
+Olá, Diana!
+Olá, Eva!</code></pre>
+
+        <!-- 8 -->
+        <h3 class="mt-4">8) Exercício Integrador</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>Console.Write("Digite um número: ");
+int numero = int.Parse(Console.ReadLine());
+
+if (numero > 0)
+    for (int i = 1; i <= numero; i++)
+        Console.WriteLine(i);</code></pre>
+
+        <!-- 9 -->
+        <h3 class="mt-4">9) Contador com validação (while + if)</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>int n = 0;
+while (n <= 0)
+{
+    Console.Write("Digite um número maior que 0: ");
+    n = int.Parse(Console.ReadLine());
+}
+
+while (n >= 1)
+{
+    Console.WriteLine(n);
+    n--;
+}</code></pre>
+
+        <!-- 10 -->
+        <h3 class="mt-4">10) Menu de operações (switch + loop)</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>int opcao;
+do
+{
+    Console.WriteLine("\n1-Somar  2-Subtrair  3-Multiplicar  4-Dividir  0-Sair");
+    Console.Write("Opção: ");
+    opcao = int.Parse(Console.ReadLine());
+
+    if (opcao >= 1 && opcao <= 4)
+    {
+        Console.Write("Primeiro número: ");
+        double a = double.Parse(Console.ReadLine());
+        Console.Write("Segundo número: ");
+        double b = double.Parse(Console.ReadLine());
+
+        switch (opcao)
+        {
+            case 1: Console.WriteLine("Resultado: " + (a + b)); break;
+            case 2: Console.WriteLine("Resultado: " + (a - b)); break;
+            case 3: Console.WriteLine("Resultado: " + (a * b)); break;
+            case 4:
+                if (b == 0)
+                    Console.WriteLine("Erro: divisão por zero!");
+                else
+                    Console.WriteLine("Resultado: " + (a / b));
+                break;
+        }
+    }
+} while (opcao != 0);
+
+Console.WriteLine("Até logo!");</code></pre>
+
+        <!-- 11 -->
+        <h3 class="mt-4">11) Contar vogais (foreach + if)</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>Console.Write("Digite uma frase: ");
+string frase = Console.ReadLine().ToLower();
+
+int total = 0, cA = 0, cE = 0, cI = 0, cO = 0, cU = 0;
+
+foreach (char c in frase)
+{
+    switch (c)
+    {
+        case 'a': cA++; total++; break;
+        case 'e': cE++; total++; break;
+        case 'i': cI++; total++; break;
+        case 'o': cO++; total++; break;
+        case 'u': cU++; total++; break;
+    }
+}
+
+Console.WriteLine("Total de vogais: " + total);
+Console.WriteLine($"a={cA}  e={cE}  i={cI}  o={cO}  u={cU}");</code></pre>
+
+        <!-- 12 -->
+        <h3 class="mt-4">12) Maior, menor e média (for + if)</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>Console.Write("Quantidade de valores: ");
+int n = int.Parse(Console.ReadLine());
+
+int maior = int.MinValue, menor = int.MaxValue, soma = 0;
+
+for (int i = 0; i < n; i++)
+{
+    Console.Write("Valor: ");
+    int v = int.Parse(Console.ReadLine());
+    soma += v;
+    if (v > maior) maior = v;
+    if (v < menor) menor = v;
+}
+
+Console.WriteLine("Maior: " + maior);
+Console.WriteLine("Menor: " + menor);
+Console.WriteLine("Média: " + (double)soma / n);</code></pre>
+
+        <!-- 13 -->
+        <h3 class="mt-4">13) Fibonacci até um limite (while)</h3>
+        <pre class="bg-dark text-light p-3 rounded"><code>Console.Write("Digite o limite L: ");
+int L = int.Parse(Console.ReadLine());
+
+int a = 0, b = 1;
+while (a <= L)
+{
+    Console.Write(a + " ");
+    int temp = a + b;
+    a = b;
+    b = temp;
+}
+Console.WriteLine();</code></pre>
+        <p class="mt-2"><strong>Exemplo (L = 20):</strong></p>
+        <pre class="bg-secondary text-light p-3 rounded"><code>0 1 1 2 3 5 8 13</code></pre>
+
     </div>
+
+</body>
 
 </body>
 
