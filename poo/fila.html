@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualização de Fila Encadeada</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      margin-top: 0;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+
+    .panel {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    input[type="text"], input[type="number"] {
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      min-width: 180px;
+      font-size: 16px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    .btn-insert { background: #2563eb; color: white; }
+    .btn-remove { background: #dc2626; color: white; }
+    .btn-reset { background: #475569; color: white; }
+    .btn-random { background: #0f766e; color: white; }
+
+    .status {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #eef2ff;
+      color: #3730a3;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .info-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #0f172a;
+    }
+
+    .queue-wrapper {
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .queue-area {
+      position: relative;
+      min-height: 260px;
+      min-width: 100%;
+      padding: 24px 8px 8px;
+    }
+
+    .queue-track {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      min-height: 180px;
+      padding: 20px 12px 40px;
+    }
+
+    .node-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      opacity: 0;
+      transform: translateY(18px) scale(0.96);
+      animation: showNode 0.45s ease forwards;
+    }
+
+    @keyframes showNode {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .node {
+      width: 150px;
+      border: 2px solid #0f172a;
+      border-radius: 14px;
+      overflow: hidden;
+      background: white;
+      position: relative;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .node-label {
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      font-size: 12px;
+      padding: 6px;
+      letter-spacing: 0.4px;
+    }
+
+    .node-body {
+      display: grid;
+      grid-template-columns: 1fr 56px;
+      height: 74px;
+    }
+
+    .value-cell, .next-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .value-cell {
+      background: #eff6ff;
+      border-right: 2px solid #0f172a;
+      color: #1d4ed8;
+    }
+
+    .next-cell {
+      background: #f8fafc;
+      font-size: 13px;
+      color: #475569;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .next-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #0ea5e9;
+    }
+
+    .null-dot {
+      background: #94a3b8;
+    }
+
+    .arrow {
+      position: relative;
+      width: 70px;
+      height: 4px;
+      background: #0ea5e9;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+
+    .arrow::after {
+      content: "";
+      position: absolute;
+      right: -2px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 14px solid #0ea5e9;
+    }
+
+    .pointer-tag {
+      position: absolute;
+      top: -18px;
+      background: #f59e0b;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      box-shadow: 0 6px 14px rgba(245, 158, 11, 0.25);
+    }
+
+    .pointer-tag.end {
+      background: #7c3aed;
+      box-shadow: 0 6px 14px rgba(124, 58, 237, 0.25);
+    }
+
+    .explanation {
+      line-height: 1.65;
+      color: #334155;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+    }
+
+    .empty-state {
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      background: #f8fafc;
+      font-size: 18px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    code {
+      background: #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Fila Encadeada Interativa</h1>
+    <p class="subtitle">
+      Esta página representa graficamente a estrutura da classe <strong>Fila</strong>, mostrando os nós,
+      o ponteiro <strong>proximo</strong>, e as referências <strong>inicio</strong> e <strong>fim</strong>.
+    </p>
+
+    <div class="panel">
+      <div class="controls">
+        <input id="valorInput" type="text" placeholder="Digite um valor" />
+        <button class="btn-insert" id="btnInsere">Insere</button>
+        <button class="btn-remove" id="btnRetira">Retira</button>
+        <button class="btn-random" id="btnExemplo">Inserir exemplo</button>
+        <button class="btn-reset" id="btnReset">Limpar fila</button>
+      </div>
+      <div class="status" id="status">Fila criada. Pronta para inserções.</div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <strong>Início</strong>
+          <span id="inicioInfo">None</span>
+        </div>
+        <div class="info-card">
+          <strong>Fim</strong>
+          <span id="fimInfo">None</span>
+        </div>
+        <div class="info-card">
+          <strong>Tamanho</strong>
+          <span id="tamanhoInfo">0</span>
+        </div>
+        <div class="info-card">
+          <strong>Frente da fila</strong>
+          <span id="frenteInfo">None</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Representação gráfica</h2>
+      <div class="queue-wrapper">
+        <div class="queue-area">
+          <div class="queue-track" id="queueTrack"></div>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-color" style="background:#f59e0b"></span> Ponteiro <strong>inicio</strong></div>
+        <div class="legend-item"><span class="legend-color" style="background:#7c3aed"></span> Ponteiro <strong>fim</strong></div>
+        <div class="legend-item"><span class="legend-color" style="background:#0ea5e9"></span> Referência <strong>proximo</strong></div>
+        <div class="legend-item"><span class="legend-color" style="background:#94a3b8"></span> <strong>None</strong> / fim da cadeia</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>O que está acontecendo?</h2>
+      <div class="explanation" id="explicacao">
+        A fila está vazia. Quando você clicar em <code>Insere</code>, um novo nó será criado. Se for o primeiro,
+        tanto <code>inicio</code> quanto <code>fim</code> apontarão para ele.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class No {
+      constructor(valor) {
+        this.valor = valor;
+        this.proximo = null;
+      }
+    }
+
+    class Fila {
+      constructor() {
+        this.inicio = null;
+        this.fim = null;
+        this.tamanho = 0;
+      }
+
+      insere(valor) {
+        const novoNo = new No(valor);
+
+        if (this.fim === null) {
+          this.inicio = novoNo;
+          this.fim = novoNo;
+        } else {
+          this.fim.proximo = novoNo;
+          this.fim = novoNo;
+        }
+
+        this.tamanho += 1;
+      }
+
+      retira() {
+        if (this.estaVazia()) {
+          return null;
+        }
+
+        const valorRemovido = this.inicio.valor;
+        this.inicio = this.inicio.proximo;
+
+        if (this.inicio === null) {
+          this.fim = null;
+        }
+
+        this.tamanho -= 1;
+        return valorRemovido;
+      }
+
+      frente() {
+        if (this.estaVazia()) return null;
+        return this.inicio.valor;
+      }
+
+      estaVazia() {
+        return this.inicio === null;
+      }
+
+      toArray() {
+        const itens = [];
+        let atual = this.inicio;
+        while (atual !== null) {
+          itens.push(atual);
+          atual = atual.proximo;
+        }
+        return itens;
+      }
+    }
+
+    const fila = new Fila();
+
+    const valorInput = document.getElementById('valorInput');
+    const btnInsere = document.getElementById('btnInsere');
+    const btnRetira = document.getElementById('btnRetira');
+    const btnReset = document.getElementById('btnReset');
+    const btnExemplo = document.getElementById('btnExemplo');
+    const statusEl = document.getElementById('status');
+    const queueTrack = document.getElementById('queueTrack');
+    const inicioInfo = document.getElementById('inicioInfo');
+    const fimInfo = document.getElementById('fimInfo');
+    const tamanhoInfo = document.getElementById('tamanhoInfo');
+    const frenteInfo = document.getElementById('frenteInfo');
+    const explicacao = document.getElementById('explicacao');
+
+    let ultimoEvento = 'init';
+    let ultimoValor = null;
+
+    function atualizarTela() {
+      const itens = fila.toArray();
+      queueTrack.innerHTML = '';
+
+      if (itens.length === 0) {
+        queueTrack.innerHTML = '<div class="empty-state">Fila vazia.<br>Nenhum nó encadeado no momento.</div>';
+      } else {
+        itens.forEach((no, index) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'node-wrapper';
+
+          const node = document.createElement('div');
+          node.className = 'node';
+
+          const label = document.createElement('div');
+          label.className = 'node-label';
+          label.textContent = `Nó ${index + 1}`;
+
+          const body = document.createElement('div');
+          body.className = 'node-body';
+
+          const valueCell = document.createElement('div');
+          valueCell.className = 'value-cell';
+          valueCell.textContent = no.valor;
+
+          const nextCell = document.createElement('div');
+          nextCell.className = 'next-cell';
+          nextCell.innerHTML = `<span>${no.proximo ? 'próx.' : 'None'}</span><span class="next-dot ${no.proximo ? '' : 'null-dot'}"></span>`;
+
+          body.appendChild(valueCell);
+          body.appendChild(nextCell);
+          node.appendChild(label);
+          node.appendChild(body);
+          wrapper.appendChild(node);
+
+          if (index === 0) {
+            const startTag = document.createElement('div');
+            startTag.className = 'pointer-tag';
+            startTag.textContent = 'inicio';
+            wrapper.appendChild(startTag);
+          }
+
+          if (index === itens.length - 1) {
+            const endTag = document.createElement('div');
+            endTag.className = 'pointer-tag end';
+            endTag.style.right = '0';
+            endTag.textContent = 'fim';
+            wrapper.appendChild(endTag);
+          }
+
+          queueTrack.appendChild(wrapper);
+
+          if (index < itens.length - 1) {
+            const arrow = document.createElement('div');
+            arrow.className = 'arrow';
+            arrow.title = 'referência proximo';
+            queueTrack.appendChild(arrow);
+          }
+        });
+      }
+
+      inicioInfo.textContent = fila.inicio ? fila.inicio.valor : 'None';
+      fimInfo.textContent = fila.fim ? fila.fim.valor : 'None';
+      tamanhoInfo.textContent = fila.tamanho;
+      frenteInfo.textContent = fila.frente() ?? 'None';
+
+      atualizarExplicacao();
+    }
+
+    function atualizarExplicacao() {
+      if (fila.estaVazia()) {
+        explicacao.innerHTML = 'A fila está vazia. Tanto <code>inicio</code> quanto <code>fim</code> são <code>None</code>. Não existe nenhum encadeamento entre nós.';
+        return;
+      }
+
+      if (ultimoEvento === 'insere') {
+        if (fila.tamanho === 1) {
+          explicacao.innerHTML = `Foi inserido o valor <code>${ultimoValor}</code>. Como era o primeiro elemento, <code>inicio</code> e <code>fim</code> passaram a apontar para o mesmo nó.`;
+        } else {
+          explicacao.innerHTML = `Foi inserido o valor <code>${ultimoValor}</code> no final da fila. O antigo nó final agora aponta para este novo nó por meio de <code>proximo</code>, e <code>fim</code> foi atualizado.`;
+        }
+        return;
+      }
+
+      if (ultimoEvento === 'retira') {
+        explicacao.innerHTML = `O valor <code>${ultimoValor}</code> foi removido do início da fila. Agora <code>inicio</code> aponta para o próximo nó. Se não restou nenhum elemento, então <code>fim</code> também vira <code>None</code>.`;
+        return;
+      }
+
+      explicacao.innerHTML = 'A fila mantém a ordem FIFO: o primeiro a entrar é o primeiro a sair. Novos nós entram no <code>fim</code> e as remoções acontecem no <code>inicio</code>.';
+    }
+
+    function inserirValor() {
+      const valor = valorInput.value.trim();
+      if (!valor) {
+        statusEl.textContent = 'Digite um valor antes de inserir.';
+        return;
+      }
+
+      fila.insere(valor);
+      ultimoEvento = 'insere';
+      ultimoValor = valor;
+      statusEl.textContent = `Valor "${valor}" inserido com sucesso no fim da fila.`;
+      valorInput.value = '';
+      valorInput.focus();
+      atualizarTela();
+    }
+
+    function retirarValor() {
+      const removido = fila.retira();
+      if (removido === null) {
+        statusEl.textContent = 'A fila está vazia. Não há elemento para retirar.';
+        ultimoEvento = 'empty';
+        ultimoValor = null;
+        atualizarTela();
+        return;
+      }
+
+      ultimoEvento = 'retira';
+      ultimoValor = removido;
+      statusEl.textContent = `Valor "${removido}" retirado do início da fila.`;
+      atualizarTela();
+    }
+
+    function limparFila() {
+      fila.inicio = null;
+      fila.fim = null;
+      fila.tamanho = 0;
+      ultimoEvento = 'reset';
+      ultimoValor = null;
+      statusEl.textContent = 'Fila limpa com sucesso.';
+      atualizarTela();
+    }
+
+    function inserirExemplo() {
+      const exemplos = ['A', 'B', 'C'];
+      exemplos.forEach(v => fila.insere(v));
+      ultimoEvento = 'insere';
+      ultimoValor = exemplos[exemplos.length - 1];
+      statusEl.textContent = 'Exemplo inserido: A, B, C.';
+      atualizarTela();
+    }
+
+    btnInsere.addEventListener('click', inserirValor);
+    btnRetira.addEventListener('click', retirarValor);
+    btnReset.addEventListener('click', limparFila);
+    btnExemplo.addEventListener('click', inserirExemplo);
+
+    valorInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') inserirValor();
+    });
+
+    atualizarTela();
+  </script>
+</body>
+</html>
