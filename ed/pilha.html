@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualização de Pilha Encadeada</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      margin-top: 0;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+
+    .panel {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    input[type="text"] {
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      min-width: 180px;
+      font-size: 16px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    .btn-push { background: #2563eb; color: white; }
+    .btn-pop { background: #dc2626; color: white; }
+    .btn-reset { background: #475569; color: white; }
+    .btn-random { background: #0f766e; color: white; }
+
+    .status {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #eef2ff;
+      color: #3730a3;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .info-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #0f172a;
+    }
+
+    .stack-layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .stack-visual {
+      min-height: 520px;
+      background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      border: 2px dashed #cbd5e1;
+      border-radius: 18px;
+      padding: 20px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      overflow: auto;
+    }
+
+    .stack-column {
+      width: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      min-height: 100%;
+    }
+
+    .node-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(-16px) scale(0.96);
+      animation: showNode 0.4s ease forwards;
+    }
+
+    @keyframes showNode {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .pointer-tag {
+      background: #f59e0b;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      box-shadow: 0 6px 14px rgba(245, 158, 11, 0.25);
+    }
+
+    .node {
+      width: 180px;
+      border: 2px solid #0f172a;
+      border-radius: 14px;
+      overflow: hidden;
+      background: white;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .node-label {
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      font-size: 12px;
+      padding: 6px;
+      letter-spacing: 0.4px;
+    }
+
+    .node-body {
+      display: grid;
+      grid-template-columns: 1fr 58px;
+      height: 74px;
+    }
+
+    .value-cell, .next-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .value-cell {
+      background: #eff6ff;
+      border-right: 2px solid #0f172a;
+      color: #1d4ed8;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .next-cell {
+      background: #f8fafc;
+      color: #475569;
+      font-size: 12px;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .next-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #0ea5e9;
+    }
+
+    .null-dot {
+      background: #94a3b8;
+    }
+
+    .down-arrow {
+      position: relative;
+      width: 4px;
+      height: 42px;
+      background: #0ea5e9;
+      border-radius: 999px;
+    }
+
+    .down-arrow::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -2px;
+      transform: translateX(-50%);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 14px solid #0ea5e9;
+    }
+
+    .base-label {
+      margin-top: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #334155;
+      color: white;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+    }
+
+    .empty-state {
+      min-height: 420px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #64748b;
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      background: #f8fafc;
+      font-size: 18px;
+      padding: 20px;
+    }
+
+    .explanation {
+      line-height: 1.65;
+      color: #334155;
+    }
+
+    .code-box {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 14px;
+      overflow: auto;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    code {
+      background: #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .stack-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Pilha Encadeada Interativa</h1>
+    <p class="subtitle">
+      Esta visualização representa a classe <strong>Pilha</strong> usando nós encadeados. O elemento mais recente
+      fica no <strong>topo</strong>, e cada nó aponta para o anterior usando <strong>prox</strong>.
+    </p>
+
+    <div class="panel">
+      <div class="controls">
+        <input id="valorInput" type="text" placeholder="Digite um valor" />
+        <button class="btn-push" id="btnPush">Push</button>
+        <button class="btn-pop" id="btnPop">Pop</button>
+        <button class="btn-random" id="btnExemplo">Inserir exemplo</button>
+        <button class="btn-reset" id="btnReset">Limpar pilha</button>
+      </div>
+
+      <div class="status" id="status">Pilha criada. Pronta para operações.</div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <strong>Topo</strong>
+          <span id="topoInfo">None</span>
+        </div>
+        <div class="info-card">
+          <strong>Tamanho</strong>
+          <span id="tamanhoInfo">0</span>
+        </div>
+        <div class="info-card">
+          <strong>Está vazia?</strong>
+          <span id="vaziaInfo">Sim</span>
+        </div>
+        <div class="info-card">
+          <strong>Valor do topo (vtopo)</strong>
+          <span id="vtopoInfo">None</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Representação gráfica</h2>
+      <div class="stack-layout">
+        <div class="stack-visual">
+          <div class="stack-column" id="stackColumn"></div>
+        </div>
+        <div>
+          <div class="explanation" id="explicacao">
+            A pilha está vazia. Quando você usar <code>Push</code>, um novo nó será criado e passará a ser o novo <code>topo</code>.
+          </div>
+
+          <div class="legend">
+            <div class="legend-item"><span class="legend-color" style="background:#f59e0b"></span> Ponteiro <strong>topo</strong></div>
+            <div class="legend-item"><span class="legend-color" style="background:#0ea5e9"></span> Referência <strong>prox</strong></div>
+            <div class="legend-item"><span class="legend-color" style="background:#94a3b8"></span> <strong>None</strong> / fim do encadeamento</div>
+          </div>
+
+          <h3 style="margin-top:24px;">Comportamento da pilha</h3>
+          <div class="code-box">Push:
+- cria um novo nó
+- novo nó aponta para o topo atual
+- topo passa a ser o novo nó
+
+Pop:
+- remove o nó do topo
+- topo passa a apontar para o próximo nó
+
+Regra:
+- LIFO (Last In, First Out)
+- o último que entra é o primeiro que sai</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class No {
+      constructor(val) {
+        this.valor = val;
+        this.prox = null;
+      }
+    }
+
+    class Pilha {
+      constructor() {
+        this.topo = null;
+        this.tam = 0;
+      }
+
+      push(val) {
+        const no = new No(val);
+        no.prox = this.topo;
+        this.topo = no;
+        this.tam += 1;
+      }
+
+      pop() {
+        if (this.vazia()) {
+          return null;
+        }
+
+        const t = this.topo.valor;
+        this.topo = this.topo.prox;
+        this.tam -= 1;
+        return t;
+      }
+
+      vazia() {
+        return this.topo === null;
+      }
+
+      tamanho() {
+        return this.tam;
+      }
+
+      vtopo() {
+        return this.topo ? this.topo.valor : null;
+      }
+
+      toArray() {
+        const itens = [];
+        let no = this.topo;
+        while (no !== null) {
+          itens.push(no);
+          no = no.prox;
+        }
+        return itens;
+      }
+    }
+
+    const pilha = new Pilha();
+
+    const valorInput = document.getElementById('valorInput');
+    const btnPush = document.getElementById('btnPush');
+    const btnPop = document.getElementById('btnPop');
+    const btnReset = document.getElementById('btnReset');
+    const btnExemplo = document.getElementById('btnExemplo');
+    const statusEl = document.getElementById('status');
+    const stackColumn = document.getElementById('stackColumn');
+    const topoInfo = document.getElementById('topoInfo');
+    const tamanhoInfo = document.getElementById('tamanhoInfo');
+    const vaziaInfo = document.getElementById('vaziaInfo');
+    const vtopoInfo = document.getElementById('vtopoInfo');
+    const explicacao = document.getElementById('explicacao');
+
+    let ultimoEvento = 'init';
+    let ultimoValor = null;
+
+    function atualizarTela() {
+      const itens = pilha.toArray();
+      stackColumn.innerHTML = '';
+
+      if (itens.length === 0) {
+        stackColumn.innerHTML = '<div class="empty-state">Pilha vazia.<br>Nenhum nó empilhado no momento.</div>';
+      } else {
+        itens.forEach((no, index) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'node-wrapper';
+
+          if (index === 0) {
+            const tag = document.createElement('div');
+            tag.className = 'pointer-tag';
+            tag.textContent = 'topo';
+            wrapper.appendChild(tag);
+          }
+
+          const node = document.createElement('div');
+          node.className = 'node';
+
+          const label = document.createElement('div');
+          label.className = 'node-label';
+          label.textContent = `Nó ${index + 1}`;
+
+          const body = document.createElement('div');
+          body.className = 'node-body';
+
+          const valueCell = document.createElement('div');
+          valueCell.className = 'value-cell';
+          valueCell.textContent = no.valor;
+
+          const nextCell = document.createElement('div');
+          nextCell.className = 'next-cell';
+          nextCell.innerHTML = `<span>${no.prox ? 'prox' : 'None'}</span><span class="next-dot ${no.prox ? '' : 'null-dot'}"></span>`;
+
+          body.appendChild(valueCell);
+          body.appendChild(nextCell);
+          node.appendChild(label);
+          node.appendChild(body);
+          wrapper.appendChild(node);
+          stackColumn.appendChild(wrapper);
+
+          if (index < itens.length - 1) {
+            const arrow = document.createElement('div');
+            arrow.className = 'down-arrow';
+            arrow.title = 'referência prox';
+            stackColumn.appendChild(arrow);
+          }
+        });
+
+        const baseLabel = document.createElement('div');
+        baseLabel.className = 'base-label';
+        baseLabel.textContent = 'Base da pilha';
+        stackColumn.appendChild(baseLabel);
+      }
+
+      topoInfo.textContent = pilha.topo ? pilha.topo.valor : 'None';
+      tamanhoInfo.textContent = pilha.tamanho();
+      vaziaInfo.textContent = pilha.vazia() ? 'Sim' : 'Não';
+      vtopoInfo.textContent = pilha.vtopo() ?? 'None';
+
+      atualizarExplicacao();
+    }
+
+    function atualizarExplicacao() {
+      if (pilha.vazia()) {
+        explicacao.innerHTML = 'A pilha está vazia. O ponteiro <code>topo</code> é <code>None</code> e não existe encadeamento entre nós.';
+        return;
+      }
+
+      if (ultimoEvento === 'push') {
+        if (pilha.tamanho() === 1) {
+          explicacao.innerHTML = `Foi feito <code>push(${ultimoValor})</code>. Como a pilha estava vazia, esse nó passou a ser o único elemento e também o <code>topo</code>.`;
+        } else {
+          explicacao.innerHTML = `Foi feito <code>push(${ultimoValor})</code>. O novo nó foi colocado acima dos demais e seu campo <code>prox</code> passou a apontar para o topo antigo.`;
+        }
+        return;
+      }
+
+      if (ultimoEvento === 'pop') {
+        explicacao.innerHTML = `Foi feito <code>pop()</code> e o valor removido foi <code>${ultimoValor}</code>. Agora o ponteiro <code>topo</code> aponta para o próximo nó da cadeia.`;
+        return;
+      }
+
+      explicacao.innerHTML = 'A pilha segue a regra <strong>LIFO</strong>: o último elemento inserido é o primeiro a sair. Toda inserção e remoção acontece no <code>topo</code>.';
+    }
+
+    function fazerPush() {
+      const valor = valorInput.value.trim();
+      if (!valor) {
+        statusEl.textContent = 'Digite um valor antes de fazer push.';
+        return;
+      }
+
+      pilha.push(valor);
+      ultimoEvento = 'push';
+      ultimoValor = valor;
+      statusEl.textContent = `Valor "${valor}" inserido no topo da pilha.`;
+      valorInput.value = '';
+      valorInput.focus();
+      atualizarTela();
+    }
+
+    function fazerPop() {
+      const removido = pilha.pop();
+      if (removido === null) {
+        statusEl.textContent = 'Pilha vazia. Não há elemento para remover.';
+        ultimoEvento = 'empty';
+        ultimoValor = null;
+        atualizarTela();
+        return;
+      }
+
+      ultimoEvento = 'pop';
+      ultimoValor = removido;
+      statusEl.textContent = `Valor "${removido}" removido do topo da pilha.`;
+      atualizarTela();
+    }
+
+    function limparPilha() {
+      pilha.topo = null;
+      pilha.tam = 0;
+      ultimoEvento = 'reset';
+      ultimoValor = null;
+      statusEl.textContent = 'Pilha limpa com sucesso.';
+      atualizarTela();
+    }
+
+    function inserirExemplo() {
+      ['A', 'B', 'C'].forEach(v => pilha.push(v));
+      ultimoEvento = 'push';
+      ultimoValor = 'C';
+      statusEl.textContent = 'Exemplo inserido: push(A), push(B), push(C).';
+      atualizarTela();
+    }
+
+    btnPush.addEventListener('click', fazerPush);
+    btnPop.addEventListener('click', fazerPop);
+    btnReset.addEventListener('click', limparPilha);
+    btnExemplo.addEventListener('click', inserirExemplo);
+
+    valorInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') fazerPush();
+    });
+
+    atualizarTela();
+  </script>
+</body>
+</html>
