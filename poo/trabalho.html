@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trabalho de POO em C# - Cadastro de Produto</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      color: #222;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    h1, h2, h3 {
+      color: #1f4e79;
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #e8f1fb;
+      color: #1f4e79;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .section {
+      margin-bottom: 28px;
+    }
+
+    ul, ol {
+      padding-left: 22px;
+    }
+
+    code, pre {
+      background: #f1f1f1;
+      border-radius: 8px;
+      font-family: Consolas, monospace;
+    }
+
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .highlight {
+      background: #fff8e1;
+      border-left: 5px solid #f4b400;
+      padding: 14px;
+      border-radius: 8px;
+    }
+
+    .box {
+      background: #f9fbfc;
+      border: 1px solid #dbe5ec;
+      border-radius: 10px;
+      padding: 18px;
+      margin-top: 12px;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      margin-top: 30px;
+    }
+
+    .steps-list li,
+    .objective-list li {
+      margin-bottom: 8px;
+    }
+
+    .type {
+      color: #8a2be2;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Trabalho de POO em C#</h1>
+    <div class="tag">Cadastro de Produto</div>
+
+    <div class="highlight" style="margin-bottom: 24px;">
+      📅 <strong>Enviar até 22/04 no form abaixo:</strong><br/>
+      <a href="https://forms.gle/tR1zK24PFvk8gTsPA" target="_blank">https://forms.gle/tR1zK24PFvk8gTsPA</a>
+    </div>
+
+    <div class="section">
+      <h2>Objetivo</h2>
+      <p>
+        Criar um programa simples em C# para praticar os conceitos iniciais de
+        Programação Orientada a Objetos.
+      </p>
+      <ul class="objective-list">
+        <li>Criar classes</li>
+        <li>Definir propriedades</li>
+        <li>Criar métodos</li>
+        <li>Instanciar objetos no <code>Program.cs</code></li>
+        <li>Chamar métodos dos objetos criados</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Enunciado</h2>
+      <p>
+        Crie um sistema simples de <strong>cadastro de produtos</strong>.
+        O sistema deverá possuir uma classe chamada <code>Produto</code>.
+      </p>
+
+      <div class="box">
+        <h3>A classe <code>Produto</code> deve possuir:</h3>
+
+        <p><strong>Propriedades:</strong></p>
+        <ul>
+          <li><code>Nome: <span class="type">string</span></code></li>
+          <li><code>Preco: <span class="type">double</span></code></li>
+          <li><code>Categoria: <span class="type">string</span></code></li>
+        </ul>
+
+        <p><strong>Métodos:</strong></p>
+        <ul>
+          <li>
+            <code>ExibirInformacoes(): <span class="type">void</span></code>
+            → mostra os dados do produto
+          </li>
+          <li>
+            <code>AplicarDesconto(double percentual): <span class="type">void</span></code>
+            → reduz o preço do produto conforme o percentual informado
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>O que o Program deve fazer</h2>
+      <ol class="steps-list">
+        <li>Criar pelo menos <strong>2 objetos</strong> da classe <code>Produto</code></li>
+        <li>Preencher os dados dos produtos</li>
+        <li>Exibir as informações na tela</li>
+        <li>Aplicar desconto em um dos produtos</li>
+        <li>Mostrar novamente as informações atualizadas</li>
+      </ol>
+    </div>
+
+    <div class="section">
+      <h2>Exemplo de saída esperada</h2>
+      <pre>
+Produto: Caderno
+Categoria: Papelaria
+Preço: R$ 25,00
+
+Aplicando desconto de 10%...
+
+Produto: Caderno
+Categoria: Papelaria
+Preço: R$ 22,50
+      </pre>
+    </div>
+
+    <div class="section">
+      <h2>Regras</h2>
+      <div class="highlight">
+        <ul>
+          <li>Faça a classe separadamente.</li>
+          <li>Depois utilize a classe no <code>Program.cs</code>.</li>
+          <li>Não use herança.</li>
+          <li>Foque em <strong>classes, propriedades, métodos e objetos</strong>.</li>
+          <li>O programa pode ser feito em <strong>Console App</strong>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Pesquisa</h2>
+      <p>Responda brevemente:</p>
+      <ol>
+        <li>O que é uma classe?</li>
+        <li>O que é uma instância (objeto)?</li>
+        <li>Qual a diferença entre propriedade e método?</li>
+        <li>Para que servem os tipos em C#?</li>
+      </ol>
+    </div>
+
+    <div class="section">
+      <h2>Desafio extra</h2>
+      <p>
+        Crie um terceiro produto e aplique descontos diferentes em cada um deles.
+      </p>
+    </div>
+
+    <div class="footer">
+      Exercício simples de Programação Orientada a Objetos em C#
+    </div>
+  </div>
+</body>
+</html>
