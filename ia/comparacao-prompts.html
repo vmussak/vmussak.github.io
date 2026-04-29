@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tool Calling e Context Window</title>
+  <style>
+    :root {
+      --bg: #090b12;
+      --panel: rgba(255, 255, 255, 0.07);
+      --panel-2: rgba(255, 255, 255, 0.11);
+      --border: rgba(255, 255, 255, 0.14);
+      --text: #f6f7fb;
+      --muted: #9ca3b5;
+
+      --good: #3ddc97;
+      --warn: #ffbf69;
+      --bad: #ff5d73;
+      --blue: #67b7ff;
+      --purple: #b687ff;
+
+      --user: #67b7ff;
+      --llm: #b687ff;
+      --tool: #3ddc97;
+
+      --shadow: 0 24px 70px rgba(0, 0, 0, .45);
+      --radius: 24px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(103,183,255,.28), transparent 32%),
+        radial-gradient(circle at 85% 0%, rgba(182,135,255,.26), transparent 38%),
+        radial-gradient(circle at 50% 100%, rgba(61,220,151,.14), transparent 30%),
+        var(--bg);
+      overflow-x: hidden;
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .12;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+    }
+
+    header {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 56px 24px 18px;
+      display: grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap: 22px;
+      align-items: end;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 4.8vw, 5.2rem);
+      line-height: .95;
+      margin: 0;
+      letter-spacing: -0.075em;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(120deg, #fff, #9ed1ff, #c3a6ff);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: clamp(1rem, 1.5vw, 1.18rem);
+      line-height: 1.6;
+      max-width: 780px;
+      margin: 22px 0 0;
+    }
+
+    .summary-card {
+      background: linear-gradient(145deg, rgba(255,255,255,.14), rgba(255,255,255,.05));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .summary-card strong {
+      display: block;
+      font-size: 2rem;
+      letter-spacing: -.04em;
+    }
+
+    .summary-card small {
+      color: var(--muted);
+      line-height: 1.4;
+      display: block;
+      margin-top: 8px;
+    }
+
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .controls {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      margin: 8px 0 26px;
+      background: rgba(9, 11, 18, .78);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 16px 50px rgba(0,0,0,.32);
+      backdrop-filter: blur(22px);
+    }
+
+    .buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    button {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,.16);
+      color: var(--text);
+      background: rgba(255,255,255,.09);
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-weight: 750;
+      cursor: pointer;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    }
+
+    button:hover { transform: translateY(-2px); background: rgba(255,255,255,.14); }
+    button.active { border-color: rgba(103,183,255,.8); background: rgba(103,183,255,.18); }
+    button.primary { background: linear-gradient(135deg, rgba(103,183,255,.32), rgba(182,135,255,.28)); }
+
+    .context-meter {
+      min-width: min(460px, 100%);
+      flex: 1;
+      max-width: 560px;
+    }
+
+    .meter-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: .88rem;
+      margin-bottom: 8px;
+    }
+
+    .bar {
+      height: 17px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--good), var(--warn), var(--bad));
+      transition: width .55s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+      align-items: start;
+    }
+
+    .scenario {
+      position: relative;
+      min-height: 720px;
+      background: rgba(255,255,255,.065);
+      border: 1px solid var(--border);
+      border-radius: 34px;
+      padding: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+    }
+
+    .scenario::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background: radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 26%);
+      pointer-events: none;
+    }
+
+    .scenario.good::after,
+    .scenario.bad::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--bad), #ff9966);
+    }
+
+    .scenario.good::after { background: linear-gradient(90deg, var(--good), var(--blue)); }
+
+    .scenario-header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .badge {
+      font-size: .78rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #111827;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .bad .badge { background: var(--warn); }
+    .good .badge { background: var(--good); }
+
+    h2 {
+      margin: 0;
+      letter-spacing: -.04em;
+      font-size: clamp(1.3rem, 2vw, 2rem);
+    }
+
+    .prompt-box {
+      position: relative;
+      z-index: 1;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.13);
+      padding: 15px;
+      background: rgba(0,0,0,.25);
+      font-family: var(--mono);
+      line-height: 1.5;
+      color: #e7ecff;
+      min-height: 88px;
+    }
+
+    .prompt-label {
+      color: var(--muted);
+      font-family: var(--sans);
+      font-size: .8rem;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .flow {
+      position: relative;
+      z-index: 1;
+      margin-top: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 13px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.1);
+      opacity: .35;
+      transform: translateX(-8px) scale(.99);
+      transition: opacity .35s ease, transform .35s ease, background .35s ease, border-color .35s ease;
+    }
+
+    .step.active {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      background: rgba(255,255,255,.125);
+      border-color: rgba(255,255,255,.24);
+    }
+
+    .icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: rgba(255,255,255,.09);
+      font-size: 1.25rem;
+    }
+
+    .step-title { font-weight: 850; margin-bottom: 4px; }
+    .step-desc { color: var(--muted); font-size: .91rem; line-height: 1.35; }
+
+    .tokens {
+      font-family: var(--mono);
+      color: var(--text);
+      font-weight: 900;
+      border-radius: 999px;
+      background: rgba(0,0,0,.28);
+      padding: 8px 10px;
+      white-space: nowrap;
+    }
+
+    .actor-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: .74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+    }
+
+    .actor-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .stats {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .stat {
+      border-radius: 20px;
+      background: rgba(0,0,0,.2);
+      border: 1px solid rgba(255,255,255,.1);
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.45rem;
+      letter-spacing: -.05em;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    .terminal {
+      position: relative;
+      z-index: 1;
+      margin-top: 18px;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.42);
+    }
+
+    .terminal-top {
+      height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 14px;
+      background: rgba(255,255,255,.07);
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.25); }
+
+    .terminal pre {
+      margin: 0;
+      padding: 15px;
+      min-height: 160px;
+      font-family: var(--mono);
+      font-size: .82rem;
+      line-height: 1.45;
+      color: #dce7ff;
+      white-space: pre-wrap;
+    }
+
+    .visual-board {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 1fr 330px;
+      gap: 22px;
+    }
+
+    .canvas-card, .lesson-card {
+      border-radius: 34px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.065);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+    }
+
+    .canvas-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .context-window {
+      height: 300px;
+      position: relative;
+      border-radius: 24px;
+      border: 1px dashed rgba(255,255,255,.22);
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+        rgba(0,0,0,.18);
+      background-size: 40px 40px;
+    }
+
+    .context-lane {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      height: 92px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.13);
+      background: rgba(255,255,255,.08);
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      align-items: center;
+      padding: 12px 14px;
+      gap: 14px;
+    }
+
+    .lane-bad { top: 44px; }
+    .lane-good { top: 164px; }
+
+    .lane-label {
+      color: var(--muted);
+      font-size: .88rem;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .lane-fill {
+      height: 58px;
+      width: 100%;
+      border-radius: 14px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      overflow: hidden;
+      display: flex;
+      gap: 3px;
+      align-items: stretch;
+      padding: 3px;
+    }
+
+    .ctx-block {
+      height: 100%;
+      border-radius: 9px;
+      width: 0%;
+      min-width: 0;
+      transition: width .55s cubic-bezier(.2,.8,.2,1), opacity .35s ease;
+      opacity: .92;
+      position: relative;
+    }
+
+    .ctx-block.user { background: var(--user); }
+    .ctx-block.llm { background: var(--llm); }
+    .ctx-block.tool { background: var(--tool); }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: .86rem;
+      margin-top: 14px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border: 1px solid rgba(255,255,255,.11);
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+    }
+
+    .swatch { width: 12px; height: 12px; border-radius: 4px; }
+
+    .lesson-card h3 { margin: 0 0 12px; font-size: 1.4rem; letter-spacing: -.03em; }
+    .lesson-card p, .lesson-card li { color: var(--muted); line-height: 1.55; }
+    .lesson-card ul { padding-left: 18px; margin: 12px 0 0; }
+
+    .callout {
+      margin-top: 16px;
+      border-radius: 22px;
+      padding: 16px;
+      background: linear-gradient(145deg, rgba(61,220,151,.16), rgba(103,183,255,.11));
+      border: 1px solid rgba(61,220,151,.28);
+    }
+
+    .callout strong { display: block; margin-bottom: 5px; }
+
+    .floating-token {
+      position: fixed;
+      pointer-events: none;
+      z-index: 99;
+      font-family: var(--mono);
+      font-weight: 950;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      color: #0b1020;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      animation: floatUp .9s ease forwards;
+    }
+
+    @keyframes floatUp {
+      to { transform: translateY(-48px) scale(.88); opacity: 0; }
+    }
+
+    @media (max-width: 980px) {
+      header, .scenario-grid, .visual-board { grid-template-columns: 1fr; }
+      .scenario { min-height: auto; }
+      .controls { position: relative; }
+    }
+
+    @media (max-width: 620px) {
+      header { padding-top: 34px; }
+      .step { grid-template-columns: 36px 1fr; }
+      .tokens { grid-column: 2; width: fit-content; }
+      .stats { grid-template-columns: 1fr; }
+      .context-lane {
+        left: 10px;
+        right: 10px;
+        grid-template-columns: 1fr;
+        height: 108px;
+      }
+      .lane-fill { height: 42px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+
+  <header>
+    <section class="hero">
+      <h1>Prompt vago <span>enche a janela de contexto</span></h1>
+      <p>
+        Esta simulação mostra como uma LLM com tool calling tende a gastar mais chamadas e tokens quando recebe uma tarefa ampla,
+        como <strong>“corrija o cálculo de frete”</strong>, e como um prompt mais específico,
+        como <strong>“corrija o arquivo ./CalculoFrete.cs”</strong>, reduz exploração, ruído e custo.
+      </p>
+    </section>
+    <aside class="summary-card">
+      <strong id="savingHeadline">0%</strong>
+      <small>economia estimada de tokens quando o prompt aponta diretamente para o arquivo certo.</small>
+    </aside>
+  </header>
+
+  <main>
+    <section class="controls">
+      <div class="buttons">
+        <button class="primary" id="playBtn">▶ Simular fluxo</button>
+        <button id="stepBtn">Avançar 1 etapa</button>
+        <button id="resetBtn">Reiniciar</button>
+        <button id="badOnlyBtn">Prompt vago</button>
+        <button id="goodOnlyBtn">Prompt refinado</button>
+      </div>
+      <div class="context-meter">
+        <div class="meter-head">
+          <span>Context window ocupada</span>
+          <strong id="meterText">0 / 32.000 tokens</strong>
+        </div>
+        <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+      </div>
+    </section>
+
+    <section class="scenario-grid">
+      <article class="scenario bad" id="badScenario">
+        <div class="scenario-header">
+          <div><h2>Cenário A: prompt vago</h2></div>
+          <span class="badge">mais exploração</span>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-label">Prompt do usuário</div>
+          “Corrija o cálculo de frete.”
+        </div>
+
+        <div class="flow" id="badFlow"></div>
+
+        <div class="stats">
+          <div class="stat"><strong id="badCalls">0</strong><span>tool calls</span></div>
+          <div class="stat"><strong id="badTokens">0</strong><span>tokens usados</span></div>
+          <div class="stat"><strong id="badNoise">0%</strong><span>contexto ruidoso</span></div>
+        </div>
+
+        <div class="terminal">
+          <div class="terminal-top"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>transcript</span></div>
+          <pre id="badTerminal"></pre>
+        </div>
+      </article>
+
+      <article class="scenario good" id="goodScenario">
+        <div class="scenario-header">
+          <div><h2>Cenário B: prompt refinado</h2></div>
+          <span class="badge">mais direto</span>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-label">Prompt do usuário</div>
+          “Corrija o arquivo ./CalculoFrete.cs. O bug está no cálculo de frete para CEPs com taxa regional.”
+        </div>
+
+        <div class="flow" id="goodFlow"></div>
+
+        <div class="stats">
+          <div class="stat"><strong id="goodCalls">0</strong><span>tool calls</span></div>
+          <div class="stat"><strong id="goodTokens">0</strong><span>tokens usados</span></div>
+          <div class="stat"><strong id="goodNoise">0%</strong><span>contexto ruidoso</span></div>
+        </div>
+
+        <div class="terminal">
+          <div class="terminal-top"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>transcript</span></div>
+          <pre id="goodTerminal"></pre>
+        </div>
+      </article>
+    </section>
+
+    <section class="visual-board">
+      <article class="canvas-card">
+        <div class="canvas-title">
+          <h2>Como a context window é preenchida</h2>
+          <span class="pill">capacidade fictícia: 32k tokens</span>
+        </div>
+
+        <div class="context-window">
+          <div class="context-lane lane-bad">
+            <div class="lane-label">
+              Prompt vago<br />
+              <strong id="badLaneTotal">0 tokens</strong>
+            </div>
+            <div class="lane-fill" id="badBlocks"></div>
+          </div>
+
+          <div class="context-lane lane-good">
+            <div class="lane-label">
+              Prompt refinado<br />
+              <strong id="goodLaneTotal">0 tokens</strong>
+            </div>
+            <div class="lane-fill" id="goodBlocks"></div>
+          </div>
+        </div>
+
+        <div class="legend">
+          <span class="pill"><span class="swatch" style="background: var(--user)"></span> user</span>
+          <span class="pill"><span class="swatch" style="background: var(--llm)"></span> llm</span>
+          <span class="pill"><span class="swatch" style="background: var(--tool)"></span> tool</span>
+        </div>
+      </article>
+
+      <aside class="lesson-card">
+        <h3>Ideia central</h3>
+        <p>
+          Tool calling não é “grátis”. Cada chamada normalmente adiciona ao contexto:
+          mensagem do usuário, raciocínio / planejamento da LLM, parâmetros da ferramenta,
+          resposta da ferramenta e nova interpretação antes da próxima ação.
+        </p>
+        <ul>
+          <li><strong>Prompt vago</strong>: força descoberta de diretórios, arquivos e testes.</li>
+          <li><strong>Prompt refinado</strong>: reduz o espaço de busca e vai quase direto ao patch.</li>
+          <li><strong>Menos contexto irrelevante</strong>: menor custo, mais velocidade e menos chance de erro.</li>
+        </ul>
+        <div class="callout">
+          <strong>Prompt melhor</strong>
+          Inclua arquivo, sintoma, regra de negócio, teste esperado e restrições de alteração.
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const maxContext = 32000;
+
+    const badSteps = [
+      {
+        actor: 'user',
+        icon: '🧑‍💻',
+        title: 'Usuário envia tarefa ampla',
+        desc: 'A LLM sabe que há um bug, mas não sabe onde procurar.',
+        tokens: 180,
+        terminal: 'USER: corrija o cálculo de frete'
+      },
+      {
+        actor: 'llm',
+        icon: '🧠',
+        title: 'LLM planeja investigação',
+        desc: 'Decide explorar a estrutura do projeto antes de editar.',
+        tokens: 260,
+        terminal: 'LLM: preciso descobrir em qual arquivo o cálculo está implementado.'
+      },
+      {
+        actor: 'tool',
+        icon: '📁',
+        title: 'Tool call: read_dir ./',
+        desc: 'Lista pastas do repositório para entender onde pode estar o cálculo.',
+        tokens: 1200,
+        terminal: 'TOOL read_dir("./") → /src, /tests, /docs, /scripts, README.md...'
+      },
+      {
+        actor: 'llm',
+        icon: '🧠',
+        title: 'LLM avalia candidatos',
+        desc: 'Interpreta o retorno e decide buscar por termos relacionados.',
+        tokens: 320,
+        terminal: 'LLM: agora vou procurar por frete, shipping e freight.'
+      },
+      {
+        actor: 'tool',
+        icon: '🔎',
+        title: 'Tool call: search "frete|shipping|freight"',
+        desc: 'Busca ocorrências. Retorna UI, docs, testes e código legado.',
+        tokens: 3600,
+        terminal: 'TOOL search("frete|shipping|freight") → 47 matches em 19 arquivos.'
+      },
+      {
+        actor: 'llm',
+        icon: '🧠',
+        title: 'LLM seleciona múltiplos arquivos',
+        desc: 'Ainda existe ambiguidade sobre qual arquivo contém a lógica final.',
+        tokens: 340,
+        terminal: 'LLM: preciso abrir os arquivos mais prováveis.'
+      },
+      {
+        actor: 'tool',
+        icon: '📄',
+        title: 'Tool call: read vários arquivos',
+        desc: 'Abre candidatos para inferir qual contém a regra real.',
+        tokens: 7200,
+        terminal: 'TOOL read_file("src/Services/FreightService.cs")\nTOOL read_file("src/Controllers/ShippingController.cs")\nTOOL read_file("docs/freight-rules.md")'
+      },
+      {
+        actor: 'llm',
+        icon: '🧠',
+        title: 'LLM procura validação',
+        desc: 'Busca testes para confirmar o comportamento esperado.',
+        tokens: 290,
+        terminal: 'LLM: vou olhar os testes para confirmar a regra.'
+      },
+      {
+        actor: 'tool',
+        icon: '🧪',
+        title: 'Tool call: read testes',
+        desc: 'Procura testes existentes para entender a expectativa.',
+        tokens: 4100,
+        terminal: 'TOOL read_dir("tests")\nTOOL search("shipping|freight|cep") → 22 matches'
+      },
+      {
+        actor: 'llm',
+        icon: '🧠',
+        title: 'LLM decide editar',
+        desc: 'Após reunir bastante contexto, prepara o patch.',
+        tokens: 300,
+        terminal: 'LLM: encontrei o ponto provável da falha.'
+      },
+      {
+        actor: 'tool',
+        icon: '🛠️',
+        title: 'Tool call: editar arquivo provável',
+        desc: 'Aplica um patch no arquivo mais provável.',
+        tokens: 2600,
+        terminal: 'TOOL edit_file("src/Services/FreightService.cs", patch) → ok'
+      },
+      {
+        actor: 'llm',
+        icon: '🧠',
+        title: 'LLM solicita validação',
+        desc: 'Quer verificar se o patch não quebrou outros cenários.',
+        tokens: 280,
+        terminal: 'LLM: agora vou validar com os testes.'
+      },
+      {
+        actor: 'tool',
+        icon: '✅',
+        title: 'Tool call: rodar testes',
+        desc: 'Executa testes, recebe logs e ajusta se necessário.',
+        tokens: 5200,
+        terminal: 'TOOL run("dotnet test") → 1 falha, 183 passaram. Log extenso adicionado ao contexto.'
+      },
+      {
+        actor: 'llm',
+        icon: '🧠',
+        title: 'LLM interpreta falha',
+        desc: 'Usa os logs para ajustar a correção.',
+        tokens: 360,
+        terminal: 'LLM: o arredondamento ficou na ordem errada; vou corrigir.'
+      },
+      {
+        actor: 'tool',
+        icon: '🔁',
+        title: 'Tool call: nova iteração',
+        desc: 'Corrige novamente e reexecuta a validação.',
+        tokens: 3800,
+        terminal: 'TOOL edit_file(...) → ok\nTOOL run("dotnet test") → todos os testes passaram.'
+      }
+    ];
+
+    const goodSteps = [
+      {
+        actor: 'user',
+        icon: '🎯',
+        title: 'Usuário aponta o arquivo e o sintoma',
+        desc: 'A LLM já começa praticamente no local da alteração.',
+        tokens: 220,
+        terminal: 'USER: corrija o arquivo ./CalculoFrete.cs. O bug está no cálculo de frete para CEPs com taxa regional.'
+      },
+      {
+        actor: 'llm',
+        icon: '🧠',
+        title: 'LLM planeja ação direta',
+        desc: 'Não precisa explorar o repositório inteiro.',
+        tokens: 180,
+        terminal: 'LLM: vou abrir diretamente ./CalculoFrete.cs e corrigir a regra.'
+      },
+      {
+        actor: 'tool',
+        icon: '📄',
+        title: 'Tool call: read_file ./CalculoFrete.cs',
+        desc: 'Lê apenas o arquivo necessário para entender a implementação atual.',
+        tokens: 1450,
+        terminal: 'TOOL read_file("./CalculoFrete.cs") → código do cálculo de frete retornado.'
+      },
+      {
+        actor: 'llm',
+        icon: '🧠',
+        title: 'LLM identifica a causa',
+        desc: 'Com contexto suficiente, prepara o patch específico.',
+        tokens: 210,
+        terminal: 'LLM: a taxa regional está sendo aplicada depois do arredondamento.'
+      },
+      {
+        actor: 'tool',
+        icon: '🛠️',
+        title: 'Tool call: edit_file ./CalculoFrete.cs',
+        desc: 'Aplica a correção diretamente no cálculo incorreto.',
+        tokens: 1300,
+        terminal: 'TOOL edit_file("./CalculoFrete.cs", patch) → taxa regional aplicada antes do arredondamento.'
+      },
+      {
+        actor: 'llm',
+        icon: '🧠',
+        title: 'LLM escolhe validação focada',
+        desc: 'Em vez de um conjunto amplo, usa teste direcionado.',
+        tokens: 170,
+        terminal: 'LLM: vou validar apenas o cenário relacionado a CEP regional.'
+      },
+      {
+        actor: 'tool',
+        icon: '🧪',
+        title: 'Tool call: rodar teste focado',
+        desc: 'Valida somente o cenário descrito pelo prompt.',
+        tokens: 1250,
+        terminal: 'TOOL run("dotnet test --filter FreightRegionalZipCode") → passou.'
+      },
+      {
+        actor: 'llm',
+        icon: '✅',
+        title: 'Resposta final objetiva',
+        desc: 'Resume a correção sem arrastar diretórios e logs irrelevantes.',
+        tokens: 600,
+        terminal: 'LLM: Corrigi ./CalculoFrete.cs. A taxa regional agora entra no cálculo antes do arredondamento. Teste focado passou.'
+      }
+    ];
+
+    let badIndex = -1;
+    let goodIndex = -1;
+    let playing = false;
+    let mode = 'both';
+    let timer = null;
+
+    const els = {
+      badFlow: document.getElementById('badFlow'),
+      goodFlow: document.getElementById('goodFlow'),
+      badTerminal: document.getElementById('badTerminal'),
+      goodTerminal: document.getElementById('goodTerminal'),
+      badCalls: document.getElementById('badCalls'),
+      goodCalls: document.getElementById('goodCalls'),
+      badTokens: document.getElementById('badTokens'),
+      goodTokens: document.getElementById('goodTokens'),
+      badNoise: document.getElementById('badNoise'),
+      goodNoise: document.getElementById('goodNoise'),
+      meterText: document.getElementById('meterText'),
+      barFill: document.getElementById('barFill'),
+      savingHeadline: document.getElementById('savingHeadline'),
+      badBlocks: document.getElementById('badBlocks'),
+      goodBlocks: document.getElementById('goodBlocks'),
+      badLaneTotal: document.getElementById('badLaneTotal'),
+      goodLaneTotal: document.getElementById('goodLaneTotal'),
+      playBtn: document.getElementById('playBtn'),
+      stepBtn: document.getElementById('stepBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      badOnlyBtn: document.getElementById('badOnlyBtn'),
+      goodOnlyBtn: document.getElementById('goodOnlyBtn')
+    };
+
+    function format(n) {
+      return n.toLocaleString('pt-BR');
+    }
+
+    function actorLabel(actor) {
+      if (actor === 'user') return 'user';
+      if (actor === 'llm') return 'llm';
+      return 'tool';
+    }
+
+    function stepHtml(step, i, type) {
+      const colors = {
+        user: 'var(--user)',
+        llm: 'var(--llm)',
+        tool: 'var(--tool)'
+      };
+
+      return `
+        <div class="step" data-type="${type}" data-index="${i}">
+          <div class="icon">${step.icon}</div>
+          <div>
+            <div class="step-title">${step.title}</div>
+            <div class="step-desc">${step.desc}</div>
+            <div class="actor-pill">
+              <span class="actor-dot" style="background:${colors[step.actor]}"></span>
+              ${actorLabel(step.actor)}
+            </div>
+          </div>
+          <div class="tokens">+${format(step.tokens)}</div>
+        </div>
+      `;
+    }
+
+    function renderSteps() {
+      els.badFlow.innerHTML = badSteps.map((s, i) => stepHtml(s, i, 'bad')).join('');
+      els.goodFlow.innerHTML = goodSteps.map((s, i) => stepHtml(s, i, 'good')).join('');
+
+      els.badBlocks.innerHTML = badSteps.map((s) => `<span class="ctx-block ${s.actor}"></span>`).join('');
+      els.goodBlocks.innerHTML = goodSteps.map((s) => `<span class="ctx-block ${s.actor}"></span>`).join('');
+    }
+
+    function totalUntil(steps, index) {
+      if (index < 0) return 0;
+      return steps.slice(0, index + 1).reduce((sum, s) => sum + s.tokens, 0);
+    }
+
+    function callsUntil(steps, index) {
+      if (index < 0) return 0;
+      return steps.slice(0, index + 1).filter(s => s.actor === 'tool').length;
+    }
+
+    function terminalUntil(steps, index) {
+      if (index < 0) return '';
+      return steps.slice(0, index + 1).map(s => s.terminal).join('\n\n');
+    }
+
+    function setActiveButtons() {
+      [els.badOnlyBtn, els.goodOnlyBtn].forEach(b => b.classList.remove('active'));
+      if (mode === 'bad') els.badOnlyBtn.classList.add('active');
+      if (mode === 'good') els.goodOnlyBtn.classList.add('active');
+    }
+
+    function updateBlocks() {
+      const badChildren = [...els.badBlocks.children];
+      const goodChildren = [...els.goodBlocks.children];
+
+      badChildren.forEach((block, i) => {
+        if (i <= badIndex) {
+          const width = (badSteps[i].tokens / maxContext) * 100;
+          block.style.width = `${width}%`;
+        } else {
+          block.style.width = '0%';
+        }
+      });
+
+      goodChildren.forEach((block, i) => {
+        if (i <= goodIndex) {
+          const width = (goodSteps[i].tokens / maxContext) * 100;
+          block.style.width = `${width}%`;
+        } else {
+          block.style.width = '0%';
+        }
+      });
+
+      els.badLaneTotal.textContent = `${format(totalUntil(badSteps, badIndex))} tokens`;
+      els.goodLaneTotal.textContent = `${format(totalUntil(goodSteps, goodIndex))} tokens`;
+    }
+
+    function updateUI() {
+      document.querySelectorAll('.step').forEach(el => {
+        const type = el.dataset.type;
+        const index = Number(el.dataset.index);
+        el.classList.toggle('active', type === 'bad' ? index <= badIndex : index <= goodIndex);
+      });
+
+      const badTotal = totalUntil(badSteps, badIndex);
+      const goodTotal = totalUntil(goodSteps, goodIndex);
+      const total = mode === 'bad' ? badTotal : mode === 'good' ? goodTotal : Math.max(badTotal, goodTotal);
+      const pct = Math.min(100, total / maxContext * 100);
+
+      els.badCalls.textContent = callsUntil(badSteps, badIndex);
+      els.goodCalls.textContent = callsUntil(goodSteps, goodIndex);
+      els.badTokens.textContent = format(badTotal);
+      els.goodTokens.textContent = format(goodTotal);
+
+      els.badNoise.textContent = badIndex < 0 ? '0%' : `${Math.min(84, 20 + badIndex * 4)}%`;
+      els.goodNoise.textContent = goodIndex < 0 ? '0%' : `${Math.min(20, 3 + goodIndex * 2)}%`;
+
+      els.badTerminal.textContent = terminalUntil(badSteps, badIndex);
+      els.goodTerminal.textContent = terminalUntil(goodSteps, goodIndex);
+      els.meterText.textContent = `${format(total)} / ${format(maxContext)} tokens`;
+      els.barFill.style.width = `${pct}%`;
+
+      const finalBad = badSteps.reduce((s, x) => s + x.tokens, 0);
+      const finalGood = goodSteps.reduce((s, x) => s + x.tokens, 0);
+      const saving = Math.round((1 - finalGood / finalBad) * 100);
+      els.savingHeadline.textContent = `${saving}%`;
+
+      updateBlocks();
+    }
+
+    function spawnToken(text, x, y) {
+      const t = document.createElement('div');
+      t.className = 'floating-token';
+      t.textContent = text;
+      t.style.left = `${x}px`;
+      t.style.top = `${y}px`;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 950);
+    }
+
+    function advance() {
+      let changed = false;
+
+      if ((mode === 'both' || mode === 'bad') && badIndex < badSteps.length - 1) {
+        badIndex++;
+        changed = true;
+        const rect = document.getElementById('badScenario').getBoundingClientRect();
+        spawnToken(`+${format(badSteps[badIndex].tokens)}`, rect.left + rect.width - 115, rect.top + 160);
+      }
+
+      if ((mode === 'both' || mode === 'good') && goodIndex < goodSteps.length - 1) {
+        goodIndex++;
+        changed = true;
+        const rect = document.getElementById('goodScenario').getBoundingClientRect();
+        spawnToken(`+${format(goodSteps[goodIndex].tokens)}`, rect.left + rect.width - 115, rect.top + 160);
+      }
+
+      updateUI();
+      if (!changed) stop();
+    }
+
+    function play() {
+      if (playing) return stop();
+      playing = true;
+      els.playBtn.textContent = '⏸ Pausar';
+      advance();
+      timer = setInterval(advance, 1050);
+    }
+
+    function stop() {
+      playing = false;
+      els.playBtn.textContent = '▶ Simular fluxo';
+      clearInterval(timer);
+    }
+
+    function reset() {
+      stop();
+      badIndex = -1;
+      goodIndex = -1;
+      updateUI();
+    }
+
+    els.playBtn.addEventListener('click', play);
+    els.stepBtn.addEventListener('click', () => {
+      stop();
+      advance();
+    });
+    els.resetBtn.addEventListener('click', reset);
+
+    els.badOnlyBtn.addEventListener('click', () => {
+      mode = mode === 'bad' ? 'both' : 'bad';
+      reset();
+      setActiveButtons();
+    });
+
+    els.goodOnlyBtn.addEventListener('click', () => {
+      mode = mode === 'good' ? 'both' : 'good';
+      reset();
+      setActiveButtons();
+    });
+
+    renderSteps();
+    updateUI();
+  </script>
+</body>
+</html>
