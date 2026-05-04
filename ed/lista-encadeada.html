@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualização de Lista Encadeada</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      margin-top: 0;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+
+    .panel {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-group label {
+      font-size: 13px;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    input[type="text"] {
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      min-width: 180px;
+      font-size: 16px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    .btn-start   { background: #2563eb; color: white; }
+    .btn-end     { background: #0f766e; color: white; }
+    .btn-after   { background: #7c3aed; color: white; }
+    .btn-remove  { background: #dc2626; color: white; }
+    .btn-reset   { background: #475569; color: white; }
+    .btn-random  { background: #b45309; color: white; }
+
+    .status {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #eef2ff;
+      color: #3730a3;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+
+    .status.error {
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .info-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #0f172a;
+    }
+
+    .list-wrapper {
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .list-area {
+      position: relative;
+      min-height: 260px;
+      min-width: 100%;
+      padding: 24px 8px 8px;
+    }
+
+    .list-track {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      min-height: 180px;
+      padding: 20px 12px 40px;
+    }
+
+    .node-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      opacity: 0;
+      transform: translateY(18px) scale(0.96);
+      animation: showNode 0.45s ease forwards;
+    }
+
+    @keyframes showNode {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .node {
+      width: 150px;
+      border: 2px solid #0f172a;
+      border-radius: 14px;
+      overflow: hidden;
+      background: white;
+      position: relative;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .node-label {
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      font-size: 12px;
+      padding: 6px;
+      letter-spacing: 0.4px;
+    }
+
+    .node-body {
+      display: grid;
+      grid-template-columns: 1fr 56px;
+      height: 74px;
+    }
+
+    .value-cell, .next-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .value-cell {
+      background: #eff6ff;
+      border-right: 2px solid #0f172a;
+      color: #1d4ed8;
+    }
+
+    .next-cell {
+      background: #f8fafc;
+      font-size: 13px;
+      color: #475569;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .next-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #0ea5e9;
+    }
+
+    .null-dot {
+      background: #94a3b8;
+    }
+
+    .arrow {
+      position: relative;
+      width: 70px;
+      height: 4px;
+      background: #0ea5e9;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+
+    .arrow::after {
+      content: "";
+      position: absolute;
+      right: -2px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 14px solid #0ea5e9;
+    }
+
+    .pointer-tag {
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f59e0b;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      box-shadow: 0 6px 14px rgba(245, 158, 11, 0.25);
+      white-space: nowrap;
+    }
+
+    .explanation {
+      line-height: 1.65;
+      color: #334155;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+    }
+
+    .empty-state {
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      background: #f8fafc;
+      font-size: 18px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    code {
+      background: #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .divider {
+      width: 1px;
+      height: 44px;
+      background: #e2e8f0;
+      align-self: flex-end;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Lista Encadeada Interativa</h1>
+    <p class="subtitle">
+      Esta página representa graficamente a estrutura da classe <strong>ListaEncadeada</strong>, mostrando os nós,
+      o ponteiro <strong>proximo</strong> e a referência <strong>topo</strong>.
+    </p>
+
+    <div class="panel">
+      <div class="controls">
+        <div class="control-group">
+          <label>Valor</label>
+          <input id="valorInput" type="text" placeholder="Digite um valor" />
+        </div>
+        <button class="btn-start" id="btnInserirInicio">Inserir no início</button>
+        <button class="btn-end"   id="btnInserirFim">Inserir no fim</button>
+
+        <div class="divider"></div>
+
+        <div class="control-group">
+          <label>Inserir após nó com valor</label>
+          <input id="alvoInput" type="text" placeholder="Valor do nó alvo" />
+        </div>
+        <button class="btn-after" id="btnInserirApos">Inserir após</button>
+
+        <div class="divider"></div>
+
+        <div class="control-group">
+          <label>Remover nó com valor</label>
+          <input id="removeInput" type="text" placeholder="Valor a remover" />
+        </div>
+        <button class="btn-remove" id="btnRemover">Remover nó</button>
+
+        <div class="divider"></div>
+
+        <button class="btn-random" id="btnExemplo">Inserir exemplo</button>
+        <button class="btn-reset"  id="btnReset">Limpar lista</button>
+      </div>
+      <div class="status" id="status">Lista criada. Pronta para inserções.</div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <strong>Topo</strong>
+          <span id="topoInfo">None</span>
+        </div>
+        <div class="info-card">
+          <strong>Tamanho</strong>
+          <span id="tamanhoInfo">0</span>
+        </div>
+        <div class="info-card">
+          <strong>Último nó</strong>
+          <span id="ultimoInfo">None</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Representação gráfica</h2>
+      <div class="list-wrapper">
+        <div class="list-area">
+          <div class="list-track" id="listTrack"></div>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-color" style="background:#f59e0b"></span> Ponteiro <strong>topo</strong></div>
+        <div class="legend-item"><span class="legend-color" style="background:#0ea5e9"></span> Referência <strong>proximo</strong></div>
+        <div class="legend-item"><span class="legend-color" style="background:#94a3b8"></span> <strong>None</strong> / fim da cadeia</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>O que está acontecendo?</h2>
+      <div class="explanation" id="explicacao">
+        A lista está vazia. Quando você clicar em <code>Inserir no início</code> ou <code>Inserir no fim</code>,
+        um novo nó será criado e <code>topo</code> apontará para ele.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class No {
+      constructor(valor) {
+        this.valor = valor;
+        this.proximo = null;
+      }
+    }
+
+    class ListaEncadeada {
+      constructor() {
+        this.topo = null;
+        this.tamanho = 0;
+      }
+
+      adicionarNoInicio(valor) {
+        const novoNo = new No(valor);
+        novoNo.proximo = this.topo;
+        this.topo = novoNo;
+        this.tamanho += 1;
+      }
+
+      adicionarNoFim(valor) {
+        const novoNo = new No(valor);
+
+        if (this.topo === null) {
+          this.topo = novoNo;
+        } else {
+          let noAtual = this.topo;
+          while (noAtual.proximo !== null) {
+            noAtual = noAtual.proximo;
+          }
+          noAtual.proximo = novoNo;
+        }
+
+        this.tamanho += 1;
+      }
+
+      adicionarApos(valor, valorAlvo) {
+        const novoNo = new No(valor);
+        let noAtual = this.topo;
+        let encontrou = false;
+
+        while (noAtual !== null) {
+          if (noAtual.valor == valorAlvo) {
+            novoNo.proximo = noAtual.proximo;
+            noAtual.proximo = novoNo;
+            encontrou = true;
+            this.tamanho += 1;
+            break;
+          }
+          noAtual = noAtual.proximo;
+        }
+
+        return encontrou;
+      }
+
+      removerNo(valor) {
+        let noAtual = this.topo;
+        let noAnterior = null;
+        let encontrou = false;
+
+        while (noAtual !== null) {
+          if (noAtual.valor == valor) {
+            if (noAnterior === null) {
+              this.topo = noAtual.proximo;
+            } else {
+              noAnterior.proximo = noAtual.proximo;
+            }
+            encontrou = true;
+            this.tamanho -= 1;
+            break;
+          }
+          noAnterior = noAtual;
+          noAtual = noAtual.proximo;
+        }
+
+        return encontrou;
+      }
+
+      estaVazia() {
+        return this.topo === null;
+      }
+
+      toArray() {
+        const itens = [];
+        let atual = this.topo;
+        while (atual !== null) {
+          itens.push(atual);
+          atual = atual.proximo;
+        }
+        return itens;
+      }
+    }
+
+    const lista = new ListaEncadeada();
+
+    const valorInput  = document.getElementById('valorInput');
+    const alvoInput   = document.getElementById('alvoInput');
+    const removeInput = document.getElementById('removeInput');
+    const btnInserirInicio = document.getElementById('btnInserirInicio');
+    const btnInserirFim    = document.getElementById('btnInserirFim');
+    const btnInserirApos   = document.getElementById('btnInserirApos');
+    const btnRemover       = document.getElementById('btnRemover');
+    const btnReset         = document.getElementById('btnReset');
+    const btnExemplo       = document.getElementById('btnExemplo');
+    const statusEl         = document.getElementById('status');
+    const listTrack        = document.getElementById('listTrack');
+    const topoInfo         = document.getElementById('topoInfo');
+    const tamanhoInfo      = document.getElementById('tamanhoInfo');
+    const ultimoInfo       = document.getElementById('ultimoInfo');
+    const explicacao       = document.getElementById('explicacao');
+
+    let ultimoEvento = 'init';
+    let ultimoValor  = null;
+    let ultimoAlvo   = null;
+
+    function setStatus(msg, isError = false) {
+      statusEl.textContent = msg;
+      statusEl.className = 'status' + (isError ? ' error' : '');
+    }
+
+    function atualizarTela() {
+      const itens = lista.toArray();
+      listTrack.innerHTML = '';
+
+      if (itens.length === 0) {
+        listTrack.innerHTML = '<div class="empty-state">Lista vazia.<br>Nenhum nó encadeado no momento.</div>';
+      } else {
+        itens.forEach((no, index) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'node-wrapper';
+
+          const node = document.createElement('div');
+          node.className = 'node';
+
+          const label = document.createElement('div');
+          label.className = 'node-label';
+          label.textContent = `Nó ${index + 1}`;
+
+          const body = document.createElement('div');
+          body.className = 'node-body';
+
+          const valueCell = document.createElement('div');
+          valueCell.className = 'value-cell';
+          valueCell.textContent = no.valor;
+
+          const nextCell = document.createElement('div');
+          nextCell.className = 'next-cell';
+          nextCell.innerHTML = `<span>${no.proximo ? 'próx.' : 'None'}</span><span class="next-dot ${no.proximo ? '' : 'null-dot'}"></span>`;
+
+          body.appendChild(valueCell);
+          body.appendChild(nextCell);
+          node.appendChild(label);
+          node.appendChild(body);
+          wrapper.appendChild(node);
+
+          if (index === 0) {
+            const headTag = document.createElement('div');
+            headTag.className = 'pointer-tag';
+            headTag.textContent = 'topo';
+            wrapper.appendChild(headTag);
+          }
+
+          queueTrack_appendWrapper(wrapper, itens, index);
+        });
+      }
+
+      const itensArr = lista.toArray();
+      topoInfo.textContent     = lista.topo ? lista.topo.valor : 'None';
+      tamanhoInfo.textContent = lista.tamanho;
+      ultimoInfo.textContent  = itensArr.length > 0 ? itensArr[itensArr.length - 1].valor : 'None';
+
+      atualizarExplicacao();
+    }
+
+    function queueTrack_appendWrapper(wrapper, itens, index) {
+      listTrack.appendChild(wrapper);
+      if (index < itens.length - 1) {
+        const arrow = document.createElement('div');
+        arrow.className = 'arrow';
+        arrow.title = 'referência proximo';
+        listTrack.appendChild(arrow);
+      }
+    }
+
+    function atualizarExplicacao() {
+      if (lista.estaVazia()) {
+        explicacao.innerHTML = 'A lista está vazia. <code>topo</code> é <code>None</code>. Não existe nenhum encadeamento entre nós.';
+        return;
+      }
+
+      if (ultimoEvento === 'inicio') {
+        if (lista.tamanho === 1) {
+          explicacao.innerHTML = `Foi inserido o valor <code>${ultimoValor}</code> no início. Como era o primeiro elemento, <code>topo</code> passou a apontar para este nó e seu <code>proximo</code> é <code>None</code>.`;
+        } else {
+          explicacao.innerHTML = `Foi inserido o valor <code>${ultimoValor}</code> no início da lista. O novo nó passou a apontar para o antigo <code>topo</code> por meio de <code>proximo</code>, e <code>topo</code> foi atualizado para o novo nó.`;
+        }
+        return;
+      }
+
+      if (ultimoEvento === 'fim') {
+        if (lista.tamanho === 1) {
+          explicacao.innerHTML = `Foi inserido o valor <code>${ultimoValor}</code> no fim. Como era o primeiro elemento, <code>topo</code> passou a apontar para este nó.`;
+        } else {
+          explicacao.innerHTML = `Foi inserido o valor <code>${ultimoValor}</code> no fim da lista. O algoritmo percorreu toda a lista até encontrar o nó cujo <code>proximo</code> era <code>None</code> e fez esse nó apontar para o novo nó.`;
+        }
+        return;
+      }
+
+      if (ultimoEvento === 'apos') {
+        explicacao.innerHTML = `Foi inserido o valor <code>${ultimoValor}</code> após o nó de valor <code>${ultimoAlvo}</code>. O novo nó herdou o <code>proximo</code> do nó alvo, e o nó alvo passou a apontar para o novo nó.`;
+        return;
+      }
+
+      if (ultimoEvento === 'remover') {
+        explicacao.innerHTML = `O nó de valor <code>${ultimoValor}</code> foi removido. O nó anterior passou a apontar diretamente para o nó seguinte, pulando o nó removido. Se era o <code>topo</code>, este foi atualizado para o próximo nó.`;
+        return;
+      }
+
+      explicacao.innerHTML = 'A lista encadeada permite inserções e remoções eficientes em qualquer posição, desde que se tenha acesso ao nó anterior. O acesso sempre começa por <code>topo</code>.';
+    }
+
+    function inserirInicio() {
+      const valor = valorInput.value.trim();
+      if (!valor) { setStatus('Digite um valor antes de inserir.', true); return; }
+      lista.adicionarNoInicio(valor);
+      ultimoEvento = 'inicio';
+      ultimoValor  = valor;
+      setStatus(`Valor "${valor}" inserido no início da lista.`);
+      valorInput.value = '';
+      valorInput.focus();
+      atualizarTela();
+    }
+
+    function inserirFim() {
+      const valor = valorInput.value.trim();
+      if (!valor) { setStatus('Digite um valor antes de inserir.', true); return; }
+      lista.adicionarNoFim(valor);
+      ultimoEvento = 'fim';
+      ultimoValor  = valor;
+      setStatus(`Valor "${valor}" inserido no fim da lista.`);
+      valorInput.value = '';
+      valorInput.focus();
+      atualizarTela();
+    }
+
+    function inserirApos() {
+      const valor = valorInput.value.trim();
+      const alvo  = alvoInput.value.trim();
+      if (!valor) { setStatus('Digite um valor antes de inserir.', true); return; }
+      if (!alvo)  { setStatus('Digite o valor do nó alvo.', true); return; }
+
+      const encontrado = lista.adicionarApos(valor, alvo);
+      if (!encontrado) {
+        setStatus(`Nó alvo "${alvo}" não encontrado na lista.`, true);
+        return;
+      }
+      ultimoEvento = 'apos';
+      ultimoValor  = valor;
+      ultimoAlvo   = alvo;
+      setStatus(`Valor "${valor}" inserido após o nó "${alvo}".`);
+      valorInput.value = '';
+      alvoInput.value  = '';
+      valorInput.focus();
+      atualizarTela();
+    }
+
+    function removerNo() {
+      const valor = removeInput.value.trim();
+      if (!valor) { setStatus('Digite o valor do nó a remover.', true); return; }
+
+      if (lista.estaVazia()) { setStatus('A lista está vazia. Não há nó para remover.', true); return; }
+
+      const removido = lista.removerNo(valor);
+      if (!removido) {
+        setStatus(`Nó com valor "${valor}" não encontrado na lista.`, true);
+        return;
+      }
+      ultimoEvento = 'remover';
+      ultimoValor  = valor;
+      setStatus(`Nó com valor "${valor}" removido da lista.`);
+      removeInput.value = '';
+      removeInput.focus();
+      atualizarTela();
+    }
+
+    function limparLista() {
+      lista.topo     = null;
+      lista.tamanho  = 0;
+      ultimoEvento   = 'reset';
+      ultimoValor    = null;
+      setStatus('Lista limpa com sucesso.');
+      atualizarTela();
+    }
+
+    function inserirExemplo() {
+      ['A', 'B', 'C', 'D'].forEach(v => lista.adicionarNoFim(v));
+      ultimoEvento = 'fim';
+      ultimoValor  = 'D';
+      setStatus('Exemplo inserido: A → B → C → D.');
+      atualizarTela();
+    }
+
+    btnInserirInicio.addEventListener('click', inserirInicio);
+    btnInserirFim.addEventListener('click', inserirFim);
+    btnInserirApos.addEventListener('click', inserirApos);
+    btnRemover.addEventListener('click', removerNo);
+    btnReset.addEventListener('click', limparLista);
+    btnExemplo.addEventListener('click', inserirExemplo);
+
+    valorInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') inserirFim(); });
+
+    atualizarTela();
+  </script>
+</body>
+</html>
