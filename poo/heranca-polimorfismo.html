@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Herança e Polimorfismo em C#</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      color: #222;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    h1, h2, h3 {
+      color: #1f4e79;
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #e8f1fb;
+      color: #1f4e79;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .section {
+      margin-bottom: 28px;
+    }
+
+    ul, ol {
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    code, pre {
+      background: #f1f1f1;
+      border-radius: 8px;
+      font-family: Consolas, monospace;
+    }
+
+    code {
+      padding: 2px 6px;
+      font-size: 0.95em;
+    }
+
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      font-size: 0.92em;
+    }
+
+    .highlight {
+      background: #fff8e1;
+      border-left: 5px solid #f4b400;
+      padding: 14px;
+      border-radius: 8px;
+      margin: 12px 0;
+    }
+
+    .quiz {
+      background: #f9fbfc;
+      border: 1px solid #dbe5ec;
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .quiz p {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .quiz ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .quiz ul li::before {
+      content: "○  ";
+      color: #1f4e79;
+    }
+
+    .quiz ul li.correct::before {
+      content: "● ";
+      color: #2e7d32;
+      font-weight: bold;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      margin-top: 30px;
+      border-top: 1px solid #eee;
+      padding-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Herança e Polimorfismo em C#</h1>
+    <span class="tag">Programação Orientada a Objetos</span>
+
+    <!-- 1. Problema inicial -->
+    <div class="section">
+      <p>
+        Imagine que nosso sistema de gerenciamento de veículos precise realizar acelerações de acordo
+        com o tipo do veículo. Se o veículo for uma <strong>Moto</strong>, ela consome apenas
+        <strong>1</strong> de combustível por aceleração e ganha <strong>2</strong> de velocidade.
+        Se for um <strong>Carro</strong> (ou veículo genérico), consome <strong>2</strong> de
+        combustível e ganha <strong>1</strong> de velocidade.
+      </p>
+      <p>Para implementar essa regra de negócio, poderíamos colocar um <code>if</code> no método <code>Acelerar</code>:</p>
+      <pre>public void Acelerar()
+{
+    if(this.Tipo == ???????????) // Moto
+    {
+        this.QuantidadeCombustivel -= 1;
+        this.Velocidade += 2;
+    }
+    else // Carro ou genérico
+    {
+        this.QuantidadeCombustivel -= 2;
+        this.Velocidade += 1;
+    }
+}</pre>
+      <p>
+        Poderíamos criar um atributo <code>Tipo</code> na classe <code>Veiculo</code>, onde o
+        número <code>1</code> representaria "Moto" e <code>2</code> "Carro".
+      </p>
+      <p>A implementação seria algo como:</p>
+      <pre>public class Veiculo
+{
+    public string Placa { get; set; }
+    public int QuantidadeCombustivel { get; private set; }
+    public int Velocidade { get; private set; }
+    public string Modelo { get; set; }
+    public int Tipo { get; set; }
+
+    public void Acelerar()
+    {
+        if(this.Tipo == 1) // Moto
+        {
+            this.QuantidadeCombustivel -= 1;
+            this.Velocidade += 2;
+        }
+        else // Carro ou genérico
+        {
+            this.QuantidadeCombustivel -= 2;
+            this.Velocidade += 1;
+        }
+    }
+
+    public void Abastecer()
+    {
+        this.QuantidadeCombustivel += 1;
+    }
+}</pre>
+      <p>
+        Veja que uma simples regra de negócio como essa fez nosso código crescer muito. E poderia
+        ser pior: imagine se nosso sistema tivesse 10 tipos de veículos diferentes. Esse
+        <code>if</code> seria maior ainda.
+      </p>
+      <p>Precisamos encontrar uma maneira de fazer com que a criação de novos tipos de veículo não implique em um aumento de complexidade.</p>
+    </div>
+
+    <!-- 2. Reaproveitando com Herança -->
+    <div class="section">
+      <h2>Reaproveitando código com a Herança</h2>
+      <p>Uma solução seria ter classes separadas para <code>Veiculo</code> (o genérico/Carro) e <code>Moto</code>:</p>
+      <pre>public class Veiculo
+{
+    public string Placa { get; set; }
+    public int QuantidadeCombustivel { get; private set; }
+    public int Velocidade { get; private set; }
+    public string Modelo { get; set; }
+
+    public void Acelerar()
+    {
+        this.QuantidadeCombustivel -= 2;
+        this.Velocidade += 1;
+    }
+
+    public void Abastecer()
+    {
+        this.QuantidadeCombustivel += 1;
+    }
+}
+
+public class Moto
+{
+    public string Placa { get; set; }
+    public int QuantidadeCombustivel { get; private set; }
+    public int Velocidade { get; private set; }
+    public string Modelo { get; set; }
+
+    public void Acelerar()
+    {
+        this.QuantidadeCombustivel -= 1;
+        this.Velocidade += 2;
+    }
+
+    public void Abastecer()
+    {
+        this.QuantidadeCombustivel += 1;
+    }
+}</pre>
+      <p>
+        Ambas as classes possuem código bem simples, mas agora o problema é outro: a
+        <strong>repetição de código</strong> entre ambas as classes. Se amanhã precisarmos guardar
+        "Cor", por exemplo, precisaremos mexer em todas as classes que representam um veículo no
+        sistema. Isso pode ser trabalhoso.
+      </p>
+      <p>
+        A ideia é, portanto, reaproveitar código. Veja que, no fim, uma <code>Moto</code> é um
+        <code>Veiculo</code>, pois ambos têm <code>Placa</code>, <code>QuantidadeCombustivel</code>,
+        <code>Velocidade</code> e <code>Modelo</code>. A única diferença é o comportamento no
+        momento da aceleração. Podemos falar que uma <strong>Moto é um Veiculo</strong>:
+      </p>
+      <pre>public class Moto : Veiculo
+{
+
+}</pre>
+      <p>
+        Quando uma classe é definida com <code>:</code>, dizemos que ela <strong>herda</strong> da
+        outra (<code>Veiculo</code>) e por isso ela ganha todos os atributos e métodos da outra
+        classe. Por exemplo, se <code>Moto</code> herdar de <code>Veiculo</code>, ela terá
+        <code>Placa</code>, <code>QuantidadeCombustivel</code>, <code>Velocidade</code>,
+        <code>Acelerar()</code> e <code>Abastecer()</code> automaticamente, sem precisar fazer
+        nada. Dizemos que <code>Moto</code> é uma <strong>subclasse</strong> ou
+        <strong>classe filha</strong> de <code>Veiculo</code>, e que <code>Veiculo</code> é a
+        <strong>classe base</strong> ou <strong>classe pai</strong>. Veja o código a seguir:
+      </p>
+      <pre>// Arquivo Moto.cs
+public class Moto : Veiculo
+{
+
+}
+
+// Código no formulário que utiliza a Moto
+Moto m = new Moto();
+m.Abastecer(); // método herdado de Veiculo</pre>
+      <p>
+        Basta usar a notação <code>:</code> e o C# automaticamente herda os métodos e atributos
+        da classe pai. Mas a <code>Moto</code> tem o comportamento de <code>Acelerar()</code>
+        diferente. Para isso, basta reescrever o comportamento na classe filha, usando a palavra
+        <code>override</code> e marcando o método na classe pai como <code>virtual</code>, para
+        indicar que ele pode ser sobrescrito:
+      </p>
+      <pre>// Arquivo Veiculo.cs
+public class Veiculo
+{
+    public virtual void Acelerar()
+    {
+        this.QuantidadeCombustivel -= 2;
+        this.Velocidade += 1;
+    }
+
+    // Resto do código da classe
+}
+
+// Arquivo Moto.cs
+public class Moto : Veiculo
+{
+    public override void Acelerar()
+    {
+        this.QuantidadeCombustivel -= 1;
+        this.Velocidade += 2;
+    }
+}
+
+// Código do formulário da aplicação
+Moto m = new Moto();
+
+// Chama o comportamento escrito no pai (Veiculo)
+// QuantidadeCombustivel termina em 1 depois dessa linha
+m.Abastecer();
+
+// Chama o comportamento escrito na Moto
+// QuantidadeCombustivel termina em 0, Velocidade termina em 2
+m.Acelerar();</pre>
+      <p>
+        Veja nesse código que invocamos tanto <code>Abastecer()</code> quanto
+        <code>Acelerar()</code>. No abastecimento, como a classe filha não redefiniu o
+        comportamento, o método escrito na classe pai será utilizado.
+      </p>
+      <p>Já na aceleração, o comportamento usado é o que foi sobrescrito na classe filha.</p>
+
+      <div class="highlight">
+        <strong>Atenção:</strong> o código anterior ainda não compila. Repare que o método
+        <code>Acelerar()</code> da <code>Moto</code> manipula <code>QuantidadeCombustivel</code>
+        e <code>Velocidade</code>. Mas essas propriedades são <code>private</code>! Atributos
+        privados só são visíveis para a classe que os declarou. Os filhos não enxergam.
+      </div>
+
+      <p>
+        Queremos proteger nossos atributos mas não deixá-los privados nem públicos. Queremos
+        protegê-los o suficiente para ninguém de fora acessar, mas permitir que quem herda tenha
+        acesso. Para resolver, alteraremos o modificador de acesso para <code>protected</code>.
+        Atributos/métodos marcados como <code>protected</code> são visíveis apenas para a própria
+        classe e para as classes filhas:
+      </p>
+      <pre>public class Veiculo
+{
+    public string Placa { get; set; }
+    public int QuantidadeCombustivel { get; protected set; }
+    public int Velocidade { get; protected set; }
+    public string Modelo { get; set; }
+
+    // ...
+}</pre>
+      <p>A classe <code>Veiculo</code> ainda pode ser instanciada sem problemas:</p>
+      <pre>Veiculo v = new Veiculo();
+v.Abastecer();</pre>
+      <p>Veja que com herança conseguimos simplificar e reutilizar código ao mesmo tempo. A herança é um mecanismo poderoso mas deve ser utilizado com cuidado.</p>
+    </div>
+
+    <!-- 3. Reaproveitando com base -->
+    <div class="section">
+      <h2>Reaproveitando a implementação da classe base</h2>
+      <p>Quando fazemos a sobrescrita de métodos, muitas vezes queremos apenas estender o comportamento da classe base, aproveitando o que já foi implementado. Nessas situações podemos reutilizar o código do pai com a palavra <code>base</code>.</p>
+      <p>
+        Imagine, por exemplo, que ao abastecer uma <code>Moto</code>, além de adicionar
+        combustível, ela também precisa parar completamente (pois o piloto desce para abastecer).
+        Sem <code>base</code>, duplicaríamos a lógica:
+      </p>
+      <pre>// Sem base — duplicando a lógica de adicionar combustível
+public class Moto : Veiculo
+{
+    public override void Abastecer()
+    {
+        this.QuantidadeCombustivel += 1; // código repetido do pai!
+        this.Velocidade = 0;             // comportamento específico da Moto
+    }
+}</pre>
+      <p>Com <code>base</code>, podemos chamar o método da classe pai e apenas adicionar o comportamento extra:</p>
+      <pre>// Com base — reutilizando o código do pai
+public class Moto : Veiculo
+{
+    public override void Abastecer()
+    {
+        base.Abastecer(); // QuantidadeCombustivel += 1 (reaproveita o código do pai)
+        this.Velocidade = 0; // ao abastecer, a Moto para completamente
+    }
+}</pre>
+      <p>
+        Com essa implementação, o <code>Abastecer</code> da <code>Moto</code> delega ao método da
+        classe base a adição de combustível e, em seguida, realiza o comportamento específico da
+        moto. Se a lógica de abastecimento em <code>Veiculo</code> mudar no futuro, a
+        <code>Moto</code> se beneficia automaticamente.
+      </p>
+      <p>
+        Repare que, como a classe filha não acessa mais <code>QuantidadeCombustivel</code>
+        diretamente no <code>Abastecer</code>, essa propriedade poderia voltar a ser
+        <code>private</code> — desde que o método <code>Acelerar</code> da
+        <code>Moto</code> também usasse <code>base</code>. Porém, como o <code>Acelerar</code>
+        da <code>Moto</code> ainda modifica <code>QuantidadeCombustivel</code> e
+        <code>Velocidade</code> com valores diferentes dos do pai, ambas as propriedades
+        precisam continuar como <code>protected</code>.
+      </p>
+    </div>
+
+    <!-- 4. Polimorfismo -->
+    <div class="section">
+      <h2>Polimorfismo</h2>
+      <p>
+        Nosso sistema possui um <strong>Radar</strong> que registra os veículos que passam por ele
+        e acumula a velocidade total detectada. Começando com zero:
+      </p>
+      <pre>public class Radar
+{
+    public int VelocidadeTotal { get; private set; }
+}</pre>
+      <p>Permitimos registrar um <code>Veiculo</code> e acumular sua velocidade:</p>
+      <pre>public class Radar
+{
+    public int VelocidadeTotal { get; private set; }
+
+    public void Registrar(Veiculo veiculo)
+    {
+        VelocidadeTotal += veiculo.Velocidade;
+    }
+}
+
+Veiculo v1 = new Veiculo();
+Veiculo v2 = new Veiculo();
+
+Radar r = new Radar();
+r.Registrar(v1);
+r.Registrar(v2);</pre>
+      <p>
+        Ótimo. Mas o problema é que temos classes que representam diferentes tipos de veículos, e
+        queremos registrar todos eles. Uma primeira solução seria ter um método
+        <code>Registrar()</code> para cada classe específica:
+      </p>
+      <pre>public class Radar
+{
+    public int VelocidadeTotal { get; private set; }
+
+    public void Registrar(Veiculo veiculo) { /* ... */ }
+    public void Registrar(Moto moto) { /* ... */ }
+    public void Registrar(Carro carro) { /* ... */ }
+    // mais um monte de métodos aqui!
+}</pre>
+      <p>Novamente caímos no problema da repetição de código.</p>
+      <p>
+        Veja que <code>Moto</code> é um <code>Veiculo</code>. Isso é inclusive expresso através
+        da relação de herança entre as classes. E já que <code>Moto</code> é um
+        <code>Veiculo</code>, o C# permite que você passe uma <code>Moto</code> em lugares que
+        aceitam referências do tipo <code>Veiculo</code>!
+      </p>
+      <pre>public class Radar
+{
+    public int VelocidadeTotal { get; private set; }
+
+    public void Registrar(Veiculo veiculo)
+    {
+        VelocidadeTotal += veiculo.Velocidade;
+    }
+}
+
+Veiculo v1 = new Veiculo();
+Moto m1 = new Moto();
+
+Radar r = new Radar();
+r.Registrar(v1);
+r.Registrar(m1); // funciona! Moto é um Veiculo</pre>
+      <p>
+        O código funciona! O C# sabe que <code>Moto</code> herda todos os atributos e métodos de
+        <code>Veiculo</code>, e portanto tem a certeza de que existe a propriedade
+        <code>Velocidade</code>, podendo invocá-la sem problemas.
+      </p>
+      <p>
+        Agora, imagine que a <code>Moto</code> tenha um comportamento específico para emitir um
+        som característico:
+      </p>
+      <pre>class Moto : Veiculo
+{
+    public void EmitirSom()
+    {
+        // som específico da moto
+    }
+}</pre>
+      <p>Se tentarmos chamar <code>EmitirSom()</code> dentro do <code>Registrar</code>:</p>
+      <pre>public class Radar
+{
+    public int VelocidadeTotal { get; private set; }
+
+    public void Registrar(Veiculo veiculo)
+    {
+        VelocidadeTotal += veiculo.Velocidade;
+        veiculo.EmitirSom(); // não compila!
+    }
+}</pre>
+      <p>
+        O código não compila. Por quê? Porque o C# não consegue garantir que o que virá na
+        variável <code>veiculo</code> será uma <code>Moto</code>. Naquela "porta" entra
+        <code>Veiculo</code> ou qualquer filho de <code>Veiculo</code>. Portanto, tudo o que o
+        C# consegue garantir é que o objeto que entrar ali tem tudo que <code>Veiculo</code> tem.
+        Por isso, só podemos usar métodos e atributos definidos pelo tipo da variável (no caso,
+        <code>Veiculo</code>).
+      </p>
+      <p>
+        Essa ideia de uma variável conseguir referenciar seu próprio tipo ou filhos desse tipo é
+        conhecida como <strong>polimorfismo</strong>. Com o uso de polimorfismo, garantimos que a
+        classe <code>Radar</code> funcionará para qualquer novo tipo de <code>Veiculo</code> que
+        aparecer.
+      </p>
+      <p>
+        Se no futuro um novo tipo de veículo, como <code>Caminhao</code>, for criado, basta que
+        ele herde de <code>Veiculo</code> e o <code>Radar</code> funcionará naturalmente, sem
+        nenhuma modificação!
+      </p>
+    </div>
+
+    <!-- 5. Exercícios -->
+    <div class="section">
+      <h2>Exercícios</h2>
+
+      <div class="quiz">
+        <p>1. Qual a diferença entre <code>private</code> e <code>protected</code>?</p>
+        <ul>
+          <li>Nenhuma. Em ambos, o atributo/método é visível para todos.</li>
+          <li class="correct">Só a própria classe enxerga atributos/métodos <code>private</code>, enquanto <code>protected</code> é visto pela própria classe e pelas classes filhas.</li>
+          <li>Só a própria classe enxerga atributos/métodos <code>protected</code>, enquanto <code>private</code> é visto pela própria classe e pelas classes filhas.</li>
+        </ul>
+      </div>
+
+      <div class="quiz">
+        <p>2. Para que serve a palavra <code>override</code>?</p>
+        <ul>
+          <li class="correct">Para indicar que o método está sobrescrevendo um método da classe pai.</li>
+          <li>Para não permitir acesso ao atributo por outras classes.</li>
+          <li>Para indicar que esse método não deve ser utilizado.</li>
+        </ul>
+      </div>
+
+      <div class="quiz">
+        <p>3. Para que serve a palavra <code>virtual</code>?</p>
+        <ul>
+          <li class="correct">Para permitir que o método seja sobrescrito pelas classes filhas.</li>
+          <li>Para indicar que esse método não deve ser sobrescrito.</li>
+          <li>Para sobrescrever um método da classe pai.</li>
+          <li>Para não permitir acesso ao atributo por outras classes.</li>
+        </ul>
+      </div>
+
+      <div class="quiz">
+        <p>
+          4. Adicione a classe <code>Moto</code> na aplicação. Essa classe deve herdar de
+          <code>Veiculo</code> e sobrescrever o comportamento do método <code>Acelerar</code>
+          para que cada aceleração da moto consuma apenas <strong>1</strong> de
+          <code>QuantidadeCombustivel</code> e aumente <strong>2</strong> em
+          <code>Velocidade</code>.
+        </p>
+        <p>Não se esqueça de utilizar as palavras <code>virtual</code> e <code>override</code>.</p>
+      </div>
+
+      <div class="quiz">
+        <p>5. O que acontece ao executarmos o código a seguir?</p>
+        <pre>Veiculo v1 = new Moto();
+v1.Abastecer();
+v1.Abastecer();
+v1.Abastecer();
+v1.Acelerar();
+MessageBox.Show("moto: comb=" + v1.QuantidadeCombustivel + " vel=" + v1.Velocidade);
+
+Veiculo v2 = new Veiculo();
+v2.Abastecer();
+v2.Abastecer();
+v2.Abastecer();
+v2.Acelerar();
+MessageBox.Show("veículo: comb=" + v2.QuantidadeCombustivel + " vel=" + v2.Velocidade);</pre>
+        <ul>
+          <li class="correct">moto: comb=2 vel=2 &nbsp;|&nbsp; veículo: comb=1 vel=1</li>
+          <li>moto: comb=2 vel=2 &nbsp;|&nbsp; veículo: comb=2 vel=2</li>
+          <li>moto: comb=1 vel=1 &nbsp;|&nbsp; veículo: comb=1 vel=1</li>
+          <li>moto: comb=1 vel=1 &nbsp;|&nbsp; veículo: comb=2 vel=2</li>
+        </ul>
+      </div>
+
+      <div class="quiz">
+        <p>
+          6. Faça com que o método <code>Form1_Load</code> instancie uma <code>Moto</code> ao
+          invés de um <code>Veiculo</code>:
+        </p>
+        <pre>public partial class Form1 : Form
+{
+    // Mesma declaração do capítulo anterior
+    private Veiculo veiculo;
+
+    private void Form1_Load(object sender, EventArgs e)
+    {
+        this.veiculo = new Moto();
+        // resto do código continua igual
+    }
+
+    // código do resto do formulário também continua igual
+}</pre>
+        <p>
+          Repare que não precisamos modificar o tipo da variável <code>veiculo</code>, pois como
+          <code>Moto</code> herda de <code>Veiculo</code>, podemos utilizar o polimorfismo para
+          atribuir uma referência do tipo <code>Moto</code> em uma variável do tipo
+          <code>Veiculo</code>.
+        </p>
+        <p>
+          Teste o botão de abastecimento — a <code>Moto</code> não declarou <code>Abastecer</code>,
+          mas mesmo assim conseguimos invocá-lo, pois todo o comportamento da classe pai é herdado.
+          Teste também a aceleração: como a <code>Moto</code> sobrescreve <code>Acelerar</code>,
+          o comportamento especializado da moto será utilizado.
+        </p>
+      </div>
+
+      <div class="quiz">
+        <p>
+          7. Crie a classe <code>Carro</code> dentro do projeto e faça com que ela herde da
+          classe <code>Veiculo</code>.
+        </p>
+        <p>
+          O <code>Carro</code> é um veículo mais pesado e com tanque maior, portanto suas
+          operações funcionam de forma diferente: cada <code>Acelerar</code> consome
+          <strong>3</strong> de <code>QuantidadeCombustivel</code> e aumenta
+          <strong>1</strong> em <code>Velocidade</code>; cada <code>Abastecer</code> adiciona
+          <strong>2</strong> ao <code>QuantidadeCombustivel</code> (tanque maior). Ou seja,
+          no <code>Carro</code>, precisaremos sobrescrever tanto o <code>Acelerar</code>
+          quanto o <code>Abastecer</code>. Não se esqueça de usar <code>virtual</code> e
+          <code>override</code>.
+        </p>
+        <p>
+          Depois de criar o <code>Carro</code>, modifique novamente o formulário para que ele
+          trabalhe com um <code>Carro</code> ao invés de uma <code>Moto</code>.
+        </p>
+      </div>
+
+      <div class="quiz">
+        <p>
+          8. (Opcional) Implemente a classe <code>Radar</code> com uma propriedade chamada
+          <code>VelocidadeTotal</code> e um método chamado <code>Registrar</code> que deve
+          receber um <code>Veiculo</code> e somar sua velocidade ao total do radar. Escreva um
+          código que testa o radar registrando diferentes tipos de veículos.
+        </p>
+        <p>Podemos passar uma instância de <code>Carro</code> para o <code>Registrar</code> do radar? Por quê?</p>
+      </div>
+    </div>
+
+    <!-- 6. Para Saber Mais -->
+    <div class="section">
+      <h2>Para saber mais — o que é herdado?</h2>
+      <p>
+        Quando fazemos a classe <code>Moto</code> herdar da classe <code>Veiculo</code>, ela
+        recebe automaticamente todos os atributos, propriedades e métodos da classe pai, porém
+        os <strong>construtores da classe pai não são herdados</strong>. Se a classe filha precisar
+        de um construtor que está na classe pai, ela deve explicitamente declará-lo em seu código.
+      </p>
+      <p>Imagine, por exemplo, que para construir um veículo precisamos passar sua placa:</p>
+      <pre>public class Veiculo
+{
+    public string Placa { get; set; }
+
+    // Construtor sem argumentos
+    public Veiculo() {}
+
+    public Veiculo(string placa)
+    {
+        this.Placa = placa;
+    }
+}</pre>
+      <p>
+        Na classe <code>Moto</code>, como o construtor não é herdado, precisamos declará-lo
+        explicitamente:
+      </p>
+      <pre>public class Moto : Veiculo
+{
+    public Moto(string placa)
+    {
+        // A propriedade Placa veio herdada da classe Veiculo
+        this.Placa = placa;
+    }
+}</pre>
+      <p>
+        Nesse construtor fizemos apenas a inicialização da placa, exatamente o mesmo código que
+        temos no construtor da classe pai. Ao invés de repetirmos o código, podemos simplesmente
+        chamar o construtor de <code>Veiculo</code> a partir do construtor de <code>Moto</code>
+        utilizando a palavra <code>base</code>:
+      </p>
+      <pre>public class Moto : Veiculo
+{
+    // Estamos chamando o construtor da classe pai que já faz a inicialização
+    // da placa, por isso o corpo do construtor pode ficar vazio.
+    public Moto(string placa) : base(placa) { }
+}</pre>
+      <p>
+        Na verdade, dentro do C#, sempre que construímos uma instância de <code>Moto</code>, o
+        C# sempre precisa chamar um construtor da classe <code>Veiculo</code> para fazer a
+        inicialização da classe base. Quando não invocamos explicitamente o construtor da classe
+        pai, o C# coloca implicitamente uma chamada para o construtor sem argumentos da classe pai:
+      </p>
+      <pre>public class Moto : Veiculo
+{
+    // Nesse código o C# chamará o construtor sem argumentos de Veiculo.
+    public Moto(string placa)
+    {
+        this.Placa = placa;
+    }
+}</pre>
+      <p>Se a classe <code>Veiculo</code> não definir o construtor sem argumentos, teremos um erro de compilação se não invocarmos explicitamente um construtor da classe pai.</p>
+    </div>
+
+    <div class="footer">
+      Herança e Polimorfismo em C# &mdash; POO
+    </div>
+  </div>
+</body>
+</html>
