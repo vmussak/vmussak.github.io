@@ -1,0 +1,12 @@
+//Implementar um Placar
+//Futebol: de 1 em 1
+//Basquete: 2 em 2
+
+//Time da Casa
+//Time Visitante
+//Todo time precisa ter um nome
+
+//Os times marcam pontos
+
+//No final temos um placar
+//E um resultado: Vitória, Derrota e Empate
