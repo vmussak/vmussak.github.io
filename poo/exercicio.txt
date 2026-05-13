@@ -10,3 +10,5 @@
 
 //No final temos um placar
 //E um resultado: Vitória, Derrota e Empate
+
+Enviar: https://docs.google.com/forms/d/e/1FAIpQLSf_XQMx69QXQ1-aNJJTs4Uxxm_6Zzx_hux10-DsYw4jAu7yww/viewform?usp=dialog
