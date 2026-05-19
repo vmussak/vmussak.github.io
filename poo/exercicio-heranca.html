@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Projeto Windows Forms - Calculadora de Frete</title>
+</head>
+<body>
+    <h1>Projeto: Calculadora de Frete</h1>
+
+    <h2>Objetivo</h2>
+    <p>
+        Criar uma aplicação simples em Windows Forms com C# para calcular o valor de um frete,
+        utilizando Programação Orientada a Objetos, herança e polimorfismo.
+    </p>
+
+    <h2>Protótipo da Interface</h2>
+    <img src="prototipo.png" alt="Protótipo da Calculadora de Frete" width="800">
+
+    <h2>Descrição do Sistema</h2>
+    <p>
+        O usuário deverá informar o nome do cliente, o peso do pacote e o tipo de entrega.
+        Ao clicar no botão de calcular, o sistema deverá mostrar o valor do frete.
+    </p>
+
+    <h2>Requisitos</h2>
+    <ul>
+        <li>O sistema deve possuir uma classe base chamada <strong>Entrega</strong>.</li>
+        <li>A classe <strong>Entrega</strong> deve conter as propriedades Cliente e Peso.</li>
+        <li>A classe <strong>Entrega</strong> deve possuir um método para calcular o frete.</li>
+        <li>Devem existir duas classes filhas: <strong>EntregaNormal</strong> e <strong>EntregaExpressa</strong>.</li>
+        <li>A entrega normal deve calcular o frete multiplicando o peso por 5.</li>
+        <li>A entrega expressa deve calcular o frete multiplicando o peso por 10.</li>
+        <li>O cálculo deve usar polimorfismo.</li>
+    </ul>
+
+    <h2>Campos da Tela</h2>
+    <ul>
+        <li>Nome do cliente</li>
+        <li>Peso do pacote</li>
+        <li>Tipo de entrega: Normal ou Expressa</li>
+        <li>Botão Calcular Frete</li>
+        <li>Área para exibir o resultado</li>
+    </ul>
+
+    <h2>Resultado Esperado</h2>
+    <p>
+        Após o cálculo, o sistema deve exibir:
+    </p>
+
+    <ul>
+        <li>Nome do cliente</li>
+        <li>Peso informado</li>
+        <li>Tipo de entrega escolhido</li>
+        <li>Valor final do frete</li>
+    </ul>
+</body>
+</html>
