@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualização de Lista Duplamente Encadeada</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    h1 { margin-bottom: 8px; }
+
+    .subtitle {
+      margin-top: 0;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+
+    .panel {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-group label {
+      font-size: 13px;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    input[type="text"] {
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      min-width: 170px;
+      font-size: 16px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    .btn-start    { background: #2563eb; color: white; }
+    .btn-end      { background: #0f766e; color: white; }
+    .btn-after    { background: #7c3aed; color: white; }
+    .btn-remove   { background: #dc2626; color: white; }
+    .btn-sorted   { background: #d97706; color: white; }
+    .btn-max      { background: #0891b2; color: white; }
+    .btn-reverse  { background: #be185d; color: white; }
+    .btn-reset    { background: #475569; color: white; }
+    .btn-random   { background: #b45309; color: white; }
+
+    .status {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #eef2ff;
+      color: #3730a3;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+
+    .status.error {
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    .status.highlight {
+      background: #f0fdf4;
+      color: #166534;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .info-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #0f172a;
+    }
+
+    /* ── List track ── */
+    .list-wrapper {
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .list-area {
+      position: relative;
+      min-height: 280px;
+      min-width: 100%;
+      padding: 32px 8px 8px;
+    }
+
+    .list-track {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      min-height: 200px;
+      padding: 30px 12px 50px;
+    }
+
+    /* ── Node ── */
+    .node-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(18px) scale(0.96);
+      animation: showNode 0.45s ease forwards;
+    }
+
+    @keyframes showNode {
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .node {
+      width: 178px;
+      border: 2px solid #0f172a;
+      border-radius: 14px;
+      overflow: hidden;
+      background: white;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+      flex-shrink: 0;
+    }
+
+    .node.highlighted {
+      border-color: #0891b2;
+      box-shadow: 0 0 0 3px rgba(8,145,178,0.3), 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .node-label {
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      font-size: 12px;
+      padding: 6px;
+      letter-spacing: 0.4px;
+    }
+
+    .node-body {
+      display: grid;
+      grid-template-columns: 46px 1fr 46px;
+      height: 78px;
+    }
+
+    .prev-cell, .value-cell, .next-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .prev-cell {
+      background: #fdf4ff;
+      border-right: 2px solid #0f172a;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11px;
+      color: #7e22ce;
+    }
+
+    .value-cell {
+      background: #eff6ff;
+      border-right: 2px solid #0f172a;
+      font-size: 22px;
+      font-weight: bold;
+      color: #1d4ed8;
+    }
+
+    .next-cell {
+      background: #f8fafc;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11px;
+      color: #475569;
+    }
+
+    .cell-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+    }
+
+    .dot-next    { background: #0ea5e9; }
+    .dot-prev    { background: #a855f7; }
+    .dot-null    { background: #94a3b8; }
+
+    /* ── Bidirectional arrow connector ── */
+    .connector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 52px;
+      flex-shrink: 0;
+    }
+
+    .arrow-forward, .arrow-backward {
+      position: relative;
+      width: 48px;
+      height: 4px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+
+    .arrow-forward {
+      background: #0ea5e9;
+    }
+
+    .arrow-forward::after {
+      content: "";
+      position: absolute;
+      right: -2px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-left: 12px solid #0ea5e9;
+    }
+
+    .arrow-backward {
+      background: #a855f7;
+    }
+
+    .arrow-backward::before {
+      content: "";
+      position: absolute;
+      left: -2px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-right: 12px solid #a855f7;
+    }
+
+    /* ── Pointer tags ── */
+    .pointer-tag {
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .tag-cabeca {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .tag-cauda {
+      background: #10b981;
+      color: white;
+    }
+
+    .tag-both {
+      background: linear-gradient(90deg, #f59e0b 50%, #10b981 50%);
+      color: white;
+    }
+
+    /* ── Traversal overlay ── */
+    .traversal-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      min-height: 36px;
+      align-items: center;
+    }
+
+    .trav-val {
+      background: #0891b2;
+      color: white;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-weight: bold;
+      animation: popIn 0.3s ease forwards;
+    }
+
+    .trav-sep {
+      color: #64748b;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* ── Misc ── */
+    .explanation {
+      line-height: 1.65;
+      color: #334155;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+    }
+
+    .empty-state {
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      background: #f8fafc;
+      font-size: 18px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    code {
+      background: #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .divider {
+      width: 1px;
+      height: 44px;
+      background: #e2e8f0;
+      align-self: flex-end;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 8px;
+    }
+
+    .traversal-section {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Lista Duplamente Encadeada Interativa</h1>
+    <p class="subtitle">
+      Representação gráfica da classe <strong>ListaDuplamenteEncadeada</strong>.
+      Cada nó possui três campos: <strong>anterior</strong>, <strong>valor</strong> e <strong>proximo</strong>,
+      permitindo travessia nos dois sentidos. Os ponteiros <strong>cabeca</strong> e <strong>cauda</strong> marcam os extremos da lista.
+    </p>
+
+    <!-- Controls -->
+    <div class="panel">
+      <div class="controls">
+        <!-- Valor input shared by insert operations -->
+        <div class="control-group">
+          <label>Valor</label>
+          <input id="valorInput" type="text" placeholder="Digite um valor" />
+        </div>
+        <button class="btn-start"  id="btnInserirInicio">Inserir no início</button>
+        <button class="btn-end"    id="btnInserirFim">Inserir no fim</button>
+        <button class="btn-sorted" id="btnInserirOrdenado">Inserir ordenado</button>
+
+        <div class="divider"></div>
+
+        <div class="control-group">
+          <label>Inserir após nó com valor</label>
+          <input id="alvoInput" type="text" placeholder="Valor do nó alvo" />
+        </div>
+        <button class="btn-after" id="btnInserirApos">Inserir após</button>
+
+        <div class="divider"></div>
+
+        <div class="control-group">
+          <label>Remover nó com valor</label>
+          <input id="removeInput" type="text" placeholder="Valor a remover" />
+        </div>
+        <button class="btn-remove" id="btnRemover">Remover nó</button>
+
+        <div class="divider"></div>
+
+        <button class="btn-max"     id="btnMaior">Maior valor</button>
+        <button class="btn-reverse" id="btnReverso">Percorrer reverso</button>
+        <button class="btn-random"  id="btnExemplo">Inserir exemplo</button>
+        <button class="btn-reset"   id="btnReset">Limpar lista</button>
+      </div>
+
+      <div class="status" id="status">Lista criada. Pronta para inserções.</div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <strong>Cabeça (cabeca)</strong>
+          <span id="cabecaInfo">None</span>
+        </div>
+        <div class="info-card">
+          <strong>Cauda (cauda)</strong>
+          <span id="caudaInfo">None</span>
+        </div>
+        <div class="info-card">
+          <strong>Tamanho</strong>
+          <span id="tamanhoInfo">0</span>
+        </div>
+        <div class="info-card">
+          <strong>Travessia</strong>
+          <div class="traversal-bar" id="traversalBar"><span style="color:#94a3b8;font-size:13px">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual representation -->
+    <div class="panel">
+      <h2>Representação gráfica</h2>
+      <div class="list-wrapper">
+        <div class="list-area">
+          <div class="list-track" id="listTrack"></div>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-color" style="background:#f59e0b"></span> Ponteiro <strong>cabeca</strong></div>
+        <div class="legend-item"><span class="legend-color" style="background:#10b981"></span> Ponteiro <strong>cauda</strong></div>
+        <div class="legend-item"><span class="legend-color" style="background:#0ea5e9"></span> Campo <strong>proximo</strong></div>
+        <div class="legend-item"><span class="legend-color" style="background:#a855f7"></span> Campo <strong>anterior</strong></div>
+        <div class="legend-item"><span class="legend-color" style="background:#94a3b8"></span> <strong>None</strong></div>
+      </div>
+    </div>
+
+    <!-- Explanation -->
+    <div class="panel">
+      <h2>O que está acontecendo?</h2>
+      <div class="explanation" id="explicacao">
+        A lista está vazia. <code>cabeca</code> e <code>cauda</code> são <code>None</code>.
+        Use os botões acima para inserir nós e visualizar o encadeamento bidirecional.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Data structures ──────────────────────────────────────────────────────
+    class No {
+      constructor(valor) {
+        this.valor = valor;
+        this.anterior = null;
+        this.proximo = null;
+      }
+    }
+
+    class ListaDuplamenteEncadeada {
+      constructor() {
+        this.cabeca = null;
+        this.cauda = null;
+        this.tam = 0;
+      }
+
+      adicionarNoInicio(valor) {
+        const novoNo = new No(valor);
+        if (this.cabeca === null) {
+          this.cabeca = novoNo;
+          this.cauda = novoNo;
+        } else {
+          novoNo.proximo = this.cabeca;
+          this.cabeca.anterior = novoNo;
+          this.cabeca = novoNo;
+        }
+        this.tam += 1;
+      }
+
+      adicionarNoFim(valor) {
+        const novoNo = new No(valor);
+        if (this.cauda === null) {
+          this.cabeca = novoNo;
+          this.cauda = novoNo;
+        } else {
+          novoNo.anterior = this.cauda;
+          this.cauda.proximo = novoNo;
+          this.cauda = novoNo;
+        }
+        this.tam += 1;
+      }
+
+      adicionarApos(valor, valorAlvo) {
+        const novoNo = new No(valor);
+        let noAtual = this.cabeca;
+        let encontrou = false;
+
+        while (noAtual !== null) {
+          if (noAtual.valor == valorAlvo) {
+            novoNo.proximo = noAtual.proximo;
+            novoNo.anterior = noAtual;
+
+            if (noAtual.proximo !== null) {
+              noAtual.proximo.anterior = novoNo;
+            } else {
+              this.cauda = novoNo;
+            }
+
+            noAtual.proximo = novoNo;
+            encontrou = true;
+            this.tam += 1;
+            break;
+          }
+          noAtual = noAtual.proximo;
+        }
+        return encontrou;
+      }
+
+      removerNo(valor) {
+        let noAtual = this.cabeca;
+        let encontrou = false;
+        let caso = '';
+
+        while (noAtual !== null) {
+          if (noAtual.valor == valor) {
+            if (noAtual.anterior === null && noAtual.proximo === null) {
+              this.cabeca = null;
+              this.cauda = null;
+              caso = 'unico';
+            } else if (noAtual.anterior === null) {
+              this.cabeca = noAtual.proximo;
+              this.cabeca.anterior = null;
+              caso = 'primeiro';
+            } else if (noAtual.proximo === null) {
+              this.cauda = noAtual.anterior;
+              this.cauda.proximo = null;
+              caso = 'ultimo';
+            } else {
+              noAtual.anterior.proximo = noAtual.proximo;
+              noAtual.proximo.anterior = noAtual.anterior;
+              caso = 'meio';
+            }
+            encontrou = true;
+            this.tam -= 1;
+            break;
+          }
+          noAtual = noAtual.proximo;
+        }
+        return { encontrou, caso };
+      }
+
+      inserirOrdenado(valor) {
+        const novoNo = new No(valor);
+
+        if (this.cabeca === null) {
+          this.cabeca = novoNo;
+          this.cauda = novoNo;
+          this.tam += 1;
+          return 'empty';
+        }
+
+        if (valor < this.cabeca.valor) {
+          novoNo.proximo = this.cabeca;
+          this.cabeca.anterior = novoNo;
+          this.cabeca = novoNo;
+          this.tam += 1;
+          return 'inicio';
+        }
+
+        if (valor > this.cauda.valor) {
+          novoNo.anterior = this.cauda;
+          this.cauda.proximo = novoNo;
+          this.cauda = novoNo;
+          this.tam += 1;
+          return 'fim';
+        }
+
+        let noAtual = this.cabeca;
+        while (noAtual.proximo !== null && noAtual.proximo.valor < valor) {
+          noAtual = noAtual.proximo;
+        }
+
+        novoNo.proximo = noAtual.proximo;
+        novoNo.anterior = noAtual;
+        if (noAtual.proximo !== null) {
+          noAtual.proximo.anterior = novoNo;
+        }
+        noAtual.proximo = novoNo;
+        this.tam += 1;
+        return 'meio';
+      }
+
+      maiorValor() {
+        if (this.cabeca === null) return null;
+        let noAtual = this.cabeca;
+        let maior = noAtual.valor;
+        while (noAtual !== null) {
+          if (noAtual.valor > maior) maior = noAtual.valor;
+          noAtual = noAtual.proximo;
+        }
+        return maior;
+      }
+
+      toArray() {
+        const itens = [];
+        let atual = this.cabeca;
+        while (atual !== null) {
+          itens.push(atual);
+          atual = atual.proximo;
+        }
+        return itens;
+      }
+
+      toArrayReverso() {
+        const itens = [];
+        let atual = this.cauda;
+        while (atual !== null) {
+          itens.push(atual.valor);
+          atual = atual.anterior;
+        }
+        return itens;
+      }
+
+      estaVazia() { return this.cabeca === null; }
+    }
+
+    // ── State ────────────────────────────────────────────────────────────────
+    const lista = new ListaDuplamenteEncadeada();
+
+    let ultimoEvento  = 'init';
+    let ultimoValor   = null;
+    let ultimoAlvo    = null;
+    let ultimoCaso    = null;
+    let highlightedVal = null;
+
+    // ── DOM refs ─────────────────────────────────────────────────────────────
+    const valorInput  = document.getElementById('valorInput');
+    const alvoInput   = document.getElementById('alvoInput');
+    const removeInput = document.getElementById('removeInput');
+
+    const btnInserirInicio   = document.getElementById('btnInserirInicio');
+    const btnInserirFim      = document.getElementById('btnInserirFim');
+    const btnInserirApos     = document.getElementById('btnInserirApos');
+    const btnInserirOrdenado = document.getElementById('btnInserirOrdenado');
+    const btnRemover         = document.getElementById('btnRemover');
+    const btnMaior           = document.getElementById('btnMaior');
+    const btnReverso         = document.getElementById('btnReverso');
+    const btnExemplo         = document.getElementById('btnExemplo');
+    const btnReset           = document.getElementById('btnReset');
+
+    const statusEl      = document.getElementById('status');
+    const listTrack     = document.getElementById('listTrack');
+    const cabecaInfo    = document.getElementById('cabecaInfo');
+    const caudaInfo     = document.getElementById('caudaInfo');
+    const tamanhoInfo   = document.getElementById('tamanhoInfo');
+    const traversalBar  = document.getElementById('traversalBar');
+    const explicacao    = document.getElementById('explicacao');
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    function setStatus(msg, type = '') {
+      statusEl.textContent = msg;
+      statusEl.className = 'status' + (type ? ' ' + type : '');
+    }
+
+    function clearTraversal() {
+      traversalBar.innerHTML = '<span style="color:#94a3b8;font-size:13px">—</span>';
+    }
+
+    function showTraversal(values, arrow = '→') {
+      traversalBar.innerHTML = '';
+      values.forEach((v, i) => {
+        const span = document.createElement('span');
+        span.className = 'trav-val';
+        span.style.animationDelay = (i * 70) + 'ms';
+        span.textContent = v;
+        traversalBar.appendChild(span);
+        if (i < values.length - 1) {
+          const sep = document.createElement('span');
+          sep.className = 'trav-sep';
+          sep.textContent = arrow;
+          traversalBar.appendChild(sep);
+        }
+      });
+    }
+
+    // ── Render ────────────────────────────────────────────────────────────────
+    function atualizarTela() {
+      const itens = lista.toArray();
+      listTrack.innerHTML = '';
+
+      if (itens.length === 0) {
+        listTrack.innerHTML = '<div class="empty-state">Lista vazia.<br>Nenhum nó encadeado no momento.</div>';
+      } else {
+        itens.forEach((no, index) => {
+          const isFirst = index === 0;
+          const isLast  = index === itens.length - 1;
+
+          const wrapper = document.createElement('div');
+          wrapper.className = 'node-wrapper';
+
+          // Pointer tag(s)
+          if (isFirst || isLast) {
+            const tag = document.createElement('div');
+            tag.className = 'pointer-tag';
+
+            if (isFirst && isLast) {
+              tag.className += ' tag-both';
+              tag.textContent = 'cabeca / cauda';
+            } else if (isFirst) {
+              tag.className += ' tag-cabeca';
+              tag.textContent = 'cabeca';
+            } else {
+              tag.className += ' tag-cauda';
+              tag.textContent = 'cauda';
+            }
+            wrapper.appendChild(tag);
+          }
+
+          // Node box
+          const node = document.createElement('div');
+          node.className = 'node' + (no.valor == highlightedVal ? ' highlighted' : '');
+
+          const nodeLabel = document.createElement('div');
+          nodeLabel.className = 'node-label';
+          nodeLabel.textContent = `Nó ${index + 1}`;
+
+          const nodeBody = document.createElement('div');
+          nodeBody.className = 'node-body';
+
+          // prev cell
+          const prevCell = document.createElement('div');
+          prevCell.className = 'prev-cell';
+          prevCell.innerHTML = `<span>${no.anterior ? 'ant.' : 'None'}</span><span class="cell-dot ${no.anterior ? 'dot-prev' : 'dot-null'}"></span>`;
+
+          // value cell
+          const valCell = document.createElement('div');
+          valCell.className = 'value-cell';
+          valCell.textContent = no.valor;
+
+          // next cell
+          const nextCell = document.createElement('div');
+          nextCell.className = 'next-cell';
+          nextCell.innerHTML = `<span>${no.proximo ? 'próx.' : 'None'}</span><span class="cell-dot ${no.proximo ? 'dot-next' : 'dot-null'}"></span>`;
+
+          nodeBody.appendChild(prevCell);
+          nodeBody.appendChild(valCell);
+          nodeBody.appendChild(nextCell);
+          node.appendChild(nodeLabel);
+          node.appendChild(nodeBody);
+          wrapper.appendChild(node);
+          listTrack.appendChild(wrapper);
+
+          // Connector (bidirectional arrows) between nodes
+          if (index < itens.length - 1) {
+            const conn = document.createElement('div');
+            conn.className = 'connector';
+            conn.innerHTML = `
+              <div class="arrow-forward"  title="proximo"></div>
+              <div class="arrow-backward" title="anterior"></div>
+            `;
+            listTrack.appendChild(conn);
+          }
+        });
+      }
+
+      // Info cards
+      cabecaInfo.textContent  = lista.cabeca ? lista.cabeca.valor : 'None';
+      caudaInfo.textContent   = lista.cauda  ? lista.cauda.valor  : 'None';
+      tamanhoInfo.textContent = lista.tam;
+
+      atualizarExplicacao();
+    }
+
+    function atualizarExplicacao() {
+      if (lista.estaVazia()) {
+        explicacao.innerHTML = `A lista está vazia. <code>cabeca</code> e <code>cauda</code> são <code>None</code>. Nenhum nó encadeado.`;
+        return;
+      }
+
+      switch (ultimoEvento) {
+        case 'inicio':
+          if (lista.tam === 1) {
+            explicacao.innerHTML = `Inserido <code>${ultimoValor}</code> no início. Era o primeiro nó: <code>cabeca</code> e <code>cauda</code> apontam para ele. <code>anterior</code> e <code>proximo</code> são <code>None</code>.`;
+          } else {
+            explicacao.innerHTML = `Inserido <code>${ultimoValor}</code> no início. O novo nó teve seu <code>proximo</code> apontado para o antigo <code>cabeca</code>, e o antigo <code>cabeca</code> teve seu <code>anterior</code> atualizado para o novo nó. <code>cabeca</code> foi movido para o novo nó.`;
+          }
+          break;
+
+        case 'fim':
+          if (lista.tam === 1) {
+            explicacao.innerHTML = `Inserido <code>${ultimoValor}</code> no fim. Era o primeiro nó: <code>cabeca</code> e <code>cauda</code> apontam para ele.`;
+          } else {
+            explicacao.innerHTML = `Inserido <code>${ultimoValor}</code> no fim. O novo nó teve seu <code>anterior</code> apontado para a antiga <code>cauda</code>, e a antiga <code>cauda</code> teve seu <code>proximo</code> atualizado para o novo nó. <code>cauda</code> foi movido para o novo nó.`;
+          }
+          break;
+
+        case 'apos':
+          explicacao.innerHTML = `Inserido <code>${ultimoValor}</code> após o nó <code>${ultimoAlvo}</code>. O novo nó herdou o <code>proximo</code> do nó alvo, e seu <code>anterior</code> aponta para o nó alvo. Os vizinhos tiveram seus ponteiros atualizados para manter o encadeamento bidirecional.`;
+          break;
+
+        case 'ordenado':
+          if (ultimoCaso === 'empty' || ultimoCaso === 'inicio') {
+            explicacao.innerHTML = `Inserido <code>${ultimoValor}</code> em ordem crescente — ficou no <strong>início</strong> da lista, pois é menor que todos os elementos existentes.`;
+          } else if (ultimoCaso === 'fim') {
+            explicacao.innerHTML = `Inserido <code>${ultimoValor}</code> em ordem crescente — ficou no <strong>fim</strong> da lista, pois é maior que todos os elementos existentes.`;
+          } else {
+            explicacao.innerHTML = `Inserido <code>${ultimoValor}</code> em ordem crescente — inserido no <strong>meio</strong> da lista. O algoritmo percorreu os nós até encontrar a posição correta e atualizou os ponteiros <code>anterior</code> e <code>proximo</code> dos vizinhos.`;
+          }
+          break;
+
+        case 'remover':
+          const casoTextos = {
+            unico:   `Era o único nó da lista. <code>cabeca</code> e <code>cauda</code> foram definidos como <code>None</code>.`,
+            primeiro:`Era o primeiro nó. <code>cabeca</code> foi movido para o nó seguinte e o <code>anterior</code> desse nó foi definido como <code>None</code>.`,
+            ultimo:  `Era o último nó. <code>cauda</code> foi movido para o nó anterior e o <code>proximo</code> desse nó foi definido como <code>None</code>.`,
+            meio:    `Era um nó do meio. O nó anterior passou a apontar diretamente para o nó seguinte (<code>proximo</code>), e o nó seguinte passou a apontar para o nó anterior (<code>anterior</code>), removendo o nó do encadeamento.`
+          };
+          explicacao.innerHTML = `Removido o nó <code>${ultimoValor}</code>. ${casoTextos[ultimoCaso] || ''}`;
+          break;
+
+        case 'maior':
+          explicacao.innerHTML = `Para encontrar o maior valor, o algoritmo percorre todos os nós a partir da <code>cabeca</code>, comparando os valores. O maior valor encontrado foi <code>${ultimoValor}</code>.`;
+          break;
+
+        case 'reverso':
+          explicacao.innerHTML = `Travessia reversa realizada a partir da <code>cauda</code>. O algoritmo segue os ponteiros <code>anterior</code> de cada nó até chegar ao início da lista.`;
+          break;
+
+        default:
+          explicacao.innerHTML = `A lista duplamente encadeada permite travessia nos dois sentidos. O acesso direto por <code>cabeca</code> e <code>cauda</code> torna inserções e remoções nas extremidades muito eficientes (O(1)).`;
+      }
+    }
+
+    // ── Actions ────────────────────────────────────────────────────────────────
+    function inserirInicio() {
+      const valor = valorInput.value.trim();
+      if (!valor) { setStatus('Digite um valor antes de inserir.', 'error'); return; }
+      lista.adicionarNoInicio(valor);
+      ultimoEvento = 'inicio';
+      ultimoValor  = valor;
+      highlightedVal = null;
+      setStatus(`Valor "${valor}" inserido no início.`);
+      valorInput.value = '';
+      valorInput.focus();
+      clearTraversal();
+      atualizarTela();
+    }
+
+    function inserirFim() {
+      const valor = valorInput.value.trim();
+      if (!valor) { setStatus('Digite um valor antes de inserir.', 'error'); return; }
+      lista.adicionarNoFim(valor);
+      ultimoEvento = 'fim';
+      ultimoValor  = valor;
+      highlightedVal = null;
+      setStatus(`Valor "${valor}" inserido no fim.`);
+      valorInput.value = '';
+      valorInput.focus();
+      clearTraversal();
+      atualizarTela();
+    }
+
+    function inserirApos() {
+      const valor = valorInput.value.trim();
+      const alvo  = alvoInput.value.trim();
+      if (!valor) { setStatus('Digite um valor antes de inserir.', 'error'); return; }
+      if (!alvo)  { setStatus('Digite o valor do nó alvo.', 'error'); return; }
+
+      const encontrado = lista.adicionarApos(valor, alvo);
+      if (!encontrado) { setStatus(`Nó alvo "${alvo}" não encontrado.`, 'error'); return; }
+
+      ultimoEvento = 'apos';
+      ultimoValor  = valor;
+      ultimoAlvo   = alvo;
+      highlightedVal = null;
+      setStatus(`Valor "${valor}" inserido após "${alvo}".`);
+      valorInput.value = '';
+      alvoInput.value  = '';
+      valorInput.focus();
+      clearTraversal();
+      atualizarTela();
+    }
+
+    function inserirOrdenado() {
+      const valor = valorInput.value.trim();
+      if (!valor) { setStatus('Digite um valor antes de inserir.', 'error'); return; }
+      const caso = lista.inserirOrdenado(valor);
+      ultimoEvento = 'ordenado';
+      ultimoValor  = valor;
+      ultimoCaso   = caso;
+      highlightedVal = null;
+      setStatus(`Valor "${valor}" inserido em ordem crescente.`);
+      valorInput.value = '';
+      valorInput.focus();
+      clearTraversal();
+      atualizarTela();
+    }
+
+    function removerNo() {
+      const valor = removeInput.value.trim();
+      if (!valor) { setStatus('Digite o valor do nó a remover.', 'error'); return; }
+      if (lista.estaVazia()) { setStatus('A lista está vazia.', 'error'); return; }
+
+      const { encontrou, caso } = lista.removerNo(valor);
+      if (!encontrou) { setStatus(`Nó "${valor}" não encontrado.`, 'error'); return; }
+
+      ultimoEvento = 'remover';
+      ultimoValor  = valor;
+      ultimoCaso   = caso;
+      highlightedVal = null;
+      setStatus(`Nó "${valor}" removido (${caso === 'unico' ? 'único nó' : caso === 'primeiro' ? 'primeiro nó' : caso === 'ultimo' ? 'último nó' : 'nó do meio'}).`);
+      removeInput.value = '';
+      removeInput.focus();
+      clearTraversal();
+      atualizarTela();
+    }
+
+    function maiorValor() {
+      if (lista.estaVazia()) { setStatus('A lista está vazia.', 'error'); return; }
+      const maior = lista.maiorValor();
+      ultimoEvento = 'maior';
+      ultimoValor  = maior;
+      highlightedVal = maior;
+      setStatus(`Maior valor encontrado: "${maior}".`, 'highlight');
+      showTraversal(lista.toArray().map(n => n.valor), '→');
+      atualizarTela();
+    }
+
+    function percorrerReverso() {
+      if (lista.estaVazia()) { setStatus('A lista está vazia.', 'error'); return; }
+      const vals = lista.toArrayReverso();
+      ultimoEvento = 'reverso';
+      ultimoValor  = null;
+      highlightedVal = null;
+      setStatus(`Travessia reversa: ${vals.join(' ← ')}.`);
+      showTraversal(vals, '←');
+      atualizarTela();
+    }
+
+    function inserirExemplo() {
+      ['10', '30', '20', '40', '25'].forEach(v => lista.adicionarNoFim(v));
+      ultimoEvento = 'fim';
+      ultimoValor  = '25';
+      highlightedVal = null;
+      setStatus('Exemplo inserido: 10 ↔ 30 ↔ 20 ↔ 40 ↔ 25.');
+      clearTraversal();
+      atualizarTela();
+    }
+
+    function limparLista() {
+      lista.cabeca = null;
+      lista.cauda  = null;
+      lista.tam    = 0;
+      ultimoEvento = 'reset';
+      ultimoValor  = null;
+      highlightedVal = null;
+      setStatus('Lista limpa com sucesso.');
+      clearTraversal();
+      atualizarTela();
+    }
+
+    // ── Event listeners ───────────────────────────────────────────────────────
+    btnInserirInicio.addEventListener('click', inserirInicio);
+    btnInserirFim.addEventListener('click', inserirFim);
+    btnInserirApos.addEventListener('click', inserirApos);
+    btnInserirOrdenado.addEventListener('click', inserirOrdenado);
+    btnRemover.addEventListener('click', removerNo);
+    btnMaior.addEventListener('click', maiorValor);
+    btnReverso.addEventListener('click', percorrerReverso);
+    btnExemplo.addEventListener('click', inserirExemplo);
+    btnReset.addEventListener('click', limparLista);
+
+    valorInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') inserirFim(); });
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    atualizarTela();
+  </script>
+</body>
+</html>
