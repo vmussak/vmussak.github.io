@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Revisão para a Prova | Estruturas de Dados I</title>
+  <meta name="description" content="Guia de revisão para prova de Estruturas de Dados I: TAD, pilha, fila, listas encadeadas e ordenação.">
+  <style>
+    :root {
+      --navy: #102239;
+      --blue: #2257d5;
+      --blue-soft: #ecf3ff;
+      --cyan: #dff5ff;
+      --green: #12805c;
+      --green-soft: #e6f7f0;
+      --orange: #a95707;
+      --orange-soft: #fff3de;
+      --red: #b42318;
+      --red-soft: #ffebe9;
+      --paper: #f5f7fb;
+      --white: #ffffff;
+      --text: #182230;
+      --muted: #556579;
+      --line: #d9e1ec;
+      --code: #101b2c;
+      --shadow: 0 8px 25px rgba(16, 34, 57, .08);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--paper);
+      line-height: 1.55;
+    }
+
+    header {
+      background:
+        radial-gradient(circle at 88% 18%, rgba(75, 143, 255, .34), transparent 24rem),
+        linear-gradient(120deg, #0c1a2e, #163a71);
+      color: var(--white);
+      padding: 54px 24px 52px;
+    }
+
+    .hero {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 330px;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      border: 1px solid rgba(255,255,255,.28);
+      background: rgba(255,255,255,.09);
+      border-radius: 999px;
+      font-size: .85rem;
+      padding: 6px 13px;
+      margin-bottom: 16px;
+      font-weight: 600;
+      letter-spacing: .02em;
+    }
+
+    h1 {
+      margin: 0 0 15px;
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      line-height: 1.08;
+      letter-spacing: -.045em;
+    }
+
+    .subtitle {
+      font-size: 1.08rem;
+      max-width: 670px;
+      color: #dbe7ff;
+      margin: 0;
+    }
+
+    .hero-card {
+      background: rgba(255,255,255,.11);
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 20px;
+      padding: 22px;
+    }
+
+    .hero-card strong {
+      display: block;
+      margin-bottom: 12px;
+      font-size: .95rem;
+    }
+
+    .topic-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .topic-pills span {
+      border-radius: 999px;
+      background: rgba(255,255,255,.15);
+      padding: 5px 10px;
+      font-size: .82rem;
+    }
+
+    .layout {
+      max-width: 1180px;
+      margin: -22px auto 50px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 262px minmax(0, 1fr);
+      gap: 26px;
+      align-items: start;
+    }
+
+    aside {
+      position: sticky;
+      top: 18px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 17px;
+      z-index: 2;
+    }
+
+    aside h2 {
+      margin: 2px 0 12px;
+      font-size: .85rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+    }
+
+    aside nav a {
+      display: block;
+      color: var(--text);
+      text-decoration: none;
+      padding: 8px 10px;
+      font-size: .94rem;
+      border-radius: 9px;
+      margin-bottom: 2px;
+    }
+
+    aside nav a:hover, aside nav a.active {
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-weight: 600;
+    }
+
+    .tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 9px;
+      font: inherit;
+      font-size: .9rem;
+      padding: 9px 12px;
+      font-weight: 600;
+      background: var(--blue);
+      color: white;
+    }
+
+    button.secondary {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+    }
+
+    section {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: clamp(20px, 3vw, 31px);
+      box-shadow: var(--shadow);
+      scroll-margin-top: 18px;
+    }
+
+    h2.section-title {
+      margin: 0 0 8px;
+      font-size: 1.55rem;
+      letter-spacing: -.025em;
+      color: var(--navy);
+    }
+
+    h3 {
+      color: var(--navy);
+      margin: 24px 0 9px;
+      font-size: 1.12rem;
+    }
+
+    p { margin: 8px 0; }
+
+    .lead {
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .grid-2, .grid-3 {
+      display: grid;
+      gap: 13px;
+      margin-top: 14px;
+    }
+
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 15px;
+      background: #fff;
+    }
+
+    .card h3, .card h4 {
+      margin: 0 0 7px;
+      color: var(--navy);
+      font-size: 1rem;
+    }
+
+    .card p { color: var(--muted); font-size: .93rem; }
+
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      font-size: .76rem;
+      padding: 3px 9px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .tag.key { background: var(--blue-soft); color: var(--blue); }
+    .tag.attention { background: var(--orange-soft); color: var(--orange); }
+    .tag.exam { background: var(--green-soft); color: var(--green); }
+
+    .callout {
+      margin: 15px 0 0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .callout.attention {
+      border-color: var(--orange);
+      background: var(--orange-soft);
+    }
+
+    .callout.error {
+      border-color: var(--red);
+      background: var(--red-soft);
+    }
+
+    .callout strong { display: block; margin-bottom: 3px; }
+
+    ul {
+      margin: 7px 0 0;
+      padding-left: 20px;
+    }
+
+    li { margin: 5px 0; }
+
+    code {
+      font-family: Consolas, "Cascadia Code", monospace;
+      background: #edf2fa;
+      color: #15386f;
+      border-radius: 5px;
+      padding: .1rem .32rem;
+      font-size: .91em;
+    }
+
+    pre {
+      background: var(--code);
+      color: #edf3ff;
+      border-radius: 12px;
+      padding: 15px 17px;
+      overflow-x: auto;
+      line-height: 1.48;
+      font-size: .89rem;
+      margin: 10px 0 4px;
+    }
+
+    pre code {
+      color: inherit;
+      background: transparent;
+      padding: 0;
+    }
+
+    .diagram {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 7px;
+      font-family: Consolas, monospace;
+      background: #f8fafc;
+      border: 1px dashed #bdcadc;
+      border-radius: 10px;
+      padding: 13px;
+      margin: 10px 0;
+    }
+
+    .node {
+      border: 2px solid #bdd1ff;
+      color: #163a71;
+      background: var(--blue-soft);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-weight: 700;
+      min-width: 43px;
+      text-align: center;
+    }
+
+    .arrow { color: #63758c; font-weight: 700; }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 12px;
+      font-size: .93rem;
+      overflow: hidden;
+    }
+
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      padding: 10px 10px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f5f8fd;
+      color: var(--navy);
+    }
+
+    tbody tr:hover { background: #fafcff; }
+
+    .checklist {
+      display: grid;
+      gap: 8px;
+      margin-top: 13px;
+    }
+
+    .checklist label {
+      display: flex;
+      align-items: start;
+      gap: 10px;
+      background: #fafcff;
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      border-radius: 10px;
+    }
+
+    .checklist input {
+      margin-top: 4px;
+      accent-color: var(--blue);
+    }
+
+    .quiz-item {
+      border: 1px solid var(--line);
+      padding: 14px;
+      border-radius: 12px;
+      margin: 10px 0;
+    }
+
+    .quiz-item p:first-child {
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .answer {
+      display: none;
+      border-top: 1px dashed var(--line);
+      margin-top: 10px;
+      padding-top: 10px;
+      color: var(--muted);
+    }
+
+    .quiz-item.open .answer { display: block; }
+
+    .quiz-item button {
+      margin-top: 8px;
+      font-size: .84rem;
+      padding: 6px 10px;
+    }
+
+    .mini {
+      font-size: .9rem;
+      color: var(--muted);
+    }
+
+    footer {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 20px 34px;
+      color: var(--muted);
+      font-size: .9rem;
+      text-align: center;
+    }
+
+    @media (max-width: 940px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-card { max-width: 520px; }
+      .layout { grid-template-columns: 1fr; margin-top: -22px; }
+      aside { position: static; }
+      aside nav {
+        display: flex;
+        overflow-x: auto;
+        gap: 6px;
+        padding-bottom: 4px;
+      }
+      aside nav a { white-space: nowrap; background: #f5f8fd; }
+    }
+
+    @media (max-width: 680px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      table { font-size: .86rem; }
+      th, td { padding: 8px 6px; }
+    }
+
+    @media print {
+      body { background: white; font-size: 10.5pt; }
+      header { padding: 26px 0; color: #000; background: white; border-bottom: 2px solid #000; }
+      .subtitle, .hero-card { color: #000; }
+      .layout { display: block; margin: 0; padding: 0; }
+      aside, .tools, button { display: none !important; }
+      section { box-shadow: none; border-radius: 0; page-break-inside: avoid; padding: 18px 0; border-bottom: 1px solid #ccc; }
+      pre { color: #000; background: #f5f5f5; border: 1px solid #ccc; }
+      .answer { display: block; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Estruturas de Dados I • Revisão para Prova</div>
+      <h1>Guia completo de revisão</h1>
+      <p class="subtitle">Resumo visual dos conceitos, operações, implementações em Python, pontos de atenção e questões essenciais sobre tudo o que foi trabalhado no material.</p>
+    </div>
+    <div class="hero-card">
+      <strong>Conteúdos cobrados</strong>
+      <div class="topic-pills">
+        <span>TAD</span><span>Pilha</span><span>Fila</span>
+        <span>Lista Encadeada</span><span>Lista Dupla</span>
+        <span>Lista Circular</span><span>Ordenação</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside>
+    <h2>Navegação</h2>
+    <nav id="nav">
+      <a href="#mapa">Mapa da prova</a>
+      <a href="#tad">TAD e Nós</a>
+      <a href="#pilha">Pilha</a>
+      <a href="#fila">Fila</a>
+      <a href="#lista">Lista Encadeada</a>
+      <a href="#dupla">Lista Duplamente Encadeada</a>
+      <a href="#circular">Lista Circular</a>
+      <a href="#ordenacao">Ordenação</a>
+      <a href="#comparacao">Comparativo</a>
+      <a href="#atencao">Pontos de atenção</a>
+      <a href="#checklist">Checklist</a>
+      <a href="#questoes">Questões de revisão</a>
+    </nav>
+    <div class="tools">
+      <button onclick="window.print()">Imprimir / Salvar PDF</button>
+      <button class="secondary" onclick="resetChecklist()">Limpar checklist</button>
+    </div>
+  </aside>
+
+  <main>
+    <section id="mapa">
+      <h2 class="section-title">Mapa da prova</h2>
+      <p class="lead">A prova avalia principalmente sua capacidade de escolher a estrutura correta, manipular seus nós e preservar a ordem dos dados.</p>
+      <div class="grid-3">
+        <article class="card">
+          <span class="tag key">Conceito</span>
+          <h3>Entender a regra</h3>
+          <p>Saber diferenciar <strong>LIFO</strong>, <strong>FIFO</strong> e estruturas sem regra fixa de entrada/saída.</p>
+        </article>
+        <article class="card">
+          <span class="tag exam">Implementação</span>
+          <h3>Operar os nós</h3>
+          <p>Atualizar corretamente referências como <code>topo</code>, <code>inicio</code>, <code>fim</code>, <code>cabeca</code>, <code>cauda</code> e <code>proximo</code>.</p>
+        </article>
+        <article class="card">
+          <span class="tag attention">Cuidado</span>
+          <h3>Não alterar indevidamente</h3>
+          <p>Ao buscar, somar, copiar ou comparar, muitas questões exigem que a estrutura original permaneça intacta.</p>
+        </article>
+      </div>
+      <div class="callout">
+        <strong>Prioridade para estudar</strong>
+        Treine operações usando apenas as primitivas da estrutura: em pilhas, <code>push</code>/<code>pop</code>; em filas, <code>insere</code>/<code>retira</code>; em listas, navegação por referências.
+      </div>
+    </section>
+
+    <section id="tad">
+      <h2 class="section-title">1. TAD e representação por nós</h2>
+      <p class="lead"><strong>Tipo Abstrato de Dados (TAD)</strong> é um conjunto de dados acompanhado das operações permitidas sobre esses dados.</p>
+      <div class="grid-2">
+        <article class="card">
+          <h3>O que o usuário da classe enxerga?</h3>
+          <ul>
+            <li>Os métodos disponíveis, como inserir, retirar, consultar e percorrer.</li>
+            <li>O comportamento da estrutura.</li>
+            <li>Não precisa conhecer cada alteração de ponteiro internamente.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Nó simples</h3>
+          <pre><code>class No:
+    def __init__(self, valor):
+        self.valor = valor
+        self.proximo = None</code></pre>
+          <p class="mini">Cada nó guarda um valor e uma referência para o próximo nó.</p>
+        </article>
+      </div>
+      <div class="callout attention">
+        <strong>Item importante</strong>
+        Uma referência que deveria apontar para outro nó, quando alterada incorretamente, pode perder parte da estrutura ou gerar laço infinito em listas circulares.
+      </div>
+    </section>
+
+    <section id="pilha">
+      <h2 class="section-title">2. Pilha — LIFO</h2>
+      <p class="lead">Na pilha, o <strong>último elemento inserido</strong> é o <strong>primeiro removido</strong>. Inserções e remoções sempre acontecem no <code>topo</code>.</p>
+
+      <div class="diagram" aria-label="Exemplo visual de pilha">
+        <span>Topo</span><span class="arrow">→</span><span class="node">30</span><span class="arrow">→</span><span class="node">20</span><span class="arrow">→</span><span class="node">10</span><span class="arrow">→ None</span>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Operação</th><th>Função</th><th>Alterações essenciais</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>push(valor)</code></td><td>Insere no topo.</td><td>Novo nó aponta para o topo antigo; <code>topo</code> passa a ser o novo nó; incrementa <code>tam</code>.</td></tr>
+          <tr><td><code>pop()</code></td><td>Remove do topo.</td><td>Guarda o valor; <code>topo = topo.prox</code>; decrementa <code>tam</code>.</td></tr>
+          <tr><td><code>vazia()</code></td><td>Consulta se não há itens.</td><td>Verifica <code>topo is None</code>.</td></tr>
+          <tr><td><code>__len__()</code></td><td>Obtém tamanho.</td><td>Retorna <code>tam</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Padrão fundamental: usar pilha auxiliar e restaurar</h3>
+      <p>Para contar, buscar, somar ou remover uma ocorrência sem destruir os dados, retire elementos para uma pilha auxiliar e, depois, devolva-os.</p>
+      <pre><code>def somar_pilha(pilha):
+    aux = Pilha()
+    soma = 0
+
+    while not pilha.vazia():
+        x = pilha.pop()
+        soma += x
+        aux.push(x)
+
+    while not aux.vazia():
+        pilha.push(aux.pop())
+
+    return soma</code></pre>
+
+      <div class="grid-2">
+        <article class="card">
+          <span class="tag exam">Pratique</span>
+          <h3>Funções cobradas no material</h3>
+          <ul>
+            <li>Contar elementos e contar ocorrências.</li>
+            <li>Copiar mantendo a ordem.</li>
+            <li>Buscar valor sem alterar a pilha.</li>
+            <li>Inserir na base.</li>
+            <li>Remover primeira ocorrência.</li>
+            <li>Comparar duas pilhas.</li>
+            <li>Testar palíndromo.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <span class="tag attention">Atenção</span>
+          <h3>Ordem na cópia e inversão</h3>
+          <p>Transferir diretamente de uma pilha para outra <strong>inverte</strong> a ordem. Para copiar mantendo a ordem, geralmente é necessária uma pilha auxiliar intermediária.</p>
+          <p>Exemplo: se o topo de <code>p1</code> é 30, copiar diretamente faz 10 terminar no topo de <code>p2</code>.</p>
+        </article>
+      </div>
+
+      <h3>Problema integrador: embaralhar duas pilhas</h3>
+      <p>O material trabalha a intercalação de duas pilhas de tamanhos diferentes, mantendo <code>p1</code> e <code>p2</code> intactas e produzindo <code>p3</code>.</p>
+      <div class="diagram">
+        <span class="node">P1: A B C D</span><span class="arrow">+</span>
+        <span class="node">P2: 1 2</span><span class="arrow">⇒</span>
+        <span class="node">P3: A 1 B 2 C D</span>
+      </div>
+      <div class="callout attention">
+        <strong>O que não pode acontecer</strong>
+        Um laço que retira de uma pilha auxiliar e coloca novamente na mesma pilha nunca termina. Para restaurar, o <code>pop()</code> da auxiliar deve ser enviado à pilha original.
+      </div>
+    </section>
+
+    <section id="fila">
+      <h2 class="section-title">3. Fila — FIFO</h2>
+      <p class="lead">Na fila, o <strong>primeiro a entrar</strong> é o <strong>primeiro a sair</strong>. Insere-se no <code>fim</code> e remove-se do <code>inicio</code>.</p>
+      <div class="diagram">
+        <span>Início</span><span class="arrow">→</span><span class="node">10</span><span class="arrow">→</span><span class="node">20</span><span class="arrow">→</span><span class="node">30</span><span class="arrow">→</span><span>Fim</span>
+      </div>
+
+      <table>
+        <thead><tr><th>Operação</th><th>O que faz</th><th>Caso crítico</th></tr></thead>
+        <tbody>
+          <tr><td><code>insere(valor)</code></td><td>Coloca um novo nó no final.</td><td>Se vazia, <code>inicio</code> e <code>fim</code> recebem o mesmo nó.</td></tr>
+          <tr><td><code>retira()</code></td><td>Remove o primeiro nó.</td><td>Ao retirar o único elemento, também definir <code>fim = None</code>.</td></tr>
+          <tr><td><code>frente()</code></td><td>Consulta o primeiro valor sem remover.</td><td>Tratar fila vazia.</td></tr>
+          <tr><td><code>esta_vazia()</code></td><td>Verifica ausência de nós.</td><td><code>inicio is None</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Padrão de preservação na fila</h3>
+      <p>Uma fila auxiliar permite processar todos os itens e recolocá-los na mesma ordem original, pois retirar e inserir em fila preserva a sequência.</p>
+      <pre><code>def somar_fila(fila):
+    aux = Fila()
+    soma = 0
+
+    while not fila.esta_vazia():
+        x = fila.retira()
+        soma += x
+        aux.insere(x)
+
+    while not aux.esta_vazia():
+        fila.insere(aux.retira())
+
+    return soma</code></pre>
+
+      <div class="grid-2">
+        <article class="card">
+          <span class="tag exam">Exercícios-chave</span>
+          <ul>
+            <li>Enfileirar e desenfileirar.</li>
+            <li>Consultar a frente e o tamanho.</li>
+            <li>Simular atendimento.</li>
+            <li>Somar e contar ocorrências mantendo a fila.</li>
+            <li>Remover a primeira ocorrência.</li>
+            <li>Verificar se duas filas são iguais.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <span class="tag attention">Pegadinha</span>
+          <p>Em uma fila, “primeira ocorrência” significa a primeira encontrada começando pelo <code>inicio</code>. Ao remover apenas essa ocorrência, todos os demais itens devem continuar na mesma ordem.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="lista">
+      <h2 class="section-title">4. Lista simplesmente encadeada</h2>
+      <p class="lead">Diferentemente de pilha e fila, a lista não possui uma única regra de entrada e saída: pode inserir e remover no início, no final, após um alvo ou em ordem crescente.</p>
+      <div class="diagram">
+        <span class="node">3</span><span class="arrow">→</span><span class="node">5</span><span class="arrow">→</span><span class="node">7</span><span class="arrow">→</span><span class="node">10</span><span class="arrow">→ None</span>
+      </div>
+
+      <table>
+        <thead><tr><th>Método</th><th>Lógica principal</th><th>Referência alterada</th></tr></thead>
+        <tbody>
+          <tr><td><code>adicionar_no_inicio</code></td><td>Novo nó antecede o antigo primeiro.</td><td><code>novo.proximo = topo</code>; <code>topo = novo</code>.</td></tr>
+          <tr><td><code>adicionar_no_fim</code></td><td>Percorre até encontrar o último.</td><td><code>ultimo.proximo = novo</code>.</td></tr>
+          <tr><td><code>adicionar_apos</code></td><td>Localiza valor-alvo e encaixa o novo nó.</td><td>Duas referências: novo aponta ao próximo; alvo aponta ao novo.</td></tr>
+          <tr><td><code>remove_no</code></td><td>Localiza valor e “pula” o nó removido.</td><td>Se for primeiro, altera <code>topo</code>; senão, altera <code>anterior.proximo</code>.</td></tr>
+          <tr><td><code>insere_ordenado</code></td><td>Encontra a posição crescente correta.</td><td>Insere antes do primeiro maior ou igual.</td></tr>
+          <tr><td><code>percorrer</code></td><td>Visita os nós até <code>None</code>.</td><td>Pode usar <code>yield</code> para entregar valores.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Inserção ordenada: raciocínio que deve dominar</h3>
+      <pre><code>def insere_ordenado(self, valor):
+    novo = No(valor)
+
+    if self.topo is None or valor &lt; self.topo.valor:
+        novo.proximo = self.topo
+        self.topo = novo
+        self.tam += 1
+        return
+
+    atual = self.topo
+    while atual.proximo is not None and atual.proximo.valor &lt; valor:
+        atual = atual.proximo
+
+    novo.proximo = atual.proximo
+    atual.proximo = novo
+    self.tam += 1</code></pre>
+
+      <div class="callout">
+        <strong>Itens importantes</strong>
+        Saiba percorrer a lista para: contar elementos sem usar <code>tam</code>, encontrar maior/menor valor, verificar se contém um número, somar valores e exibir em ordem inversa usando uma estrutura auxiliar.
+      </div>
+    </section>
+
+    <section id="dupla">
+      <h2 class="section-title">5. Lista duplamente encadeada</h2>
+      <p class="lead">Cada nó aponta para o próximo e para o anterior. A estrutura mantém referências para <code>cabeca</code> e <code>cauda</code>, permitindo percurso nos dois sentidos.</p>
+      <div class="diagram">
+        <span>None</span><span class="arrow">←</span><span class="node">10</span><span class="arrow">⇄</span><span class="node">20</span><span class="arrow">⇄</span><span class="node">30</span><span class="arrow">→</span><span>None</span>
+      </div>
+
+      <div class="grid-2">
+        <article class="card">
+          <span class="tag key">Vantagem</span>
+          <h3>Percurso reverso</h3>
+          <p>Começa na <code>cauda</code> e avança por <code>anterior</code>. É mais direto do que criar uma cópia apenas para exibir ao contrário.</p>
+          <pre><code>atual = self.cauda
+while atual is not None:
+    yield atual.valor
+    atual = atual.anterior</code></pre>
+        </article>
+        <article class="card">
+          <span class="tag attention">Cuidado</span>
+          <h3>Duas conexões</h3>
+          <p>Inserir ou remover no meio exige atualizar os dois sentidos. Não basta alterar o <code>proximo</code>; também é obrigatório ajustar o <code>anterior</code>.</p>
+        </article>
+      </div>
+
+      <h3>Remoção: quatro casos obrigatórios</h3>
+      <table>
+        <thead><tr><th>Caso</th><th>Condição</th><th>Ajustes principais</th></tr></thead>
+        <tbody>
+          <tr><td>Único nó</td><td>Sem anterior e sem próximo.</td><td><code>cabeca = None</code> e <code>cauda = None</code>.</td></tr>
+          <tr><td>Primeiro</td><td><code>anterior is None</code>.</td><td>Nova cabeça é o próximo; seu <code>anterior = None</code>.</td></tr>
+          <tr><td>Último</td><td><code>proximo is None</code>.</td><td>Nova cauda é o anterior; seu <code>proximo = None</code>.</td></tr>
+          <tr><td>Meio</td><td>Possui vizinhos dos dois lados.</td><td>Vizinho anterior aponta ao próximo e vice-versa.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="circular">
+      <h2 class="section-title">6. Lista circular</h2>
+      <p class="lead">Na lista circular, não há último nó apontando para <code>None</code>: a <code>cauda.proximo</code> deve apontar novamente para a <code>cabeca</code>.</p>
+      <div class="diagram">
+        <span class="node">Cabeça: 10</span><span class="arrow">→</span><span class="node">20</span><span class="arrow">→</span><span class="node">Cauda: 30</span><span class="arrow">↺ cabeça</span>
+      </div>
+
+      <div class="grid-2">
+        <article class="card">
+          <span class="tag key">Invariante</span>
+          <h3>Regra que nunca pode quebrar</h3>
+          <p>Quando a lista não está vazia, sempre deve valer:</p>
+          <pre><code>self.cauda.proximo == self.cabeca</code></pre>
+        </article>
+        <article class="card">
+          <span class="tag attention">Laço</span>
+          <h3>Critério de parada</h3>
+          <p>Como nenhum nó aponta para <code>None</code>, percorrer até <code>None</code> gera loop infinito. Deve-se parar ao retornar à cabeça.</p>
+          <pre><code>while True:
+    ...
+    atual = atual.proximo
+    if atual == self.cabeca:
+        break</code></pre>
+        </article>
+      </div>
+
+      <h3>Operações críticas</h3>
+      <table>
+        <thead><tr><th>Operação</th><th>O que observar</th></tr></thead>
+        <tbody>
+          <tr><td>Inserir no início</td><td>Atualizar <code>cabeca</code> e fazer <code>cauda.proximo</code> apontar à nova cabeça.</td></tr>
+          <tr><td>Inserir no fim</td><td>Novo nó aponta para a cabeça; a cauda anterior aponta ao novo; atualizar <code>cauda</code>.</td></tr>
+          <tr><td>Remover único nó</td><td>Definir cabeça e cauda como <code>None</code>.</td></tr>
+          <tr><td>Remover a cabeça</td><td>Nova cabeça deve continuar sendo alcançada pela cauda.</td></tr>
+          <tr><td>Remover a cauda</td><td>Anterior vira cauda e precisa voltar a apontar à cabeça.</td></tr>
+          <tr><td>Inserção ordenada</td><td>Tratar separadamente vazio, antes da cabeça, depois da cauda e meio.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="ordenacao">
+      <h2 class="section-title">7. Algoritmos de ordenação</h2>
+      <p class="lead">O material apresenta cinco algoritmos. Memorize a ideia principal, a forma como reorganizam valores e o cenário em que fazem sentido.</p>
+      <table>
+        <thead>
+          <tr><th>Algoritmo</th><th>Como funciona</th><th>Imagem mental</th><th>Uso indicado no material</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Bubble Sort</strong></td>
+            <td>Compara vizinhos e troca quando estão fora de ordem.</td>
+            <td>O maior “flutua” para o fim a cada passada.</td>
+            <td>Listas pequenas ou quase ordenadas.</td>
+          </tr>
+          <tr>
+            <td><strong>Selection Sort</strong></td>
+            <td>Escolhe o menor restante e o posiciona no início da parte não ordenada.</td>
+            <td>Selecionar o próximo menor.</td>
+            <td>Listas pequenas com custo alto de movimentação.</td>
+          </tr>
+          <tr>
+            <td><strong>Insertion Sort</strong></td>
+            <td>Insere cada elemento na posição correta da parte já ordenada.</td>
+            <td>Organizar cartas na mão.</td>
+            <td>Conjuntos pequenos.</td>
+          </tr>
+          <tr>
+            <td><strong>Merge Sort</strong></td>
+            <td>Divide a lista, ordena partes e mescla em ordem.</td>
+            <td>Dividir e conquistar, depois juntar.</td>
+            <td>Listas grandes; desempenho garantido e estabilidade.</td>
+          </tr>
+          <tr>
+            <td><strong>Quick Sort</strong></td>
+            <td>Escolhe pivô, separa menores/maiores e repete recursivamente.</td>
+            <td>Particionar ao redor do pivô.</td>
+            <td>Ordenação interna rápida em ampla variedade de situações.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout attention">
+        <strong>Possível questão</strong>
+        Dado um pequeno conjunto de números, descreva uma passada do Bubble Sort, Selection Sort ou Insertion Sort, ou escolha um algoritmo e implemente em Python.
+      </div>
+    </section>
+
+    <section id="comparacao">
+      <h2 class="section-title">8. Comparativo rápido das estruturas</h2>
+      <table>
+        <thead><tr><th>Estrutura</th><th>Entrada</th><th>Saída</th><th>Referências principais</th><th>Regra-chave</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Pilha</strong></td><td>Topo</td><td>Topo</td><td><code>topo</code></td><td>LIFO</td></tr>
+          <tr><td><strong>Fila</strong></td><td>Fim</td><td>Início</td><td><code>inicio</code>, <code>fim</code></td><td>FIFO</td></tr>
+          <tr><td><strong>Lista simples</strong></td><td>Variável</td><td>Variável</td><td><code>topo</code>/<code>cabeca</code>, <code>proximo</code></td><td>Travessia até <code>None</code></td></tr>
+          <tr><td><strong>Lista dupla</strong></td><td>Variável</td><td>Variável</td><td><code>cabeca</code>, <code>cauda</code>, <code>anterior</code>, <code>proximo</code></td><td>Percorre ida e volta</td></tr>
+          <tr><td><strong>Lista circular</strong></td><td>Variável</td><td>Variável</td><td><code>cabeca</code>, <code>cauda</code>, <code>proximo</code></td><td>Cauda aponta à cabeça</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <strong>Estratégia de prova</strong>
+        Antes de escrever código, desenhe os nós e marque quais referências mudam. Essa prática reduz erros em remoções e inserções nos extremos da lista.
+      </div>
+    </section>
+
+    <section id="atencao">
+      <h2 class="section-title">9. Pontos de atenção e erros comuns</h2>
+      <p class="lead">Além dos conceitos, revise estes detalhes: são fontes comuns de perda de pontos em implementação.</p>
+      <div class="grid-2">
+        <article class="card">
+          <span class="tag attention">Tamanho</span>
+          <h3>Atualize <code>tam</code></h3>
+          <p>Toda inserção bem-sucedida incrementa e toda remoção bem-sucedida decrementa. No trecho de lista simples do material, o método <code>remove_no</code> precisa decrementar <code>self.tam</code> após remover.</p>
+        </article>
+        <article class="card">
+          <span class="tag attention">Fila vazia</span>
+          <h3>Remover o único elemento</h3>
+          <p>Após <code>inicio = inicio.proximo</code>, se o início virou <code>None</code>, o <code>fim</code> também deve virar <code>None</code>.</p>
+        </article>
+        <article class="card">
+          <span class="tag attention">Pilha vazia</span>
+          <h3>Consulta do topo</h3>
+          <p>Antes de executar <code>return self.topo.valor</code>, trate o caso de pilha vazia para evitar erro de acesso a <code>None</code>.</p>
+        </article>
+        <article class="card">
+          <span class="tag attention">Circular</span>
+          <h3>Não percorra até <code>None</code></h3>
+          <p>Na lista circular, pare ao reencontrar a cabeça. Sem isso, o programa não encerra o percurso.</p>
+        </article>
+        <article class="card">
+          <span class="tag attention">Ordem</span>
+          <h3>Auxiliar correta</h3>
+          <p>Em pilhas, mover itens altera a ordem; em filas, rotacionar por retirada e inserção preserva a ordem. Faça testes com três valores para confirmar.</p>
+        </article>
+        <article class="card">
+          <span class="tag attention">Código</span>
+          <h3>Revise sintaxe e variável exibida</h3>
+          <p>No material, o exercício <code>contem</code> tem um <code>else</code> sem dois-pontos; no exercício de menor valor, deve ser mostrado <code>menor</code>, não o último <code>numero</code> percorrido.</p>
+        </article>
+      </div>
+      <div class="callout error">
+        <strong>Regra de ouro</strong>
+        Quando o enunciado disser que a estrutura deve permanecer intacta, mostre mentalmente o estado antes e depois. A resposta só está correta se valores <em>e ordem</em> forem preservados.
+      </div>
+    </section>
+
+    <section id="checklist">
+      <h2 class="section-title">10. Checklist de estudo</h2>
+      <p class="lead">Marque os itens à medida que conseguir explicá-los e implementá-los sem consultar o material. As marcações ficam salvas neste navegador.</p>
+      <div class="checklist" id="checks">
+        <label><input type="checkbox"> Explico o que é TAD e a função de um nó.</label>
+        <label><input type="checkbox"> Diferencio LIFO de FIFO com um exemplo.</label>
+        <label><input type="checkbox"> Implemento <code>push</code>, <code>pop</code>, <code>insere</code> e <code>retira</code>.</label>
+        <label><input type="checkbox"> Uso uma auxiliar para consultar uma pilha sem destruí-la.</label>
+        <label><input type="checkbox"> Removo apenas a primeira ocorrência em pilha e fila.</label>
+        <label><input type="checkbox"> Copio ou comparo pilhas preservando a ordem original.</label>
+        <label><input type="checkbox"> Implemento inserção e remoção em lista simples.</label>
+        <label><input type="checkbox"> Implemento inserção ordenada crescente.</label>
+        <label><input type="checkbox"> Identifico os quatro casos de remoção em lista dupla.</label>
+        <label><input type="checkbox"> Sei percorrer lista dupla em sentido reverso.</label>
+        <label><input type="checkbox"> Mantenho a ligação <code>cauda.proximo = cabeca</code> na lista circular.</label>
+        <label><input type="checkbox"> Comparo Bubble, Selection, Insertion, Merge e Quick Sort.</label>
+      </div>
+    </section>
+
+    <section id="questoes">
+      <h2 class="section-title">11. Questões de revisão rápida</h2>
+      <p class="lead">Tente responder antes de revelar a solução.</p>
+
+      <div class="quiz-item">
+        <p>1. Ao inserir 10, 20 e 30 em uma pilha, nessa ordem, qual valor será retornado pelo primeiro <code>pop()</code>?</p>
+        <button onclick="toggleAnswer(this)">Mostrar resposta</button>
+        <div class="answer"><strong>30.</strong> A pilha segue LIFO: o último inserido é o primeiro removido.</div>
+      </div>
+
+      <div class="quiz-item">
+        <p>2. Em uma fila com 10 → 20 → 30, qual valor sai em <code>retira()</code> e qual fica na frente?</p>
+        <button onclick="toggleAnswer(this)">Mostrar resposta</button>
+        <div class="answer">Sai <strong>10</strong>; após a remoção, <strong>20</strong> passa a estar na frente.</div>
+      </div>
+
+      <div class="quiz-item">
+        <p>3. Por que copiar diretamente de uma pilha para outra costuma inverter a ordem?</p>
+        <button onclick="toggleAnswer(this)">Mostrar resposta</button>
+        <div class="answer">Porque o topo da pilha original é retirado primeiro e também se torna o primeiro item inserido; com novas inserções acima dele, termina mais abaixo na pilha destino.</div>
+      </div>
+
+      <div class="quiz-item">
+        <p>4. Qual referência obrigatoriamente deve ser mantida em uma lista circular não vazia?</p>
+        <button onclick="toggleAnswer(this)">Mostrar resposta</button>
+        <div class="answer"><code>cauda.proximo == cabeca</code>. Essa referência fecha o ciclo.</div>
+      </div>
+
+      <div class="quiz-item">
+        <p>5. Quais são os quatro casos ao remover um nó de uma lista duplamente encadeada?</p>
+        <button onclick="toggleAnswer(this)">Mostrar resposta</button>
+        <div class="answer">Remoção do único nó, do primeiro nó, do último nó e de um nó do meio.</div>
+      </div>
+
+      <div class="quiz-item">
+        <p>6. Qual algoritmo compara elementos adjacentes e qual usa pivô?</p>
+        <button onclick="toggleAnswer(this)">Mostrar resposta</button>
+        <div class="answer"><strong>Bubble Sort</strong> compara adjacentes; <strong>Quick Sort</strong> utiliza pivô.</div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  Material de revisão elaborado a partir das aulas e exercícios de Estruturas de Dados I. Use os exemplos para estudar a lógica, desenhar referências e praticar implementações.
+</footer>
+
+<script>
+  const checkboxes = [...document.querySelectorAll('#checks input[type="checkbox"]')];
+  const storageKey = 'ed-revisao-checklist-v1';
+
+  function loadChecklist() {
+    const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    checkboxes.forEach((item, index) => item.checked = Boolean(saved[index]));
+  }
+
+  function saveChecklist() {
+    localStorage.setItem(storageKey, JSON.stringify(checkboxes.map(item => item.checked)));
+  }
+
+  function resetChecklist() {
+    checkboxes.forEach(item => item.checked = false);
+    saveChecklist();
+  }
+
+  function toggleAnswer(button) {
+    const item = button.closest('.quiz-item');
+    item.classList.toggle('open');
+    button.textContent = item.classList.contains('open') ? 'Ocultar resposta' : 'Mostrar resposta';
+  }
+
+  checkboxes.forEach(item => item.addEventListener('change', saveChecklist));
+  loadChecklist();
+
+  const links = [...document.querySelectorAll('#nav a')];
+  const sections = links.map(a => document.querySelector(a.getAttribute('href')));
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(link => link.classList.remove('active'));
+        const current = links.find(link => link.getAttribute('href') === '#' + entry.target.id);
+        if (current) current.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -65% 0px' });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+</body>
+</html>
