@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Revisão para a Prova | POO com C#</title>
+<style>
+:root{--p:#512bd4;--ps:#f1ecff;--nav:#111f38;--text:#182230;--muted:#56677d;--line:#dfe4ee;--bg:#f4f7fb;--warn:#fff4df;--w:#a75b05;--good:#e7f8f0;--g:#08764f;--bad:#ffedec;--r:#b42318;--code:#11192c}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);font:15.5px/1.55 Inter,"Segoe UI",Arial,sans-serif;color:var(--text)}
+header{color:#fff;padding:55px 22px;background:radial-gradient(circle at 90% 18%,rgba(185,165,255,.4),transparent 27rem),linear-gradient(120deg,#10192d,#362274 70%,#512bd4)}
+.hero{max-width:1170px;margin:auto;display:grid;grid-template-columns:1fr 335px;gap:34px;align-items:center}
+.badge{display:inline-block;padding:6px 13px;border:1px solid #ffffff50;background:#ffffff15;border-radius:40px;font-size:.85rem;font-weight:600;margin-bottom:15px}
+h1{font-size:clamp(2rem,4vw,3.25rem);letter-spacing:-.05em;line-height:1.08;margin:0 0 14px}
+.hero p{font-size:1.08rem;color:#e7e0ff;max-width:690px;margin:0}
+.hero-card{padding:21px;border-radius:18px;border:1px solid #ffffff3b;background:#ffffff16}
+.hero-card strong{display:block;margin-bottom:11px}.pills{display:flex;flex-wrap:wrap;gap:7px}.pills span{font-size:.8rem;padding:5px 10px;border-radius:30px;background:#ffffff19}
+.layout{max-width:1170px;margin:-21px auto 45px;padding:0 18px;display:grid;grid-template-columns:260px minmax(0,1fr);gap:25px;align-items:start}
+aside{background:#fff;border-radius:15px;padding:16px;box-shadow:0 8px 25px #10223912;position:sticky;top:18px}
+aside h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:2px 8px 11px}
+nav a{display:block;text-decoration:none;color:var(--text);padding:7px 9px;border-radius:8px;font-size:.92rem}
+nav a:hover,nav a.active{background:var(--ps);color:var(--p);font-weight:650}
+.tools{border-top:1px solid var(--line);padding-top:13px;margin-top:13px;display:grid;gap:7px}
+button{background:var(--p);color:#fff;border:0;border-radius:9px;padding:9px;cursor:pointer;font:600 .9rem inherit}button.alt{background:var(--ps);color:var(--p)}
+main{display:grid;gap:17px}section{background:#fff;border-radius:15px;padding:clamp(19px,3vw,30px);box-shadow:0 8px 25px #10223912;scroll-margin-top:18px}
+h2{margin:0 0 7px;color:var(--nav);font-size:1.52rem;letter-spacing:-.03em}h3{color:var(--nav);margin:22px 0 8px;font-size:1.1rem}.lead{color:var(--muted);margin:0 0 17px}
+.grid2,.grid3{display:grid;gap:13px;margin-top:13px}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{border:1px solid var(--line);border-radius:12px;padding:14px}.card h3{font-size:1rem;margin:0 0 6px}.card p{color:var(--muted);font-size:.93rem;margin:5px 0}
+.tag{display:inline-block;border-radius:30px;font-weight:700;font-size:.75rem;padding:3px 9px;margin-bottom:7px}.key{background:var(--ps);color:var(--p)}.exam{background:var(--good);color:var(--g)}.attention{background:var(--warn);color:var(--w)}
+.call{padding:13px 15px;border-left:4px solid var(--p);background:var(--ps);border-radius:10px;margin-top:14px}.call.warn{background:var(--warn);border-color:var(--w)}.call.bad{background:var(--bad);border-color:var(--r)}.call strong{display:block;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin-top:11px;font-size:.93rem}th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:#f7f5fd;color:var(--nav)}
+code{font: .91em Consolas,"Cascadia Code",monospace;padding:.1rem .32rem;border-radius:5px;background:#f0eafe;color:#4926b6}
+pre{margin:10px 0 4px;background:var(--code);border-radius:12px;padding:15px;overflow:auto;color:#eef2ff;font: .88rem/1.48 Consolas,"Cascadia Code",monospace}pre code{background:transparent;color:inherit;padding:0}
+ul{margin:6px 0;padding-left:20px}li{margin:4px 0}.diagram{border:1px dashed #d0c4fb;background:#fcfbff;padding:12px;border-radius:10px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0}.node{padding:7px 11px;border-radius:8px;border:2px solid #d5caff;background:var(--ps);font-weight:700;color:#4122a5}.arr{font-weight:700;color:#64758b}
+.checks{display:grid;gap:8px}.checks label{padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fcfbff;display:flex;gap:9px;align-items:start}.checks input{margin-top:5px;accent-color:var(--p)}
+.question{border:1px solid var(--line);border-radius:11px;padding:13px;margin:10px 0}.question>p:first-child{font-weight:700;color:var(--nav)}.answer{display:none;border-top:1px dashed var(--line);padding-top:9px;margin-top:9px;color:var(--muted)}.question.open .answer{display:block}.question button{font-size:.82rem;padding:6px 10px}
+footer{max-width:1170px;padding:0 18px 34px;margin:auto;text-align:center;color:var(--muted);font-size:.9rem}
+@media(max-width:920px){.hero,.layout{grid-template-columns:1fr}.layout{margin-top:-20px}aside{position:static}nav{display:flex;gap:6px;overflow:auto}nav a{white-space:nowrap;background:#faf8ff}}@media(max-width:670px){.grid2,.grid3{grid-template-columns:1fr}table{font-size:.85rem}th,td{padding:7px}}
+@media print{body{background:#fff;font-size:10.5pt}header{color:#000;background:#fff;border-bottom:2px solid #000;padding:25px 0}.hero p{color:#000}.layout{display:block;margin:0;padding:0}aside,button{display:none}section{box-shadow:none;border-bottom:1px solid #ccc;border-radius:0;padding:16px 0;page-break-inside:avoid}pre{background:#eee;color:#000;border:1px solid #ccc}.answer{display:block}}
+</style>
+</head>
+<body>
+<header><div class="hero"><div><span class="badge">Programação Orientada a Objetos • C#</span><h1>Revisão para a Prova de POO</h1><p>Resumo prático de sintaxe, modelagem e pilares da orientação a objetos, com exemplos de Console Application e alertas de implementação.</p></div><div class="hero-card"><strong>Conteúdos da prova</strong><div class="pills"><span>Classes</span><span>Propriedades</span><span>Métodos</span><span>Tipos</span><span>if</span><span>foreach</span><span>Herança</span><span>Polimorfismo</span><span>Abstração</span><span>Interfaces</span></div></div></div></header>
+<div class="layout">
+<aside><h2>Navegação</h2><nav id="nav">
+<a href="#mapa">Mapa da prova</a><a href="#classes">Classes e objetos</a><a href="#acesso">Propriedades e acesso</a><a href="#tipos">Tipos de dados</a><a href="#console">Console e conversão</a><a href="#controle">if e foreach</a><a href="#metodos">Métodos</a><a href="#heranca">Herança</a><a href="#poli">Polimorfismo</a><a href="#abstratas">Abstratas</a><a href="#interfaces">Interfaces</a><a href="#integrador">Exemplo completo</a><a href="#alertas">Atenção</a><a href="#checklist">Checklist</a><a href="#quiz">Questões</a>
+</nav><div class="tools"><button onclick="window.print()">Imprimir / Salvar PDF</button><button class="alt" onclick="resetChecks()">Limpar checklist</button></div></aside>
+<main>
+<section id="mapa"><h2>Mapa da prova</h2><p class="lead">Você deve saber criar classes, cadastrar dados, executar regras condicionais e reutilizar comportamentos com os recursos de POO.</p>
+<div class="grid3">
+<article class="card"><span class="tag key">Sintaxe</span><h3>C# básico</h3><p>Tipos, <code>Console.WriteLine</code>, entrada, conversão, <code>if</code> e <code>foreach</code>.</p></article>
+<article class="card"><span class="tag exam">Modelagem</span><h3>Objetos</h3><p>Classes, propriedades, modificadores de acesso e métodos com retorno adequado.</p></article>
+<article class="card"><span class="tag attention">POO</span><h3>Especialização</h3><p>Herança, polimorfismo, classes abstratas, métodos abstratos e interfaces.</p></article>
+</div><div class="call"><strong>Estratégia de leitura do enunciado</strong>Substantivos normalmente viram classes ou propriedades; verbos normalmente viram métodos; regras como “se...” indicam condições.</div>
+</section>
+
+<section id="classes"><h2>1. Classes, objetos e instâncias</h2><p class="lead">A classe define um molde; o objeto é uma instância concreta criada a partir dela.</p>
+<div class="diagram"><span class="node">Classe Produto</span><span class="arr">→ cria →</span><span class="node">produto1</span><span class="node">produto2</span></div>
+<div class="grid2"><article class="card"><h3>Declarando a classe</h3><pre><code>public class Produto
+{
+    public string Nome { get; set; }
+    public decimal Preco { get; set; }
+
+    public void Exibir()
+    {
+        Console.WriteLine($"{Nome}: {Preco:C}");
+    }
+}</code></pre></article>
+<article class="card"><h3>Instanciando no Program.cs</h3><pre><code>Produto produto = new Produto();
+
+produto.Nome = "Teclado";
+produto.Preco = 149.90m;
+
+produto.Exibir();</code></pre><p><code>new Produto()</code> cria um objeto em memória.</p></article></div>
+<div class="call warn"><strong>Ponto-chave</strong>Duas instâncias da mesma classe possuem as mesmas propriedades disponíveis, mas podem guardar valores diferentes.</div>
+</section>
+
+<section id="acesso"><h2>2. Propriedades e modificadores de acesso</h2><p class="lead">Propriedades representam características. Modificadores definem onde um membro pode ser acessado.</p>
+<table><thead><tr><th>Modificador</th><th>Acesso</th><th>Uso comum</th></tr></thead><tbody>
+<tr><td><code>public</code></td><td>Qualquer classe.</td><td>Métodos e propriedades que farão parte do uso externo.</td></tr>
+<tr><td><code>private</code></td><td>Somente a própria classe.</td><td>Dados internos protegidos.</td></tr>
+<tr><td><code>protected</code></td><td>Classe e classes filhas.</td><td>Regras que subclasses podem reutilizar.</td></tr>
+<tr><td><code>internal</code></td><td>Mesmo projeto/assembly.</td><td>Uso interno da aplicação.</td></tr>
+</tbody></table>
+<h3>Encapsulando uma regra</h3><pre><code>private decimal _preco;
+
+public decimal Preco
+{
+    get { return _preco; }
+    set
+    {
+        if (value >= 0)
+            _preco = value;
+    }
+}</code></pre>
+<div class="call"><strong>Encapsulamento</strong>O objeto protege seus dados e controla como eles podem ser alterados.</div>
+</section>
+
+<section id="tipos"><h2>3. Tipos de dados importantes</h2><p class="lead">O tipo deve representar corretamente o dado do problema.</p>
+<table><thead><tr><th>Tipo</th><th>Representa</th><th>Exemplo</th><th>Observação</th></tr></thead><tbody>
+<tr><td><code>int</code></td><td>Inteiros comuns.</td><td><code>int idade = 18;</code></td><td>Sem casas decimais.</td></tr>
+<tr><td><code>long</code></td><td>Inteiros grandes.</td><td><code>long habitantes = 8000000000L;</code></td><td>Use <code>L</code> no literal.</td></tr>
+<tr><td><code>double</code></td><td>Decimal geral.</td><td><code>double altura = 1.75;</code></td><td>Útil para medidas.</td></tr>
+<tr><td><code>decimal</code></td><td>Decimal preciso.</td><td><code>decimal preco = 99.90m;</code></td><td>Preferível para dinheiro.</td></tr>
+<tr><td><code>bool</code></td><td>Verdadeiro/falso.</td><td><code>bool ativo = true;</code></td><td>Ideal para condições.</td></tr>
+<tr><td><code>string</code></td><td>Texto.</td><td><code>string cpf = "001..."</code></td><td>CPF e telefone são texto.</td></tr>
+<tr><td><code>char</code></td><td>Um caractere.</td><td><code>char turma = 'A';</code></td><td>Aspas simples.</td></tr>
+</tbody></table>
+<div class="call warn"><strong>Atenção</strong>CPF, telefone, CEP e número de cartão não devem ser <code>int</code>: não são calculados e podem conter zeros à esquerda.</div>
+</section>
+
+<section id="console"><h2>4. Console, leitura e conversão</h2><p class="lead"><code>Console.ReadLine()</code> lê texto. Quando deseja um número, o texto precisa ser convertido.</p>
+<div class="grid2"><article class="card"><h3>Saída</h3><pre><code>string nome = "Ana";
+double nota = 8.5;
+
+Console.WriteLine("Resultado");
+Console.WriteLine($"Aluno: {nome}");
+Console.WriteLine($"Nota: {nota:F1}");</code></pre></article>
+<article class="card"><h3>Entrada com Parse</h3><pre><code>Console.Write("Digite sua idade: ");
+int idade = int.Parse(Console.ReadLine());
+
+Console.WriteLine($"Idade: {idade}");</code></pre><p>Funciona somente se a entrada puder ser convertida.</p></article></div>
+<h3><code>int.Parse</code> x <code>int.TryParse</code></h3>
+<table><thead><tr><th>Forma</th><th>Resultado</th><th>Entrada inválida</th></tr></thead><tbody>
+<tr><td><code>int.Parse(texto)</code></td><td>Retorna um inteiro.</td><td>Gera erro/exceção.</td></tr>
+<tr><td><code>int.TryParse(texto, out valor)</code></td><td>Retorna <code>true</code> ou <code>false</code> e preenche o valor.</td><td>Permite tratar sem encerrar o programa.</td></tr>
+</tbody></table>
+<pre><code>Console.Write("Digite a idade: ");
+
+if (int.TryParse(Console.ReadLine(), out int idade))
+{
+    Console.WriteLine($"Idade cadastrada: {idade}");
+}
+else
+{
+    Console.WriteLine("Idade inválida.");
+}</code></pre>
+</section>
+
+<section id="controle"><h2>5. Condições com <code>if</code> e repetição com <code>foreach</code></h2>
+<div class="grid2"><article class="card"><span class="tag exam">Decisão</span><h3>Classificando uma nota</h3><pre><code>if (media >= 7)
+{
+    Console.WriteLine("Aprovado");
+}
+else if (media >= 5)
+{
+    Console.WriteLine("Recuperação");
+}
+else
+{
+    Console.WriteLine("Reprovado");
+}</code></pre></article>
+<article class="card"><span class="tag exam">Coleção</span><h3>Percorrendo objetos</h3><pre><code>List&lt;Produto&gt; produtos = new List&lt;Produto&gt;();
+
+produtos.Add(new Produto {
+    Nome = "Mouse",
+    Preco = 80m
+});
+
+foreach (Produto produto in produtos)
+{
+    produto.Exibir();
+}</code></pre></article></div>
+<div class="call warn"><strong>Item importante</strong>No <code>foreach</code>, a variável representa um elemento por vez; a lista completa continua sendo <code>produtos</code>.</div>
+</section>
+
+<section id="metodos"><h2>6. Métodos e seus retornos</h2><p class="lead">Métodos são comportamentos. O tipo antes do nome informa o que o método devolve.</p>
+<table><thead><tr><th>Assinatura</th><th>Uso</th></tr></thead><tbody>
+<tr><td><code>public void ExibirDados()</code></td><td>Executa uma ação, mas não retorna valor.</td></tr>
+<tr><td><code>public double CalcularMedia()</code></td><td>Calcula e retorna um número decimal.</td></tr>
+<tr><td><code>public bool EstaAprovado()</code></td><td>Retorna verdadeiro ou falso.</td></tr>
+<tr><td><code>public void AtualizarNota(double nota)</code></td><td>Recebe um parâmetro para executar uma ação.</td></tr>
+</tbody></table>
+<pre><code>public class Aluno
+{
+    public string Nome { get; set; }
+    public double Nota1 { get; set; }
+    public double Nota2 { get; set; }
+
+    public double CalcularMedia()
+    {
+        return (Nota1 + Nota2) / 2;
+    }
+
+    public bool EstaAprovado()
+    {
+        return CalcularMedia() >= 7;
+    }
+
+    public void ExibirResultado()
+    {
+        if (EstaAprovado())
+            Console.WriteLine($"{Nome} foi aprovado.");
+        else
+            Console.WriteLine($"{Nome} não foi aprovado.");
+    }
+}</code></pre>
+<div class="call"><strong>Regra prática</strong>Quando outro trecho do programa precisa usar o resultado, retorne o valor. Não limite o método a apenas imprimir na tela.</div>
+</section>
+
+<section id="heranca"><h2>7. Herança</h2><p class="lead">Herança cria uma especialização: a classe filha reutiliza características e comportamentos da classe base.</p>
+<div class="diagram"><span class="node">Pessoa</span><span class="arr">→ classe base de →</span><span class="node">Aluno</span><span class="node">Professor</span></div>
+<pre><code>public class Pessoa
+{
+    public string Nome { get; set; }
+
+    public void Apresentar()
+    {
+        Console.WriteLine($"Meu nome é {Nome}.");
+    }
+}
+
+public class Aluno : Pessoa
+{
+    public string Matricula { get; set; }
+
+    public void Estudar()
+    {
+        Console.WriteLine($"{Nome} está estudando.");
+    }
+}</code></pre>
+<div class="grid2"><article class="card"><span class="tag key">Correto</span><h3>Relação “é um”</h3><p>Aluno <strong>é uma</strong> Pessoa. Cachorro <strong>é um</strong> Animal.</p></article><article class="card"><span class="tag attention">Incorreto</span><h3>Relação “tem um”</h3><p>Aluno <strong>tem um</strong> Endereço; portanto, <code>Aluno : Endereco</code> não faz sentido.</p></article></div>
+</section>
+
+<section id="poli"><h2>8. Polimorfismo</h2><p class="lead">Objetos de classes filhas podem ser tratados como o tipo base e executar comportamentos diferentes.</p>
+<pre><code>public class Animal
+{
+    public string Nome { get; set; }
+
+    public virtual void EmitirSom()
+    {
+        Console.WriteLine("Som do animal");
+    }
+}
+
+public class Cachorro : Animal
+{
+    public override void EmitirSom()
+    {
+        Console.WriteLine($"{Nome}: au au!");
+    }
+}
+
+public class Gato : Animal
+{
+    public override void EmitirSom()
+    {
+        Console.WriteLine($"{Nome}: miau!");
+    }
+}</code></pre>
+<pre><code>List&lt;Animal&gt; animais = new List&lt;Animal&gt;();
+animais.Add(new Cachorro { Nome = "Bolt" });
+animais.Add(new Gato { Nome = "Luna" });
+
+foreach (Animal animal in animais)
+{
+    animal.EmitirSom();
+}</code></pre>
+<div class="call"><strong>Resultado</strong>A lista é de <code>Animal</code>, mas cada instância executa sua própria implementação: cachorro late e gato mia.</div>
+<div class="call warn"><strong>Palavras-chave</strong><code>virtual</code> indica que a base permite sobrescrita opcional; <code>override</code> define a nova implementação na classe filha.</div>
+</section>
+
+<section id="abstratas"><h2>9. Classes e métodos abstratos</h2><p class="lead">Uma classe abstrata representa uma ideia geral incompleta. Ela serve como base, mas não pode ser criada diretamente.</p>
+<pre><code>public abstract class Funcionario
+{
+    public string Nome { get; set; }
+
+    public abstract decimal CalcularSalario();
+
+    public void ExibirNome()
+    {
+        Console.WriteLine($"Funcionário: {Nome}");
+    }
+}
+
+public class Horista : Funcionario
+{
+    public decimal ValorHora { get; set; }
+    public int Horas { get; set; }
+
+    public override decimal CalcularSalario()
+    {
+        return ValorHora * Horas;
+    }
+}</code></pre>
+<div class="grid2"><article class="card"><span class="tag key">Classe abstrata</span><ul><li>Pode ter propriedades.</li><li>Pode ter métodos prontos.</li><li>Pode conter métodos abstratos.</li><li>Não pode ser instanciada.</li></ul></article><article class="card"><span class="tag exam">Método abstrato</span><ul><li>Não possui corpo na classe base.</li><li>Obriga a classe concreta a implementá-lo.</li><li>A implementação utiliza <code>override</code>.</li></ul></article></div>
+<div class="call bad"><strong>Não compila</strong><code>Funcionario f = new Funcionario();</code> é inválido, pois a classe é abstrata.</div>
+</section>
+
+<section id="interfaces"><h2>10. Interfaces</h2><p class="lead">Uma interface define um contrato: classes que a implementam devem fornecer os comportamentos exigidos.</p>
+<pre><code>public interface INotificavel
+{
+    void EnviarMensagem(string mensagem);
+}
+
+public class Email : INotificavel
+{
+    public string Destinatario { get; set; }
+
+    public void EnviarMensagem(string mensagem)
+    {
+        Console.WriteLine($"Email para {Destinatario}: {mensagem}");
+    }
+}
+
+public class Sms : INotificavel
+{
+    public string Telefone { get; set; }
+
+    public void EnviarMensagem(string mensagem)
+    {
+        Console.WriteLine($"SMS para {Telefone}: {mensagem}");
+    }
+}</code></pre>
+<pre><code>List&lt;INotificavel&gt; canais = new List&lt;INotificavel&gt;();
+canais.Add(new Email { Destinatario = "aluno@email.com" });
+canais.Add(new Sms { Telefone = "11999999999" });
+
+foreach (INotificavel canal in canais)
+{
+    canal.EnviarMensagem("Prova disponível.");
+}</code></pre>
+<h3>Classe abstrata x interface</h3>
+<table><thead><tr><th>Classe abstrata</th><th>Interface</th></tr></thead><tbody>
+<tr><td>Compartilha uma base comum, inclusive propriedades e implementação.</td><td>Define comportamentos que diferentes classes devem cumprir.</td></tr>
+<tr><td>Uma classe só pode herdar de uma classe base.</td><td>Uma classe pode implementar várias interfaces.</td></tr>
+<tr><td>Ex.: <code>Funcionario</code> com <code>Nome</code> e salário.</td><td>Ex.: <code>INotificavel</code> para e-mail e SMS.</td></tr>
+</tbody></table>
+</section>
+
+<section id="integrador"><h2>11. Exemplo integrador: pagamentos</h2><p class="lead">Este exemplo reúne interface, classe abstrata, método abstrato, herança, polimorfismo, condição, entrada validada e repetição.</p>
+<pre><code>public interface IExibivel
+{
+    void ExibirResumo();
+}
+
+public abstract class Pagamento : IExibivel
+{
+    public string Descricao { get; set; }
+    public decimal Valor { get; set; }
+
+    public abstract decimal CalcularValorFinal();
+
+    public void ExibirResumo()
+    {
+        Console.WriteLine($"{Descricao}: {CalcularValorFinal():C}");
+    }
+}
+
+public class Pix : Pagamento
+{
+    public override decimal CalcularValorFinal()
+    {
+        return Valor * 0.95m;
+    }
+}
+
+public class Cartao : Pagamento
+{
+    public int Parcelas { get; set; }
+
+    public override decimal CalcularValorFinal()
+    {
+        if (Parcelas > 1)
+            return Valor * 1.05m;
+
+        return Valor;
+    }
+}
+
+// Program.cs
+Console.Write("Digite o valor: ");
+if (!decimal.TryParse(Console.ReadLine(), out decimal valor))
+{
+    Console.WriteLine("Valor inválido.");
+    return;
+}
+
+List&lt;Pagamento&gt; opcoes = new List&lt;Pagamento&gt;();
+opcoes.Add(new Pix { Descricao = "Pix", Valor = valor });
+opcoes.Add(new Cartao { Descricao = "Cartão", Valor = valor, Parcelas = 3 });
+
+foreach (Pagamento pagamento in opcoes)
+{
+    pagamento.ExibirResumo();
+}</code></pre>
+<div class="grid3"><article class="card"><span class="tag exam">Abstração</span><p><code>Pagamento</code> centraliza dados comuns.</p></article><article class="card"><span class="tag exam">Polimorfismo</span><p>Pix e cartão calculam resultados diferentes.</p></article><article class="card"><span class="tag exam">Validação</span><p><code>TryParse</code> protege a entrada.</p></article></div>
+</section>
+
+<section id="alertas"><h2>12. Pontos de atenção e erros comuns</h2><div class="grid2">
+<article class="card"><span class="tag attention">Objeto</span><h3>Declarar sem instanciar</h3><p><code>Produto p;</code> apenas declara. Use <code>new Produto()</code> antes de acessar propriedades.</p></article>
+<article class="card"><span class="tag attention">Conversão</span><h3>Confiar em <code>Parse</code></h3><p>Texto inválido gera erro. Para entrada do usuário, use <code>TryParse</code>.</p></article>
+<article class="card"><span class="tag attention">Método</span><h3>Retorno incoerente</h3><p>Um método que calcula a média deve retornar o valor quando ele será reutilizado.</p></article>
+<article class="card"><span class="tag attention">Herança</span><h3>Usar “tem um” como herança</h3><p>Um carro tem motor, mas não é um motor. Modele corretamente.</p></article>
+<article class="card"><span class="tag attention">Override</span><h3>Esquecer a base</h3><p>Para sobrescrever, o método base precisa ser <code>virtual</code> ou <code>abstract</code>.</p></article>
+<article class="card"><span class="tag attention">Interface</span><h3>Contrato incompleto</h3><p>Uma classe que implementa uma interface precisa fornecer todos os membros exigidos.</p></article>
+</div><div class="call bad"><strong>Regra de ouro</strong>Verifique tipos das propriedades, assinatura dos métodos, palavras-chave de sobrescrita e se a classe realmente representa a relação proposta pelo enunciado.</div></section>
+
+<section id="checklist"><h2>13. Checklist de estudo</h2><p class="lead">Marque apenas quando souber escrever um exemplo sem consultar o material.</p><div class="checks" id="checks">
+<label><input type="checkbox"> Explico classe, objeto e instanciação com <code>new</code>.</label>
+<label><input type="checkbox"> Defino propriedades com tipos adequados.</label>
+<label><input type="checkbox"> Diferencio <code>public</code>, <code>private</code> e <code>protected</code>.</label>
+<label><input type="checkbox"> Escolho entre <code>int</code>, <code>long</code>, <code>double</code>, <code>decimal</code>, <code>bool</code> e <code>string</code>.</label>
+<label><input type="checkbox"> Uso <code>Console.WriteLine</code> e interpolação de strings.</label>
+<label><input type="checkbox"> Diferencio <code>int.Parse</code> de <code>int.TryParse</code>.</label>
+<label><input type="checkbox"> Construo condições usando <code>if</code>/<code>else</code>.</label>
+<label><input type="checkbox"> Percorro uma coleção com <code>foreach</code>.</label>
+<label><input type="checkbox"> Crio métodos <code>void</code> e métodos com retorno.</label>
+<label><input type="checkbox"> Uso herança apenas em relações “é um”.</label>
+<label><input type="checkbox"> Implemento polimorfismo com <code>virtual</code>/<code>override</code>.</label>
+<label><input type="checkbox"> Declaro classe e método abstratos.</label>
+<label><input type="checkbox"> Declaro e implemento uma interface.</label>
+<label><input type="checkbox"> Diferencio classe abstrata de interface.</label>
+</div></section>
+
+<section id="quiz"><h2>14. Questões de revisão rápida</h2><p class="lead">Tente responder antes de revelar.</p>
+<div class="question"><p>1. Qual tipo usar para idade, preço e CPF?</p><button onclick="toggle(this)">Mostrar resposta</button><div class="answer"><code>int</code> para idade, preferencialmente <code>decimal</code> para preço e <code>string</code> para CPF.</div></div>
+<div class="question"><p>2. Qual a diferença entre <code>int.Parse</code> e <code>int.TryParse</code>?</p><button onclick="toggle(this)">Mostrar resposta</button><div class="answer"><code>Parse</code> lança erro com texto inválido; <code>TryParse</code> retorna <code>false</code> e permite tratar a situação.</div></div>
+<div class="question"><p>3. Quando um método deve retornar <code>void</code>?</p><button onclick="toggle(this)">Mostrar resposta</button><div class="answer">Quando apenas executa uma ação e nenhum resultado precisa ser devolvido para uso posterior.</div></div>
+<div class="question"><p>4. Por que <code>Aluno : Pessoa</code> faz sentido, mas <code>Aluno : Endereco</code> não?</p><button onclick="toggle(this)">Mostrar resposta</button><div class="answer">Aluno é uma pessoa, mas apenas possui um endereço. Herança modela a relação “é um”.</div></div>
+<div class="question"><p>5. Para que servem <code>virtual</code> e <code>override</code>?</p><button onclick="toggle(this)">Mostrar resposta</button><div class="answer"><code>virtual</code> permite sobrescrever o comportamento da base; <code>override</code> implementa o comportamento específico na classe filha.</div></div>
+<div class="question"><p>6. É possível fazer <code>new</code> de uma classe abstrata?</p><button onclick="toggle(this)">Mostrar resposta</button><div class="answer">Não. Deve-se instanciar uma classe concreta derivada que implemente os métodos abstratos.</div></div>
+<div class="question"><p>7. Quando uma interface é útil?</p><button onclick="toggle(this)">Mostrar resposta</button><div class="answer">Quando diferentes classes precisam cumprir o mesmo contrato, como <code>Email</code> e <code>Sms</code> implementando <code>INotificavel</code>.</div></div>
+</section>
+</main></div>
+<footer>Material de revisão • Programação Orientada a Objetos com C# • Console Application e fundamentos de modelagem</footer>
+<script>
+const boxes=[...document.querySelectorAll('#checks input')], key='poo-csharp-checks-v1';
+function load(){const s=JSON.parse(localStorage.getItem(key)||'[]');boxes.forEach((b,i)=>b.checked=!!s[i])}
+function save(){localStorage.setItem(key,JSON.stringify(boxes.map(b=>b.checked)))}
+function resetChecks(){boxes.forEach(b=>b.checked=false);save()}
+function toggle(btn){const q=btn.closest('.question');q.classList.toggle('open');btn.textContent=q.classList.contains('open')?'Ocultar resposta':'Mostrar resposta'}
+boxes.forEach(b=>b.addEventListener('change',save));load();
+const links=[...document.querySelectorAll('#nav a')];
+const ob=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.remove('active'));const a=links.find(x=>x.hash==='#'+e.target.id);if(a)a.classList.add('active')}}),{rootMargin:'-20% 0px -65% 0px'});
+links.forEach(a=>ob.observe(document.querySelector(a.hash)));
+</script>
+</body></html>
