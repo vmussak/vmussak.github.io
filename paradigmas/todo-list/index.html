@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Front-end simples para comparar APIs implementadas em diferentes paradigmas."
+    />
+    <title>Paradigm Todo</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./config.js"></script>
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">Paradigmas de Linguagens de Programação</p>
+          <h1>Paradigm Todo</h1>
+          <p class="subtitle">
+            A mesma interface, diferentes formas de construir a API.
+          </p>
+        </div>
+
+        <div class="mode-card" aria-label="Modo de armazenamento atual">
+          <span class="status-dot" aria-hidden="true"></span>
+          <div>
+            <strong id="mode-label">Modo local</strong>
+            <small id="mode-detail">Dados salvos neste navegador</small>
+          </div>
+        </div>
+      </header>
+
+      <section class="todo-card" aria-labelledby="todo-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Lista de tarefas</p>
+            <h2 id="todo-heading">O que precisamos fazer?</h2>
+          </div>
+          <span id="todo-count" class="todo-count">0 tarefas</span>
+        </div>
+
+        <form id="todo-form" class="todo-form" novalidate>
+          <label class="sr-only" for="todo-title">Título da tarefa</label>
+          <input
+            id="todo-title"
+            name="title"
+            type="text"
+            maxlength="120"
+            autocomplete="off"
+            placeholder="Ex.: preparar a apresentação"
+            required
+          />
+          <button id="add-button" type="submit">Adicionar</button>
+        </form>
+
+        <p id="form-error" class="message error-message" role="alert" hidden></p>
+        <p id="loading-message" class="message loading-message" role="status" hidden>
+          Carregando...
+        </p>
+
+        <ul id="todo-list" class="todo-list" aria-live="polite"></ul>
+
+        <div id="empty-state" class="empty-state" hidden>
+          <span aria-hidden="true">✓</span>
+          <p>Nenhuma tarefa por aqui.</p>
+          <small>Adicione a primeira tarefa usando o campo acima.</small>
+        </div>
+      </section>
+
+      <footer>
+        <p>
+          Contrato:
+          <code>GET</code>,
+          <code>POST</code>,
+          <code>PATCH</code> e
+          <code>DELETE /todos</code>
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

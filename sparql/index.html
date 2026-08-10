@@ -169,7 +169,7 @@
 
 
 <script>
-    const env = 'prod'; //dev
+    const env = 'dev'; //dev
 
     const url = {
         dev: 'http://localhost:5242',
@@ -833,7 +833,8 @@
             'variable': '#A9D18E',
             'label-filter': '#7030A0',
             'label': 'pink',
-            'default': '#FDD835'
+            'default': '#FDD835',
+            'tipo': '#B8E0D2'
         };
 
         if(node.data('color')) return '#999999ff';
@@ -931,17 +932,19 @@
             userZoomingEnabled: false,
             maxZoom: 1,
             elements: [
-                // { "data": { "id": "Atleta", "label": "Atleta" } },
-                // { "data": { "id": "Campeonato", "label": "Campeonato" } },
-                // { "data": { "id": "Classificacao", "label": "Classificacao" } },
-                // { "data": { "id": "Equipe", "label": "Equipe" } },
-                // { "data": { "id": "Estadio", "label": "Estadio" } },
+                // { "data": { "id": "Atleta", "label": "Atleta", "type": "tipo" } },
+                // { "data": { "id": "sp", "label": "SPFC" } },
+                // { "data": { "id": "c", "label": "Calleri" } },
+                // { "data": { "id": "Equipe", "label": "Equipe", "type": "tipo" } },
+                // { "data": { "id": "s", "label": "string", "type": "tipo" } },
                 // { "data": { "id": "Gol", "label": "Gol" } },
                 // { "data": { "id": "Partida", "label": "Partida" } },
                 // { "data": { "id": "Rodada", "label": "Rodada" } },
 
-                // { "data": { "id": "competePor", "source": "Atleta", "target": "Equipe", "label": "competePor" } },
-                // { "data": { "id": "formadaPor", "source": "Equipe", "target": "Atleta", "label": "formadaPor" } },
+                // { "data": { "id": "competePor", "source": "c", "target": "sp", "label": "competePor" } },
+                // { "data": { "id": "1", "source": "sp", "target": "Equipe", "label": "rdf:type" } },
+                // { "data": { "id": "2", "source": "c", "target": "Atleta", "label": "rdf:type" } },
+                // { "data": { "id": "3", "source": "possuiNome_val", "target": "s", "label": "rdf:type" } },
                 // { "data": { "id": "marcaGol", "source": "Atleta", "target": "Gol", "label": "marcaGol" } },
                 // { "data": { "id": "marcadoPor", "source": "Gol", "target": "Atleta", "label": "marcadoPor" } },
                 // { "data": { "id": "indicaPosicao", "source": "Classificacao", "target": "Equipe", "label": "indicaPosicao" } },
@@ -949,8 +952,9 @@
                 // { "data": { "id": "refereSeA", "source": "Classificacao", "target": "Campeonato", "label": "refere-se" } },
                 // { "data": { "id": "classifica", "source": "Campeonato", "target": "Classificacao", "label": "classifica" } },
                 // // { "data": { "id": "classificadoLibertadores", "source": "Classificacao", "target": "classificadoLibertadores_val", "label": "classificadoLibertadores" } },
-                // // { "data": { "id": "possuiNome", "source": "Atleta", "target": "possuiNome_val", "label": "possuiNome" } },
-                // // { "data": { "id": "classificadoSulamericana", "source": "Classificacao", "target": "classificadoSulamericana_val", "label": "classificadoSulamericana" } },
+                //  { "data": { "id": "possuiNome_val", "label": "São Paulo F.C", "type": "label" } },
+                // { "data": { "id": "possuiNome", "source": "sp", "target": "possuiNome_val", "label": "possuiNome" } },
+                 // // { "data": { "id": "classificadoSulamericana", "source": "Classificacao", "target": "classificadoSulamericana_val", "label": "classificadoSulamericana" } },
                 // // { "data": { "id": "incluiDerrotas", "source": "Classificacao", "target": "incluiDerrotas_val", "label": "incluiDerrotas" } },
                 // // { "data": { "id": "incluiEmpates", "source": "Classificacao", "target": "incluiEmpates_val", "label": "incluiEmpates" } },
                 // // { "data": { "id": "incluiGolsContra", "source": "Classificacao", "target": "incluiGolsContra_val", "label": "incluiGolsContra" } },
@@ -1004,7 +1008,6 @@
                 // { "data": { "id": "placarVisitante", "source": "Partida", "target": "placarVisitante_val", "label": "placarVisitante" } },
                 // { "data": { "id": "placarVisitante_val", "label": "int", "type": "label" } },
                 // { "data": { "id": "possuiIdentificacao_val", "label": "string", "type": "label" } },
-                //  { "data": { "id": "possuiNome_val", "label": "string", "type": "label" } },
                 // { "data": { "id": "possuiNumero_val", "label": "positiveInteger", "type": "label" } },
                 // { "data": { "id": "possuiPlacar", "source": "Partida", "target": "possuiPlacar_val", "label": "possuiPlacar" } },
                 // { "data": { "id": "possuiPlacar_val", "label": "string", "type": "label" } },
