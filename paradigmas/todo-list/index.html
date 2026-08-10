@@ -23,11 +23,25 @@
           </p>
         </div>
 
-        <div class="mode-card" aria-label="Modo de armazenamento atual">
-          <span class="status-dot" aria-hidden="true"></span>
-          <div>
-            <strong id="mode-label">Modo local</strong>
-            <small id="mode-detail">Dados salvos neste navegador</small>
+        <div class="mode-card" aria-label="Configuração de armazenamento">
+          <div class="mode-card-top">
+            <span class="status-dot" aria-hidden="true"></span>
+            <div>
+              <strong id="mode-label">Modo local</strong>
+              <small id="mode-detail">Dados salvos neste navegador</small>
+            </div>
+            <label class="toggle-switch" title="Alternar para modo API">
+              <input type="checkbox" id="mode-toggle" />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+          <div id="api-url-row" class="api-url-row" hidden>
+            <input
+              id="api-url-input"
+              type="text"
+              aria-label="URL da API"
+              placeholder="http://localhost:5000"
+            />
           </div>
         </div>
       </header>

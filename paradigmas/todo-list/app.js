@@ -18,9 +18,12 @@
     loading: document.querySelector("#loading-message"),
     modeLabel: document.querySelector("#mode-label"),
     modeDetail: document.querySelector("#mode-detail"),
+    modeToggle: document.querySelector("#mode-toggle"),
+    apiUrlRow: document.querySelector("#api-url-row"),
+    apiUrlInput: document.querySelector("#api-url-input"),
   };
 
-  const repository = config.USE_API
+  let repository = config.USE_API
     ? createApiRepository(config.API_URL)
     : createLocalRepository(config.LOCAL_STORAGE_KEY);
 
@@ -34,17 +37,49 @@
   function bindEvents() {
     elements.form.addEventListener("submit", handleCreate);
     elements.list.addEventListener("click", handleListClick);
+    elements.modeToggle.addEventListener("change", handleModeToggle);
+    elements.apiUrlInput.addEventListener("change", handleApiUrlChange);
+    elements.apiUrlInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") elements.apiUrlInput.blur();
+    });
+  }
+
+  function handleModeToggle() {
+    config.USE_API = elements.modeToggle.checked;
+    reinitRepository();
+    configureModeLabel();
+    refreshTodos();
+  }
+
+  function handleApiUrlChange() {
+    const url = elements.apiUrlInput.value.trim();
+    if (url) {
+      config.API_URL = url;
+      reinitRepository();
+      refreshTodos();
+    }
+  }
+
+  function reinitRepository() {
+    repository = config.USE_API
+      ? createApiRepository(config.API_URL)
+      : createLocalRepository(config.LOCAL_STORAGE_KEY);
   }
 
   function configureModeLabel() {
     if (config.USE_API) {
       elements.modeLabel.textContent = "Modo API";
       elements.modeDetail.textContent = config.API_URL;
+      elements.modeToggle.checked = true;
+      elements.apiUrlInput.value = config.API_URL;
+      elements.apiUrlRow.hidden = false;
       return;
     }
 
     elements.modeLabel.textContent = "Modo local";
     elements.modeDetail.textContent = "Dados salvos neste navegador";
+    elements.modeToggle.checked = false;
+    elements.apiUrlRow.hidden = true;
   }
 
   async function handleCreate(event) {
