@@ -70,8 +70,11 @@ console.log(`${tests} engine checks passed.`);
 
 // Keep the published course examples compatible with the interpreter.
 const lessonsSource = await readFile(new URL('./lessons.js', import.meta.url), 'utf8');
-const { lessons } = await import(`data:text/javascript;base64,${Buffer.from(lessonsSource).toString('base64')}`);
-let courseChecks = 0;
+const { lessons, fruitPuzzle } = await import(`data:text/javascript;base64,${Buffer.from(lessonsSource).toString('base64')}`);
+const fruitAnswer = runProlog(fruitPuzzle.program, fruitPuzzle.query);
+assert.equal(fruitAnswer.error, undefined);
+assert.deepEqual(fruitAnswer.solutions.map(solution => solution.bindings), [{ Fruta: 'morango' }]);
+let courseChecks = 1;
 for (const lesson of lessons) {
   const main = runProlog(lesson.program, lesson.query);
   assert.equal(main.error, undefined, `${lesson.id}: ${main.error}`);

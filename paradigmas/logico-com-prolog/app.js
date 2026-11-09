@@ -1,6 +1,7 @@
 import { lessons } from './lessons.js';
 import { runProlog, PROLOG_SUPPORT } from './engine.js';
 import { renderKnowledgeGraph, renderSearchTree, renderTermStructure } from './visuals.js';
+import { firstChapterIntro, bindFirstChapterIntro } from './intro.js';
 
 const $ = (selector, scope = document) => scope.querySelector(selector);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
@@ -82,6 +83,7 @@ function lessonPage(lesson) {
   document.title = `${lesson.shortTitle} · Lógica viva`;
   $('#main').innerHTML = `<article class="page-enter">
     <header class="lesson-header"><div><div class="eyebrow">CAPÍTULO ${escape(lesson.number)} · ${escape(lesson.kicker)}</div><h1>${escape(lesson.title)}</h1><p class="lesson-description">${escape(lesson.description)}</p></div><div class="chapter-badge" aria-hidden="true"><span>CAPÍTULO</span><strong>${escape(lesson.number)}</strong></div></header>
+    ${index === 0 ? firstChapterIntro() : ''}
     <nav class="page-tabs" aria-label="Seções do capítulo"><a href="#conceitos" data-scroll="conceitos">01 · Entenda</a><a href="#laboratorio" data-scroll="laboratorio">02 · Experimente</a><a href="#desafio" data-scroll="desafio">03 · Pratique</a></nav>
     <section id="conceitos" class="concept-grid" aria-label="Conceitos">${lesson.concepts.map((concept, i) => `<div class="concept"><span class="concept-index">IDEIA ${String(i + 1).padStart(2, '0')}</span><h3>${escape(concept.title)}</h3><p>${rich(concept.text)}</p>${concept.code ? `<pre><code>${escape(concept.code)}</code></pre>` : ''}</div>`).join('')}</section>
     <section id="laboratorio" aria-labelledby="lab-title"><div class="lab-heading"><div><h2 id="lab-title">Agora, faça a lógica acontecer.</h2><p>Edite o programa, escolha uma pergunta e investigue o resultado.</p></div><span class="lab-label">EXECUÇÃO LOCAL</span></div>
@@ -108,6 +110,7 @@ function lessonPage(lesson) {
     <nav class="lesson-pagination" aria-label="Navegar entre capítulos"><a class="pagination-link" href="#${index > 0 ? lessons[index - 1].id : 'inicio'}"><small>← ${index > 0 ? 'CAPÍTULO ANTERIOR' : 'VISÃO GERAL'}</small>${index > 0 ? escape(lessons[index - 1].shortTitle) : 'Voltar para a trilha'}</a><a class="pagination-link" href="#${index < lessons.length - 1 ? lessons[index + 1].id : 'referencias'}"><small>${index < lessons.length - 1 ? 'PRÓXIMA DESCOBERTA' : 'CONTINUE ESTUDANDO'} →</small>${index < lessons.length - 1 ? escape(lessons[index + 1].shortTitle) : 'Biblioteca de apoio'}</a></nav>
   </article>`;
   bindLab(lesson);
+  if (index === 0) bindFirstChapterIntro();
 }
 
 function updateLines() {

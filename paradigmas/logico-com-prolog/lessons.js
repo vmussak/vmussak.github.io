@@ -1,10 +1,15 @@
 // As referências usam a página física do arquivo PDF (incluindo capa e sumário).
 // Exemplos adaptados para a execução didática local; os PDFs permanecem como leitura integral.
+export const fruitPuzzle = {
+  program: `% Neste enigma, Joao gosta exatamente destas duas frutas.\ngosta(joao, morango).\ngosta(joao, uva).\n\n% Maria gosta de uma dessas frutas, mas nao de uva.\ngosta(maria, Fruta) :-\n    gosta(joao, Fruta),\n    Fruta \\= uva.`,
+  query: 'gosta(maria, Fruta).'
+};
+
 export const lessons = [
   {
     id: 'primeiros-fatos', number: '01', title: 'Um mundo feito de fatos', shortTitle: 'Fatos e consultas',
     kicker: 'COMECE PEQUENO',
-    description: 'Três fatos, uma pergunta. Descubra como descrever o que sabemos e pedir ao Prolog que encontre uma resposta.',
+    description: 'Comece com um desafio de lógica do dia a dia. Depois, descubra como fatos e perguntas se transformam em um programa Prolog.',
     concepts: [
       { title: 'Descreva o problema', text: 'No paradigma lógico, você declara relações e condições. Uma consulta pergunta se algo pode ser provado a partir dessas declarações. Prolog organiza a busca por uma prova; a ordem das cláusulas também influencia essa busca.' },
       { title: 'Leia um fato', text: 'gosta(ana, musica). significa “Ana gosta de música”. gosta é o nome do predicado, ana e musica são argumentos. gosta/2 indica aridade 2: dois argumentos. A ordem importa: gostar não é necessariamente uma relação simétrica.', code: 'gosta(ana, musica).' },
