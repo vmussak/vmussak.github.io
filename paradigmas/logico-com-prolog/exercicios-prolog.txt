@@ -1,0 +1,312 @@
+LÓGICA VIVA — 15 EXERCÍCIOS DE PROLOG
+Professor Vinicius Mussak · Paradigmas de Programação
+
+Ambiente: https://swish.swi-prolog.org/
+Abra um programa novo para cada exercício. Cole fatos e regras no editor;
+escreva consultas no campo próprio, sem o prompt ?-. Use Run! e peça todas
+as soluções. Antes de executar, faça uma previsão. Depois explique o resultado.
+
+EXERCÍCIO 01 — Uma pequena frutaria
+Fácil · Fatos e predicados
+
+Comece do zero. A frutaria vende banana, limao e uva. A banana é amarela, o limao é verde e a uva é roxa. Use esses nomes sem acentos no código.
+
+SUA MISSÃO
+1. Declare as três frutas com fruta/1. O único argumento é o nome da fruta.
+2. Declare as três cores com cor/2, na ordem cor(Fruta, Cor). Use os átomos amarela, verde e roxa.
+3. Confira se cada cláusula termina com ponto e explique por que fruta e cor têm aridades diferentes.
+
+PONTO DE PARTIDA
+% TODO: declare fruta/1 e cor/2 conforme o enunciado.
+% cor/2 usa primeiro a fruta e depois a cor.
+% Escreva um fato por linha; termine cada fato com ponto.
+
+—————————————————————————————————————————————————————————————————
+
+EXERCÍCIO 02 — Quem cuida de quem?
+Fácil · Consultas e ordem dos argumentos
+
+Na relação tutor(Pessoa, Animal), o primeiro argumento é a pessoa e o segundo é o animal. A base já está pronta; seu trabalho é fazer perguntas, sem acrescentar regras.
+
+SUA MISSÃO
+1. Escreva uma consulta para confirmar se Ana é tutora de Luna.
+2. Escreva outra para perguntar se Luna é tutora de Ana. Compare o significado das duas perguntas.
+3. Pergunte se Clara é tutora de Bidu. Explique por que uma falha descreve o conhecimento desta base, sem afirmar o que acontece fora dela.
+
+PONTO DE PARTIDA
+tutor(ana, luna).
+tutor(bruno, bidu).
+tutor(clara, nino).
+
+% TODO: escreva suas consultas no campo de consultas do SWISH.
+% Não coloque as consultas no lugar destes fatos.
+
+—————————————————————————————————————————————————————————————————
+
+EXERCÍCIO 03 — A turma e suas oficinas
+Fácil · Variáveis e enumeração de respostas
+
+inscricao(Aluno, Oficina) registra uma inscrição. Um aluno pode participar de mais de uma oficina. Explore a base usando variáveis e peça todas as respostas no SWISH.
+
+SUA MISSÃO
+1. Formule uma consulta para descobrir todas as oficinas de Ana.
+2. Formule outra para descobrir todos os alunos inscritos em robotica.
+3. Formule uma consulta que mostre todos os pares aluno–oficina. Depois consulte se Ana está inscrita em alguma oficina usando _ na posição que você não deseja nomear.
+
+PONTO DE PARTIDA
+inscricao(ana, robotica).
+inscricao(ana, fotografia).
+inscricao(bruno, robotica).
+inscricao(clara, teatro).
+inscricao(davi, fotografia).
+
+% TODO: formule as consultas no campo de consultas do SWISH.
+% Para ver a resposta completa, solicite todas as soluções.
+
+—————————————————————————————————————————————————————————————————
+
+EXERCÍCIO 04 — As duas peças precisam combinar
+Fácil · Unificação e variáveis repetidas
+
+par(PrimeiraCor, SegundaCor) descreve um par de peças. Você vai investigar a diferença entre pedir duas posições quaisquer e exigir que elas tenham o mesmo valor.
+
+SUA MISSÃO
+1. Escreva uma consulta que use a mesma variável nas duas posições de par/2 e obtenha apenas os pares de cores iguais.
+2. Escreva outra que use duas variáveis diferentes e enumere todos os pares da base.
+3. Sem acrescentar fatos, teste uma unificação entre caixa(X, azul) e caixa(vermelho, Y). Anote quais ligações tornam os termos compatíveis. Depois teste caixa(X, X) com caixa(vermelho, azul).
+
+PONTO DE PARTIDA
+par(azul, azul).
+par(azul, verde).
+par(verde, verde).
+
+% TODO: faça as consultas e os testes com = no campo de consultas.
+% Não acrescente regras: observe como as variáveis são unificadas.
+
+—————————————————————————————————————————————————————————————————
+
+EXERCÍCIO 05 — Um mapa dentro de um termo
+Fácil · Termos compostos e padrões
+
+local(Pessoa, ponto(Coluna, Linha)) guarda uma estrutura dentro da relação. Coluna e Linha são números; ponto/2 reúne as duas coordenadas.
+
+SUA MISSÃO
+1. Escreva uma consulta que descubra quem está na linha 3, deixando a coluna livre.
+2. Escreva outra que descubra a coluna e a linha de Clara.
+3. Pergunte quem ocupa uma posição em que coluna e linha têm o mesmo valor. Use uma variável repetida dentro de ponto/2.
+
+PONTO DE PARTIDA
+local(ana, ponto(2, 3)).
+local(bruno, ponto(4, 3)).
+local(clara, ponto(2, 5)).
+local(davi, ponto(4, 4)).
+
+% TODO: consulte usando o padrão ponto(Coluna, Linha).
+% local/2 tem dois argumentos; seu segundo argumento é um termo composto.
+
+—————————————————————————————————————————————————————————————————
+
+EXERCÍCIO 06 — A mesma família, outra pergunta
+Em transição · Regras e relação inversa
+
+progenitor(Pessoa, Filho) está definido nos fatos. Queremos consultar a relação pelo outro sentido usando filho_de(Filho, Progenitor). O nome filho_de vale para filhos e filhas.
+
+SUA MISSÃO
+1. Defina filho_de/2 por uma regra baseada em progenitor/2, respeitando a ordem dos argumentos pedida.
+2. Não copie as relações como novos fatos. A regra deve continuar funcionando se uma nova relação de progenitor for acrescentada.
+3. Execute os testes e explique quais posições da regra correspondem às posições do fato utilizado.
+
+PONTO DE PARTIDA
+progenitor(rita, leo).
+progenitor(caio, leo).
+progenitor(leo, bia).
+
+% TODO: defina filho_de(Filho, Progenitor) por uma regra.
+
+—————————————————————————————————————————————————————————————————
+
+EXERCÍCIO 07 — Uma inscrição ainda não basta
+Em transição · Conjunção de condições
+
+Uma pessoa pode participar de uma oficina quando está inscrita nela e seu pagamento está registrado. pagamento/1 é válido para todas as oficinas da pessoa neste pequeno modelo.
+
+SUA MISSÃO
+1. Defina pode_participar(Pessoa, Oficina) com as duas condições exigidas: inscrição e pagamento.
+2. Use a mesma variável para representar a pessoa em todas as condições. Não declare manualmente quem pode participar.
+3. Depois de conferir o resultado original, acrescente um fato de pagamento para Clara e execute os testes novamente. Explique qual nova participação passa a ser provada.
+
+PONTO DE PARTIDA
+inscricao(ana, robotica).
+inscricao(ana, fotografia).
+inscricao(bruno, robotica).
+inscricao(clara, teatro).
+pagamento(ana).
+pagamento(bruno).
+
+% TODO: defina pode_participar(Pessoa, Oficina).
+% Primeiro confira a base original; só depois faça a alteração pedida.
+
+—————————————————————————————————————————————————————————————————
+
+EXERCÍCIO 08 — Duas maneiras de chegar
+Em transição · Disjunção e alternativas
+
+Uma pessoa usa transporte ativo se vai a pé ou de bicicleta. Basta satisfazer uma dessas alternativas. Os fatos descrevem apenas esta atividade de sala.
+
+SUA MISSÃO
+1. Defina transporte_ativo(Pessoa), usando duas cláusulas alternativas ou uma disjunção com ;.
+2. Confira a base original. Depois acrescente que Ana também vai de bicicleta e observe quantas provas a consulta pode produzir para ela.
+3. Explique a diferença entre o número de provas encontradas e o número de pessoas distintas.
+
+PONTO DE PARTIDA
+a_pe(ana).
+a_pe(clara).
+bicicleta(bruno).
+onibus(davi).
+
+% TODO: defina transporte_ativo(Pessoa).
+% A pé OU de bicicleta: não exija as duas condições ao mesmo tempo.
+
+—————————————————————————————————————————————————————————————————
+
+EXERCÍCIO 09 — Descubra uma geração intermediária
+Em transição · Composição de relações
+
+Cada fato progenitor(A, B) liga A ao seu filho ou filha B. Defina avos(Ancestral, Descendente) para pessoas separadas por exatamente duas dessas relações, sem distinguir avó e avô.
+
+SUA MISSÃO
+1. Defina avos/2 usando duas consultas a progenitor/2 e uma variável para a pessoa intermediária.
+2. Garanta que o filho da primeira relação seja a mesma pessoa que aparece como progenitor na segunda.
+3. Desenhe à mão os dois arcos que justificam cada resposta para os avós de Bia. Não use recursão neste exercício.
+
+PONTO DE PARTIDA
+progenitor(rita, leo).
+progenitor(caio, leo).
+progenitor(leo, bia).
+progenitor(leo, teo).
+progenitor(bia, nina).
+
+% TODO: defina avos(Ancestral, Descendente) para exatamente duas gerações.
+
+—————————————————————————————————————————————————————————————————
+
+EXERCÍCIO 10 — O total de uma compra
+Em transição · Aritmética com is
+
+preco(Produto, ValorUnitario) informa valores inteiros em reais. total(Produto, Quantidade, ValorTotal) deve calcular uma compra de um único produto. Neste exercício, Produto e Quantidade são fornecidos na consulta; a quantidade é um inteiro não negativo.
+
+SUA MISSÃO
+1. Defina total/3 consultando o preço do produto e calculando o preço multiplicado pela quantidade.
+2. Use is para obter o resultado numérico. Compare conceitualmente esse uso com apenas unificar ValorTotal a uma expressão com =.
+3. Confira a quantidade zero. Não tente descobrir a quantidade a partir de um total: esse uso inverso não faz parte do modo de chamada pedido.
+
+PONTO DE PARTIDA
+preco(caderno, 12).
+preco(caneta, 3).
+preco(livro, 25).
+
+% TODO: defina total(Produto, Quantidade, ValorTotal).
+% Produto e Quantidade chegam conhecidos; ValorTotal é o resultado.
+
+—————————————————————————————————————————————————————————————————
+
+EXERCÍCIO 11 — A lista de entrada
+Médio · Negação por falha com variável instanciada
+
+Neste modelo de exercício, pode entrar quem está inscrito e não tem um bloqueio registrado. A ausência de registro será tratada como ausência de bloqueio apenas dentro desta base fechada.
+
+SUA MISSÃO
+1. Defina pode_entrar(Pessoa). Primeiro gere uma pessoa inscrita; depois use \+ para testar se existe bloqueio para essa pessoa já conhecida.
+2. Não use a negação para tentar enumerar nomes. Explique o problema de testar a ausência de bloqueio antes de escolher a pessoa.
+3. Depois da conferência original, acrescente um bloqueio para Ana e observe quais respostas deixam de ser provadas.
+
+PONTO DE PARTIDA
+inscrito(ana).
+inscrito(bruno).
+inscrito(clara).
+bloqueado(bruno).
+bloqueado(davi).
+
+% TODO: defina pode_entrar(Pessoa).
+% Gere um inscrito antes de testar a negação com \+.
+
+—————————————————————————————————————————————————————————————————
+
+EXERCÍCIO 12 — Um destino pode estar mais adiante
+Médio · Recursão em um grafo acíclico
+
+ligacao(Origem, Destino) representa uma passagem de mão única entre pontos de um mapa. O grafo fornecido não tem ciclos. alcanca/2 deve considerar caminhos com uma ou mais ligações, respeitando as setas.
+
+SUA MISSÃO
+1. Desenhe o grafo e defina alcanca(Origem, Destino) com um caso base para a ligação direta.
+2. Acrescente um caso recursivo que percorra uma ligação e procure o restante do caminho a partir do novo ponto.
+3. Não considere um caminho de comprimento zero. Na base fornecida, um ponto não deve alcançar a si mesmo. Não acrescente ligações que criem ciclos.
+
+PONTO DE PARTIDA
+ligacao(a, b).
+ligacao(b, c).
+ligacao(c, d).
+ligacao(b, e).
+
+% TODO: defina alcanca(Origem, Destino).
+% Considere somente caminhos com pelo menos uma ligação.
+% O grafo desta atividade é finito e acíclico.
+
+—————————————————————————————————————————————————————————————————
+
+EXERCÍCIO 13 — Procure uma cor na lista
+Médio · Cabeça, cauda e pertinência em listas
+
+Implemente pertence(Elemento, Lista) para dizer se um termo é um elemento do nível externo de uma lista finita, completamente fornecida na consulta e terminada em []. O elemento pode estar conhecido ou ser uma variável.
+
+SUA MISSÃO
+1. Defina um caso em que o elemento procurado é a cabeça da lista.
+2. Defina um caso recursivo que procure o elemento na cauda. Não use member/2 ou outro predicado pronto de pertinência.
+3. Teste uma lista vazia, uma lista com cores e uma lista cujo primeiro elemento é outra lista. A busca não deve entrar automaticamente em listas internas.
+
+PONTO DE PARTIDA
+% TODO: defina pertence(Elemento, Lista).
+% Os dados das listas serão fornecidos nas consultas.
+% Use a decomposição em cabeça e cauda; não use member/2.
+
+—————————————————————————————————————————————————————————————————
+
+EXERCÍCIO 14 — Conte sem usar length
+Médio · Recursão estrutural e aritmética
+
+Defina tamanho(Lista, Quantidade) para contar os elementos do nível externo de uma lista finita e conhecida. Uma sublista conta como um único elemento. A quantidade será calculada, sem uso inverso para gerar listas.
+
+SUA MISSÃO
+1. Defina o tamanho da lista vazia como caso base.
+2. No caso recursivo, obtenha o tamanho da cauda e só então calcule o tamanho da lista inteira.
+3. Não use length/2, agregação ou um predicado pronto de contagem. Teste também uma lista contendo outra lista.
+
+PONTO DE PARTIDA
+% TODO: defina tamanho(Lista, Quantidade).
+% A lista chega conhecida e é finita; calcule sua quantidade de elementos.
+% Use recursão e is, sem length/2.
+
+—————————————————————————————————————————————————————————————————
+
+EXERCÍCIO 15 — Mostre por onde o caminho passou
+Médio · Grafos, recursão e construção de listas
+
+Reúna as ideias anteriores. caminho(Origem, Destino, Nos) deve produzir uma lista com todos os pontos de uma rota orientada, incluindo as duas extremidades. Origem e Destino chegam conhecidos. O grafo é acíclico e cada caminho precisa percorrer ao menos uma ligação.
+
+SUA MISSÃO
+1. Desenhe o grafo e preveja quantas rotas diferentes ligam o ponto a ao ponto e.
+2. Defina um caso base para uma ligação direta, produzindo uma lista com origem e destino.
+3. Defina um caso recursivo que avance para um ponto intermediário e acrescente a origem à frente da rota restante. Não escreva rotas prontas como fatos, não use bibliotecas e não acrescente ciclos ao grafo.
+
+PONTO DE PARTIDA
+ligacao(a, b).
+ligacao(a, c).
+ligacao(b, d).
+ligacao(c, d).
+ligacao(d, e).
+
+% TODO: defina caminho(Origem, Destino, Nos).
+% Origem e Destino são conhecidos; Nos deve ser a lista dos pontos percorridos.
+% Não inclua caminho de comprimento zero. O grafo não tem ciclos.
+
+—————————————————————————————————————————————————————————————————

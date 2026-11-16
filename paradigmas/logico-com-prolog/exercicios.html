@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="15 exercícios de Prolog para resolver em sala no SWISH. Pratique fatos, consultas, regras, relações, aritmética, recursão e listas, do fácil ao médio.">
+  <meta name="theme-color" content="#7054c8">
+  <title>15 exercícios de Prolog · Lógica viva</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%237254c9'/%3E%3Ctext x='15' y='46' fill='white' font-size='44' font-family='Georgia'%3Eλ%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./exercises.css">
+  <script type="module" src="./exercises.js"></script>
+</head>
+<body class="practice-page">
+  <a class="skip-link" href="#main">Pular para o conteúdo</a>
+  <button class="mobile-menu" id="menu-button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir lista de exercícios">☰</button>
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="./"><span class="brand-icon" aria-hidden="true">λ</span><span>lógica viva<span class="brand-sub">UM LABORATÓRIO DE IDEIAS</span></span></a>
+    <div class="course-label">PARADIGMAS DE PROGRAMAÇÃO</div>
+    <a class="overview-link" href="./"><span aria-hidden="true">←</span> Voltar à trilha de Prolog</a>
+    <div class="nav-heading">SEU ROTEIRO DE PRÁTICA</div>
+    <nav id="exercise-nav" aria-label="Exercícios por etapa"></nav>
+    <div class="sidebar-bottom"><div class="progress-heading"><span>Exercícios resolvidos</span><strong id="progress-label">0 / 15</strong></div><div class="progress-track"><span id="progress-fill"></span></div><p id="progress-description">Marque seu avanço neste navegador.</p><a class="reference-link" href="https://swish.swi-prolog.org/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⌘</span> Abrir o SWISH <span aria-hidden="true">↗</span><span class="sr-only"> em nova aba</span></a><a class="back-link" href="../../">← Todos os materiais</a></div>
+  </aside>
+  <div class="page-shell">
+    <header class="topbar"><div><a href="./">Lógico com Prolog</a><span class="breadcrumb-slash">/</span><strong>Exercícios em sala</strong></div><a href="./#referencias" class="top-reference">Biblioteca de apoio ↗</a></header>
+    <main id="main" tabindex="-1">
+      <header class="practice-hero"><div><div class="eyebrow">PROLOG · PRÁTICA EM SALA</div><h1>15 exercícios.<br> <em>Uma ideia de cada vez.</em></h1><p>Transforme pistas em fatos, conecte relações e avance até listas e recursão. Um roteiro do fácil ao médio para construir e testar suas próprias soluções.</p><div class="practice-actions"><a class="button" href="https://swish.swi-prolog.org/" target="_blank" rel="noopener noreferrer">Resolver no SWISH <span aria-hidden="true">↗</span><span class="sr-only"> em nova aba</span></a><button class="button secondary" id="print-exercises" hidden>Imprimir roteiro <span aria-hidden="true">↧</span></button></div></div><div class="practice-art" aria-hidden="true"><div class="practice-art-label">O CAMINHO DE UMA DESCOBERTA</div><div class="practice-art-step"><span>01</span><strong>Observe as pistas.</strong><code>fatos</code></div><div class="practice-art-connector">↓</div><div class="practice-art-step"><span>02</span><strong>Conecte as ideias.</strong><code>regras</code></div><div class="practice-art-connector">↓</div><div class="practice-art-step"><span>03</span><strong>Faça uma pergunta.</strong><code>?-</code></div><div class="practice-art-footer">Escreva. Teste. Explique.</div></div></header>
+      <section class="practice-guide" aria-labelledby="guide-title"><div><span class="practice-guide-icon" aria-hidden="true">?-</span><h2 id="guide-title">Prepare seu espaço de trabalho.</h2></div><ol><li><strong>Um programa por exercício.</strong> Abra um programa novo no SWISH para não misturar bases de conhecimento.</li><li><strong>Separe programa e consulta.</strong> Fatos e regras ficam no editor à esquerda; a pergunta vai no campo de consultas, sem o prompt <code>?-</code>.</li><li><strong>Preveja, execute e explique.</strong> Escreva sua hipótese, use <code>Run!</code> e procure todas as soluções. Teste também um caso que deve falhar.</li></ol><p>As bases trazem dados e comentários de orientação. Escreva os fatos, consultas ou regras pedidos e use as dicas quando precisar de uma direção.</p></section>
+      <div class="practice-toolbar" id="practice-toolbar" hidden><div class="practice-filters" role="group" aria-label="Filtrar por etapa"><button class="practice-filter" data-block="0" aria-pressed="true">Todos os 15</button><button class="practice-filter" data-block="1" aria-pressed="false">01–05 · Comece pequeno</button><button class="practice-filter" data-block="2" aria-pressed="false">06–10 · Conecte ideias</button><button class="practice-filter" data-block="3" aria-pressed="false">11–15 · Vá um pouco além</button></div><span id="exercise-count" role="status">15 exercícios no roteiro</span></div>
+      <div id="exercise-list"><p class="loading-message" role="status">Preparando os exercícios…</p></div>
+      <noscript><p>Ative o JavaScript para ver o roteiro interativo ou <a href="./exercicios-prolog.txt">leia os 15 enunciados em texto</a>.</p></noscript>
+      <aside class="practice-closing"><span aria-hidden="true">✧</span><div><h2>A resposta importa. O raciocínio também.</h2><p>Ao concluir um exercício, explique por que sua solução funciona e o que acontece quando a consulta não encontra uma prova.</p></div><a class="text-link" href="./">Revisar a teoria →</a></aside>
+      <p class="practice-download"><a href="./exercicios-prolog.txt" download>Baixar os 15 enunciados em texto ↓</a><span>As marcações de progresso são pessoais e ficam salvas neste navegador.</span></p>
+    </main>
+    <footer class="footer"><span><span class="footer-mark" aria-hidden="true">λ</span> Aprender também é tentar outra hipótese.</span><span>Professor Vinicius Mussak · Paradigmas de programação</span></footer>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+</body>
+</html>
