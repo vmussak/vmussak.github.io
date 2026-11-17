@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Uma aula visual e interativa de índices no SQL Server: B+ tree, clustered, nonclustered, INCLUDE, key lookup, planos de execução e laboratório SQL.">
+  <meta name="theme-color" content="#235c86">
+  <title>Índices por dentro — SQL Server</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23235c86'/%3E%3Cpath d='M17 18h30v8H17zm0 13h20v7H17zm0 12h30v7H17z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./labs.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main" data-scroll="main">Pular para o conteúdo</a>
+  <aside id="sidebar" class="sidebar">
+    <a class="brand" href="#inicio"><span class="brand-mark" aria-hidden="true">i.</span><span>índices por dentro<small>UM LABORATÓRIO DE DADOS</small></span></a>
+    <div class="sidebar-course">BANCO DE DADOS · SQL SERVER</div>
+    <nav class="overview-nav" aria-label="Materiais da aula"><a href="#inicio">Visão geral <span>↗</span></a><a href="#revisao">Revisão e desafios <span>20</span></a><a href="#referencias">Laboratório e fontes <span>↗</span></a></nav>
+    <div class="nav-label">A TRILHA, UM PASSO DE CADA VEZ</div>
+    <nav id="lesson-nav" aria-label="Capítulos da aula"></nav>
+    <div class="sidebar-bottom"><div class="progress-label"><span>Seu progresso</span><strong id="progress-label">0 / 20</strong></div><div class="progress-track"><span id="progress-fill"></span></div><a href="../../index.html">← Todos os materiais</a></div>
+  </aside>
+  <div class="page-shell">
+    <header class="topbar"><button id="menu-button" class="icon-button menu-button" aria-label="Abrir capítulos" aria-controls="sidebar" aria-expanded="false">☰</button><div class="breadcrumb">Banco de dados <span>/</span> <strong id="breadcrumb">Índices no SQL Server</strong></div><div class="top-actions"><a href="./laboratorio.sql" download class="download-link">↓ Roteiro SQL</a><button id="presentation-button" class="quiet-button" aria-pressed="false">Modo aula</button></div></header>
+    <main id="main" tabindex="-1"></main>
+    <footer class="footer"><span>Professor Vinicius Mussak</span><span>Aprender. Visualizar. Investigar.</span><a href="#referencias">Microsoft Learn ↗</a></footer>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+  <noscript><p>Ative JavaScript para explorar as simulações. O <a href="./laboratorio.sql">laboratório SQL</a> e o <a href="./guia-professor.md">guia da aula</a> também estão disponíveis para download.</p></noscript>
+</body>
+</html>

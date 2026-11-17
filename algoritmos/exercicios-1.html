@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exercícios Algoritmos</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+
+<body class="bg-light">
+
+    <div class="container py-5">
+        <h2 class="mb-4">Exercícios simples de lógica (Python)</h2>
+        <h3 class="mt-4">1) Variáveis e Tipos</h3>
+        <ol>
+            <li>Crie três variáveis: uma do tipo inteiro, uma do tipo float e uma do tipo string. Em seguida, imprima o
+                tipo
+                de cada uma usando <code>type()</code>.</li>
+            <li>Crie a variável <code>x = 0</code> e imprima o resultado de <code>bool(x)</code>.</li>
+            <li>Crie a variável <code>x = -10</code> e imprima o resultado de <code>bool(x)</code>.</li>
+        </ol>
+        <h3 class="mt-4">2) Operações Numéricas</h3>
+        <ol start="4">
+            <li>Crie duas variáveis inteiras <code>a</code> e <code>b</code>. Mostre: soma (<code>a+b</code>), subtração
+                (<code>a-b</code>), multiplicação (<code>a*b</code>) e divisão (<code>a/b</code>).</li>
+            <li>Crie uma variável float com 2 casas decimais e multiplique por 3. Mostre o resultado.</li>
+            <li>Crie um número complexo e imprima o valor e o tipo usando <code>type()</code>.</li>
+        </ol>
+        <h3 class="mt-4">3) Booleanos e Operadores Lógicos</h3>
+        <ol start="7">
+            <li>Crie as variáveis <code>idade = 18</code> e <code>tem_carteira = True</code>. Verifique se a pessoa pode
+                dirigir usando <code>idade &gt;= 18</code> AND <code>tem_carteira</code>.</li>
+            <li>Crie variáveis para idade e se está acompanhada. Verifique se pode entrar usando OR: pode entrar se for
+                maior de idade OU estiver acompanhada.</li>
+            <li>Dado <code>x = 5</code>, verifique se <code>x &gt; 2</code> AND <code>x &lt; 10</code>. Imprima o
+                resultado.
+            </li>
+            <li>Crie uma variável booleana (por exemplo, <code>ativo = True</code>) e imprima o valor invertido usando
+                NOT.
+            </li>
+        </ol>
+        <h3 class="mt-4">4) Strings</h3>
+        <ol start="11">
+            <li>Crie duas strings e concatene usando o operador <code>+</code>. Imprima o resultado.</li>
+            <li>Crie uma string e use o operador <code>*</code> para repetí-la 5 vezes. Imprima o resultado.</li>
+            <li>Verifique se a palavra <code>"python"</code> está contida na string
+                <code>"estou aprendendo python"</code>
+                usando <code>in</code>. Imprima o resultado.
+            </li>
+        </ol>
+        <h3 class="mt-4">5) Range</h3>
+        <ol start="14">
+            <li>Crie um <code>range</code> que vá de 0 até 10 (sem incluir o 10). Converta para lista e imprima.</li>
+            <li>Crie um <code>range</code> que vá de 1 até 20, pulando de 2 em 2. Converta para lista e imprima.</li>
+            <li>Use um laço <code>for</code> com <code>range(5)</code> para imprimir os números de 0 a 4.</li>
+        </ol>
+        <h3 class="mt-4">6) Listas</h3>
+        <ol start="17">
+            <li>Crie uma lista contendo: um número, uma string e um booleano. Imprima a lista.</li>
+            <li>Crie uma lista com 5 números. Depois: adicione um novo número e remova um número existente. Imprima a
+                lista
+                final.</li>
+            <li>Verifique se o número 10 está dentro de uma lista usando o operador <code>in</code>. Imprima o
+                resultado.
+            </li>
+            <li>Dada a lista <code>[1, 2, 3]</code>, altere o valor 2 para 20 e imprima a lista resultante.</li>
+        </ol>
+        <h3 class="mt-4">Extra</h3>
+        <ol start="21">
+            <li>Crie um algoritmo que leia um número e imprima <code>"Positivo"</code> se ele for maior que zero, senão
+                imprima <code>"Não positivo"</code>.</li>
+        </ol>
+        <h3 class="mt-4">If / Else / Elif</h3>
+        <ol start="22">
+            <li>Crie uma variável <code>nota</code> com um valor entre 0 e 10. Usando <code>if</code>, <code>elif</code>
+                e <code>else</code>, imprima:
+                <ul>
+                    <li><code>"Aprovado"</code> se a nota for maior ou igual a 7</li>
+                    <li><code>"Recuperação"</code> se a nota for entre 5 (inclusive) e 7 (exclusive)</li>
+                    <li><code>"Reprovado"</code> se a nota for menor que 5</li>
+                </ul>
+            </li>
+            <li>Crie uma variável <code>hora</code> com um valor inteiro de 0 a 23. Usando <code>if</code>,
+                <code>elif</code> e <code>else</code>, imprima:
+                <ul>
+                    <li><code>"Bom dia"</code> se for entre 6 e 11</li>
+                    <li><code>"Boa tarde"</code> se for entre 12 e 17</li>
+                    <li><code>"Boa noite"</code> se for entre 18 e 23</li>
+                    <li><code>"De madrugada"</code> caso contrário</li>
+                </ul>
+            </li>
+        </ol>
+        <h3 class="mt-4">Match / Case (Switch)</h3>
+        <ol start="24">
+            <li>Crie uma variável <code>dia</code> com um número de 1 a 7. Usando <code>match</code>/<code>case</code>,
+                imprima o nome do dia da semana correspondente (1 = Segunda, 2 = Terça, ... 7 = Domingo). Para qualquer
+                outro valor, imprima <code>"Dia inválido"</code>.
+            </li>
+            <li>Crie uma variável <code>operacao</code> com um dos valores: <code>"soma"</code>,
+                <code>"subtracao"</code>, <code>"multiplicacao"</code> ou <code>"divisao"</code>. Crie também as
+                variáveis <code>a = 10</code> e <code>b = 4</code>. Usando <code>match</code>/<code>case</code>,
+                calcule e imprima o resultado da operação correspondente. Para qualquer outro valor, imprima
+                <code>"Operação desconhecida"</code>.
+            </li>
+        </ol>
+        <h3 class="mt-4">Forzinho</h3>
+        <ol start="26">
+            <li>Dada a lista <code>numeros = [3, 7, 2, 9, 4, 6, 1, 8, 5, 10]</code>, use um laço <code>for</code>
+                combinado com <code>if</code> para:
+                <ul>
+                    <li>Imprimir apenas os números pares</li>
+                    <li>Calcular e imprimir a soma de todos os números ímpares</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+</body>
+
+</html>
